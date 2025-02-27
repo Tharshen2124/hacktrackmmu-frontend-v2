@@ -1,5 +1,4 @@
 import DashboardLayout from "@/components/DashboardLayout";
-import MeetupCard from "@/components/HackathonCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 // import { useState } from "react";
 

@@ -1,4 +1,4 @@
-import { Check, CheckCircle, CircleAlert, CircleHelp, FolderCheck, FolderCode, Hammer, Lightbulb, Speech, User } from "lucide-react";
+import { CheckCircle, CircleAlert, FolderCheck, FolderCode, Hammer, Lightbulb, Speech, User } from "lucide-react";
 import Modal from "../ModalLayout";
 import { useState } from "react";
 import { dateMod } from "@/utils/dateMod";
@@ -35,7 +35,7 @@ interface Meetup {
   date: string
 }
 
-export default function MemberCard({  name, active, projects }: MemberCardProps) {
+export default function MemberCard({  name, projects }: MemberCardProps) {
   const numberOfCompletedProjects = projects.filter(project => project.completed).length
   const numberOfUpdates = projects.reduce((acc, project) => acc + project.updates.length, 0)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
@@ -101,9 +101,9 @@ export default function MemberCard({  name, active, projects }: MemberCardProps)
     <h3 className="text-lg font-semibold mb-1">Talks</h3>
     <div className="overflow-y-auto border flex flex-col gap-y-2 px-4 py-3 mb-8 max-h-56 lg:max-h-96 rounded-md border-gray-700">
       {projects && projects.length !==0 ? (
-        projects.map((project) =>
+        projects.map((project, index: number) =>
           project.updates && projects.length !==0 ? (
-            project.updates.map((update: Update) => (
+            project.updates.map((update: Update, index: number) => (
               <div key={update.id}>
                 <div className="font-bold flex items-center">
                   <p className="font-semibold">{project.name}</p>
@@ -119,7 +119,7 @@ export default function MemberCard({  name, active, projects }: MemberCardProps)
               </div>
             ))
           ) : (
-            <p className="text-red-400 flex items-center gap-x-2">
+            <p key={index} className="text-red-400 flex items-center gap-x-2">
               <CircleAlert size="18" />
               No updates made 
             </p>

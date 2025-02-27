@@ -1,5 +1,5 @@
 import { dateMod } from '@/utils/dateMod';
-import { Hammer, Laptop, RefreshCcw, Timer, User } from 'lucide-react';
+import { Laptop, RefreshCcw, Timer, User } from 'lucide-react';
 import Modal from '../ModalLayout';
 import { useState } from 'react';
 
