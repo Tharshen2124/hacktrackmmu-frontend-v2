@@ -79,7 +79,7 @@ export default function MemberCard({  name, projects }: MemberCardProps) {
 
       <h3 className="text-lg font-semibold mb-1">Projects</h3>
       <div className="border border-gray-700 py-3 px-4 rounded-md mb-3 max-h-36 lg:max-h-48 overflow-y-auto">
-        { projects && projects.length != 0 ? projects.map((project: Project, index: number) => (
+        { projects && projects.length != 0 ? projects.map((project: Project) => (
            <> 
               {project.completed ? (
                 <p className="text-green-500 flex items-center gap-x-2">
@@ -103,7 +103,7 @@ export default function MemberCard({  name, projects }: MemberCardProps) {
       {projects && projects.length !==0 ? (
         projects.map((project, index: number) =>
           project.updates && projects.length !==0 ? (
-            project.updates.map((update: Update, index: number) => (
+            project.updates.map((update: Update) => (
               <div key={update.id}>
                 <div className="font-bold flex items-center">
                   <p className="font-semibold">{project.name}</p>

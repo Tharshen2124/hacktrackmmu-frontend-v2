@@ -1,5 +1,4 @@
 import DashboardLayout from "@/components/DashboardLayout";
-import { Phone } from "lucide-react";
 
 export default function Onboarding() {
   return (
