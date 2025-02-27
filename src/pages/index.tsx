@@ -1,69 +1,152 @@
-import DashboardLayout from "@/components/DashboardLayout";
-import HackathonCard from "@/components/HackathonCard";
-import MeetupCard from "@/components/MeetupCard";
-import MemberCard from "@/components/MemberCard";
-import { CircleArrowRight } from "lucide-react";
+import { motion } from "framer-motion"
+import { useEffect, useState } from "react"
+import dynamic from 'next/dynamic'
+import { useRouter } from "next/router"
 
-export default function Home() {
+// Client-side only component using dynamic import with SSR disabled
+const FloatingPathsClient = ({ position }: { position: number }) => {
+  const paths = Array.from({ length: 36 }, (_, i) => ({
+    id: i,
+    d: `M-${380 - i * 5 * position} -${189 + i * 6}C-${
+      380 - i * 5 * position
+    } -${189 + i * 6} -${312 - i * 5 * position} ${216 - i * 6} ${
+      152 - i * 5 * position
+    } ${343 - i * 6}C${616 - i * 5 * position} ${470 - i * 6} ${
+      684 - i * 5 * position
+    } ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
+    color: `rgba(15,23,42,${0.1 + i * 0.03})`,
+    width: 0.5 + i * 0.03,
+  }))
+
   return (
-   <> 
-      <DashboardLayout>
-        <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
-        <div className="mt-10">
-            <div className="flex justify-between items-center">
-              <h2 className="text-3xl font-semibold">Meetups</h2>
-              <a href="/meetups" className="flex items-center gap-x-2 dark:bg-white dark:hover:bg-[#e0e0e0] dark:text-black transition duration-200 bg-gray-800 hover:bg-gray-950 py-2 px-6 rounded-md font-semibold text-white">
-                <CircleArrowRight size="20"/>
-                View All
-              </a>
-            </div>
+    <div className="absolute inset-0 pointer-events-none">
+      <svg className="w-full h-full text-blue-600 dark:text-blue-500" viewBox="0 0 696 316" fill="none">
+        <title>Background Paths</title>
+        {paths.map((path) => (
+          <motion.path
+            key={path.id}
+            d={path.d}
+            stroke="currentColor"
+            strokeWidth={path.width}
+            strokeOpacity={0.1 + path.id * 0.03}
+            initial={{ pathLength: 0.3, opacity: 0.6 }}
+            animate={{
+              pathLength: 1,
+              opacity: [0.3, 0.6, 0.3],
+              pathOffset: [0, 1, 0],
+            }}
+            transition={{
+              duration: 20 + Math.random() * 10,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: "linear",
+            }}
+          />
+        ))}
+      </svg>
+    </div>
+  )
+}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-            <MeetupCard />
-            <MeetupCard />
-            <MeetupCard />
-            <MeetupCard />
+// Dynamic import with SSR disabled
+const FloatingPaths = dynamic(() => Promise.resolve(FloatingPathsClient), {
+  ssr: false
+})
+
+// Separate animation component for title animation
+const AnimatedTitle = ({ title }: { title: string }) => {
+  const words = title.split(" ")
+
+  return (
+    <h1 className="text-5xl sm:text-7xl md:text-8xl font-bold mb-8 tracking-tighter">
+      {words.map((word, wordIndex) => (
+        <span key={wordIndex} className="inline-block mr-4 last:mr-0">
+          {word.split("").map((letter, letterIndex) => (
+            <motion.span
+              key={`${wordIndex}-${letterIndex}`}
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{
+                delay: wordIndex * 0.1 + letterIndex * 0.03,
+                type: "spring",
+                stiffness: 150,
+                damping: 25,
+              }}
+              className="inline-block text-transparent bg-clip-text 
+                        bg-gradient-to-r from-blue-900 to-blue-700/80 
+                        dark:from-blue-600 dark:to-blue-400/80"
+            >
+              {letter}
+            </motion.span>
+          ))}
+        </span>
+      ))}
+    </h1>
+  )
+}
+
+// Main component with improved SSR handling
+export default function BackgroundPaths({title = "Hacktrack MMU",}: {title?: string}) {
+  
+  // Control the mounting of client-side animations
+  const [isMounted, setIsMounted] = useState(false)
+  const router = useRouter()
+  
+  // Handle client-side mounting
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+  
+  // Always render the container, even before client-side hydration
+  return (
+    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-white dark:bg-neutral-950">
+      {/* Conditional rendering of animations */}
+      {isMounted && (
+        <div className="absolute inset-0">
+          <FloatingPaths position={1} />
+          <FloatingPaths position={-1} />
+        </div>
+      )}
+
+      <div className="relative z-10 container mx-auto px-4 md:px-6 text-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 2 }}
+          className="max-w-4xl mx-auto"
+        >
+          {isMounted ? (
+            <AnimatedTitle title={title} />
+          ) : (
+            // fallback during SSR/before hydration
+            <h1 className="text-5xl sm:text-7xl md:text-8xl font-bold mb-8 tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-900 to-blue-700/80 dark:from-blue-600 dark:to-blue-400/80">
+              {title}
+            </h1>
+          )}
+
+          <div
+            className="inline-block group relative bg-gradient-to-b from-black/10 to-white/10 
+                        dark:from-white/10 dark:to-black/10 p-px rounded-2xl backdrop-blur-lg 
+                        overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
+          >
+            <button
+              className="rounded-[1.15rem] px-8 py-6 text-lg font-semibold backdrop-blur-md 
+                            bg-white/95 hover:bg-white/100 dark:bg-black/95 dark:hover:bg-black/100 
+                            text-black dark:text-white transition-all duration-300 
+                            group-hover:-translate-y-0.5 border border-black/10 dark:border-white/10
+                            hover:shadow-md dark:hover:shadow-neutral-800/50"
+              onClick={() => { router.push("/login") }}
+            >
+              <span className="opacity-90 group-hover:opacity-100 transition-opacity"> Login </span>
+              <span
+                className="ml-3 opacity-70 group-hover:opacity-100 group-hover:translate-x-1.5 
+                                transition-all duration-300"
+              >
+                →
+              </span>
+            </button>
           </div>
-
-        </div>
-
-        <div className="mt-10">
-            <div className="flex justify-between items-center">
-              <h2 className="text-3xl flex items-center font-semibold">Hackathons</h2>
-                <a href="/meetups" className="flex items-center gap-x-2 dark:bg-white dark:hover:bg-[#e0e0e0] dark:text-black transition duration-200 bg-gray-800 hover:bg-gray-950 py-2 px-6 rounded-md font-semibold text-white">
-                  <CircleArrowRight size="20"/>
-                  View All
-                </a>
-            </div>            
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-              <HackathonCard /> 
-              <HackathonCard /> 
-              <HackathonCard />  
-              <HackathonCard /> 
-
-            </div>
-        </div>
-
-        <div className="mt-10">
-            <div className="flex justify-between items-center">
-              <h2 className="text-3xl font-semibold">Members</h2>
-              <a href="/meetups" className="flex items-center gap-x-2 dark:bg-white dark:hover:bg-[#e0e0e0] dark:text-black transition duration-200 bg-gray-800 hover:bg-gray-950 py-2 px-6 rounded-md font-semibold text-white">
-                <CircleArrowRight size="20"/>
-                View All
-              </a>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-              <MemberCard />
-              <MemberCard />
-              <MemberCard />
-              <MemberCard />
-              <MemberCard />
-              <MemberCard />
-              <MemberCard />
-              <MemberCard />
-            </div>
-        </div>
-      </DashboardLayout>
-   </>    
-  );
+        </motion.div>
+      </div>
+    </div>
+  )
 }
