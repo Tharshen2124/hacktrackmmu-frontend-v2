@@ -1,28 +1,52 @@
 import DashboardLayout from "@/components/DashboardLayout";
+import HackathonCard from "@/components/HackathonCard";
+import MeetupCard from "@/components/MeetupCard";
+import useAuthStore from "@/store/useAuthStore";
+import { apiUrl } from "@/utils/env";
+import axios from "axios";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-// import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Meetups() {
-    // const [searchQuery, setSearchQuery] = useState("")
+    const { token } = useAuthStore();
+    const [paginationNumber, setPaginationNumber] = useState<number>(1)
+    const [meetups, setMeetups] = useState<any>()
+    const [hackathons, setHackathons] = useState<any>()
+    // const 
+    // const [isLoading, setIsLoading] = useState();
+    // const [error, seError] = useState();
 
-    // const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //   setSearchQuery(event.target.value)
-    //   // Here you would typically trigger your search logic
-    //   console.log("Searching for:", event.target.value)
-    // }
-  
+    useEffect(() => {
+
+
+        async function getData() {
+            const response = await axios.get(`${apiUrl}/api/v1/meetups/?page=${paginationNumber}`, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            setMeetups(response.data.data.regular_meetups)
+            setHackathons(response.data.data.hackathons)
+            
+        }
+
+        getData()
+    }, [paginationNumber]) 
+    
   return (
     <DashboardLayout>
         <div className="flex justify-between items-center">
             <h1 className="text-4xl font-bold">Meetups</h1>
             <div className="flex items-center border-2 border-gray-200 rounded-full w-fit">
-                <button className="text-black bg-white py-2 px-2 rounded-l-full transition duration-200 hover:bg-gray-200 active:bg-gray-400">
+                <button onClick={() => setPaginationNumber((prev) => prev - 1)} className="text-black bg-white py-2 px-2 rounded-l-full transition duration-200 hover:bg-gray-200 active:bg-gray-400">
                     <ChevronLeft />
                 </button>
                 <div className="text-black bg-white w-[75px] py-2 px-2 text-center">
-                    1 - 16
+                    {paginationNumber} - 16
                 </div>
-                <button className="text-black bg-white py-2 px-2 rounded-r-full transition duration-200 hover:bg-gray-200 active:bg-gray-400">
+                <button onClick={() => setPaginationNumber((prev) => prev + 1)} className="text-black bg-white py-2 px-2 rounded-r-full transition duration-200 hover:bg-gray-200 active:bg-gray-400">
                     <ChevronRight />
                 </button>
             </div>
@@ -39,11 +63,42 @@ export default function Meetups() {
                 <Search className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             </div>
         </div> */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-            {/* <MeetupCard /> 
-            <MeetupCard /> 
-            <MeetupCard />  
-            <MeetupCard />  */}
+        <div className="mt-10">
+            <div className="flex justify-between items-center">
+            <h2 className="text-3xl font-semibold">Regular Meetups</h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
+            {meetups && meetups.map((meetup: any, index: number) => (
+                <MeetupCard 
+                    key={index} 
+                    number={meetup.number} 
+                    date={meetup.date} 
+                    numberOfUpdates={meetup.updates.length} 
+                    hostName={meetup.host && meetup.host.name && meetup.host.name || "N/A"}  
+                    updates={meetup.updates}
+                />
+            ))}
+        </div>
+
+        </div>
+
+        <div className="mt-10">
+            <div className="flex justify-between items-center">
+            <h2 className="text-3xl flex items-center font-semibold">Hackathons</h2>
+            </div>            
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
+            {hackathons && hackathons.map((meetup: any) => (
+                <HackathonCard
+                    key={meetup.id} 
+                    number={meetup.number} 
+                    date={meetup.date} 
+                    numberOfUpdates={meetup.updates.length} 
+                    hostName={meetup.host && meetup.host.name && meetup.host.name || "N/A"}  
+                    updates={meetup.updates}
+                />
+            ))}
+            </div>
         </div>
     </DashboardLayout>
   )
