@@ -5,10 +5,13 @@ import { Sidebar } from "./sidebar"
 import Image from "next/image"
 import useAuthStore from "@/store/useAuthStore"
 import { useRouter } from "next/router"
+import { useDarkMode } from "@/hooks/useDarkMode"
 
 export default function NavigationBar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const { clearToken, clearValidUntil, clearAdmin } = useAuthStore()
+  const { isDarkMode } = useDarkMode()
+
   const router = useRouter()
 
   const toggleSidebar = () => {
@@ -28,7 +31,11 @@ export default function NavigationBar() {
       <nav className="border-b dark:border-[#333] border-[#e0e0e0] w-full h-[70px] flex items-center">
         <div className="container w-[95%] mx-auto flex items-center justify-between">
           <div className="flex items-center">
-            <Image src="/hackerspaceLogo1.svg" alt="logo" className="md:w-14 md:h-14" width={40} height={40} />
+            {isDarkMode ? (
+              <Image src="/hackerspaceLogoWhite.svg" alt="logo" className="md:w-12 md:h-12" width={40} height={40} />
+            ) : (
+              <Image src="/hackerspaceLogo.svg" alt="logo" className="md:w-14 md:h-14" width={40} height={40} />
+            )}
             <h1 className="ml-2 text-lg md:text-xl font-bold">Hackerspace MMU</h1>
           </div>
           <div className="hidden lg:flex items-center">

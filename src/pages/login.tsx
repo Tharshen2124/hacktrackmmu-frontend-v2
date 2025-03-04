@@ -6,6 +6,7 @@ import { LoaderCircle, Eye, EyeOff } from "lucide-react"
 import Image from "next/image"
 import { useToast } from "@/components/Toast/ToastProvider"
 import { useRouter } from "next/router"
+import { useDarkMode } from "@/hooks/useDarkMode"
 
 const images = [
   "/presentation.jpg",
@@ -22,6 +23,7 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [waitMessage, setWaitMessage] = useState<boolean>(false)  
   const { setToken, setAdmin, setValidUntil } = useAuthStore();
+  const { isDarkMode } = useDarkMode()
   const { showToast } = useToast()
   const router = useRouter()
 
@@ -98,9 +100,13 @@ export default function LoginPage() {
       <div className="flex flex-col justify-center items-center p-8 bg-white dark:bg-[#111]">
         <div className="w-full max-w-md">
           {/* Logo placeholder */}
-          <div className="mx-auto dark:bg-white dark:w-[180px] py-4 rounded-md flex items-center justify-center">
-            <Image src="/hackerspaceLogo.svg" alt="Hacktrack MMU" className="flex justify-center" width={150} height={150} />
-          </div>
+            { 
+              isDarkMode ? (
+                <Image src="/hackerspaceLogoWhite.svg" alt="Hacktrack MMU" className="flex justify-center items-center mx-auto" width={130} height={130} />
+              ) : (
+                <Image src="/hackerspaceLogo.svg" alt="Hacktrack MMU" className="flex justify-center items-center mx-auto" width={150} height={150} />
+              )
+            }
     
           {/* Welcome text */}
           <h2 className="mt-6 text-center text-3xl font-extrabold dark:text-white text-gray-900">Welcome to Hacktrack MMU</h2>
