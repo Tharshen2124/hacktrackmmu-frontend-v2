@@ -2,15 +2,20 @@ import DashboardLayout from "@/components/DashboardLayout";
 import HackathonCard from "@/components/HackathonCard";
 import MeetupCard from "@/components/MeetupCard";
 import MemberCard from "@/components/MemberCard";
+import { useToast } from "@/components/Toast/ToastProvider";
 import useAuthStore from "@/store/useAuthStore";
 import { apiUrl } from "@/utils/env";
+import { isTokenExpired } from "@/utils/isTokenExpired";
 import axios from "axios";
 import { CircleArrowRight } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-    const { token } = useAuthStore();
+    const { token, validUntil } = useAuthStore();
+    const router = useRouter()
+    const { showToast } = useToast()
     const [members, setMembers] = useState<any>([]);
     const [meetups, setMeetups] = useState<any>([]);
     const [hackathons, setHackathons] = useState<any>([])
@@ -18,6 +23,12 @@ export default function Home() {
     const [showError, setShowError] = useState<boolean>(false);
     
     useEffect(() => {
+        if(isTokenExpired(validUntil)) {
+            router.push('/login')
+            showToast('You are not authorised to view this page. Login first.', "error")
+            return 
+        }
+        
         async function getData() {
             try {
                 function getMembers() {

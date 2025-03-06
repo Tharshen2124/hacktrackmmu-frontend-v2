@@ -50,15 +50,16 @@ export default function MemberCard({  name, projects }: MemberCardProps) {
 
   return (
     <>
-    <div
-      onClick={handleCardClick} 
-      className="bg-white dark:bg-[#222] rounded-lg p-4 border border-gray-600 hover:border-gray-200 hover:shadow-[0px_0px_8px_1px_rgba(0,_0,_0,_0.1)] hover:shadow-gray-200/50 active:shadow-none transition duration-200">
-      <h1 className="text-lg flex items-center">
-        <User size="18" className="mr-2" />
-        <span className="font-bold">
-          {name.length > 20 ? name.slice(0, 30) + "..." : name}
-        </span>
-      </h1>
+      <div
+        onClick={handleCardClick} 
+        className="bg-white dark:bg-[#222] rounded-lg p-4 border border-gray-600 hover:border-gray-200 hover:shadow-[0px_0px_8px_1px_rgba(0,_0,_0,_0.1)] hover:shadow-gray-200/50 active:shadow-none transition duration-200"
+      >
+        <h1 className="text-lg flex items-center">
+          <User size="18" className="mr-2" />
+          <span className="font-bold">
+            {name.length > 20 ? name.slice(0, 30) + "..." : name}
+          </span>
+        </h1>
       <hr className="border-gray-600 mb-2" />
       <p className="flex items-center">
         <FolderCode size="16" className="mr-2" />

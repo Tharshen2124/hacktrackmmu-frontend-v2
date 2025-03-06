@@ -1,25 +1,36 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import HackathonCard from "@/components/HackathonCard";
 import MeetupCard from "@/components/MeetupCard";
+import { SkeletonHackathonCard } from "@/components/skeletonComponents/SkeletonHackathonCard";
+import { useToast } from "@/components/Toast/ToastProvider";
 import useAuthStore from "@/store/useAuthStore";
 import { apiUrl } from "@/utils/env";
+import { isTokenExpired } from "@/utils/isTokenExpired";
 import axios from "axios";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 export default function Meetups() {
-    const { token } = useAuthStore();
+    const { token, validUntil } = useAuthStore();
     const [paginationNumber, setPaginationNumber] = useState<number>(1)
     const [meetups, setMeetups] = useState<any>()
     const [hackathons, setHackathons] = useState<any>()
-    // const 
-    // const [isLoading, setIsLoading] = useState();
-    // const [error, seError] = useState();
-
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const router = useRouter()
+    const { showToast } = useToast()
+    
+    console.log(isLoading)
+    
     useEffect(() => {
-
-
+        if(isTokenExpired(validUntil)) {
+            router.push('/login')
+            showToast('You are not authorised to view this page. Login first.', "error")
+            return 
+        }
+        
         async function getData() {
+            setIsLoading(true)
             const response = await axios.get(`${apiUrl}/api/v1/meetups/?page=${paginationNumber}`, {
                 headers: {
                     Accept: 'application/json',
@@ -29,11 +40,44 @@ export default function Meetups() {
 
             setMeetups(response.data.data.regular_meetups)
             setHackathons(response.data.data.hackathons)
-            
+            setIsLoading(false)
         }
 
         getData()
     }, [paginationNumber]) 
+
+    if(isLoading) {
+        return (
+            <DashboardLayout>
+                <div className="flex justify-between items-center">
+                    <h1 className="text-4xl font-bold">Meetups</h1>
+                </div>
+                <div className="mt-10">
+                    <div className="flex justify-between items-center">
+                    <h2 className="text-3xl font-semibold">Regular Meetups</h2>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
+                        {Array.from({ length: 28 }).map((_, index) => (
+                            <SkeletonHackathonCard key={index} />
+                        ))}
+                    </div>
+
+                </div>
+
+                <div className="mt-10">
+                    <div className="flex justify-between items-center">
+                    <h2 className="text-3xl flex items-center font-semibold">Hackathons</h2>
+                    </div>            
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
+                        {Array.from({ length: 28 }).map((_, index) => (
+                            <SkeletonHackathonCard key={index} />
+                        ))}
+                    </div>
+                </div>
+            </DashboardLayout>
+        )
+        
+    }
     
   return (
     <DashboardLayout>

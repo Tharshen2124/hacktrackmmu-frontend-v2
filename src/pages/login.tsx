@@ -71,8 +71,12 @@ export default function LoginPage() {
     } catch (error: any) {
       setIsSubmitting(false);
       
-      if(error.response && error.response?.data?.message === "Invalid password") {
+      if(error.response && error.response.data?.message === "Invalid password") {
         showToast("Invalid password. Try again.", "error")
+      } else if(error.response && error.response.data.includes("We're sorry, but something went wrong")) {
+        showToast("Service is down now. Check back later.", "error")
+      } else {
+        showToast("Error occured, try again later.", "error")
       }
     }
   }
