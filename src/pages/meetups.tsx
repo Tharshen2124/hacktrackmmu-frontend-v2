@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 export default function Meetups() {
     const { token } = useAuthStore();
     const [paginationNumber, setPaginationNumber] = useState<number>(1)
+    const [totalPagination, setTotalPagination] = useState<number>(1)
     const [meetups, setMeetups] = useState<any>()
     const [hackathons, setHackathons] = useState<any>()
     // const 
@@ -17,8 +18,6 @@ export default function Meetups() {
     // const [error, seError] = useState();
 
     useEffect(() => {
-
-
         async function getData() {
             const response = await axios.get(`${apiUrl}/api/v1/meetups/?page=${paginationNumber}`, {
                 headers: {
@@ -29,7 +28,7 @@ export default function Meetups() {
 
             setMeetups(response.data.data.regular_meetups)
             setHackathons(response.data.data.hackathons)
-            
+            setTotalPagination(response.data.meta.regular_meetups.total_pages)
         }
 
         getData()
@@ -40,13 +39,13 @@ export default function Meetups() {
         <div className="flex justify-between items-center">
             <h1 className="text-4xl font-bold">Meetups</h1>
             <div className="flex items-center border-2 border-gray-200 rounded-full w-fit">
-                <button onClick={() => setPaginationNumber((prev) => prev - 1)} className="text-black bg-white py-2 px-2 rounded-l-full transition duration-200 hover:bg-gray-200 active:bg-gray-400">
+                <button onClick={() => setPaginationNumber((prev) => (prev - 1) < 1 ? prev : prev - 1)} className="text-black bg-white py-2 px-2 rounded-l-full transition duration-200 hover:bg-gray-200 active:bg-gray-400">
                     <ChevronLeft />
                 </button>
                 <div className="text-black bg-white w-[75px] py-2 px-2 text-center">
-                    {paginationNumber} - 16
+                    {paginationNumber} - {totalPagination}
                 </div>
-                <button onClick={() => setPaginationNumber((prev) => prev + 1)} className="text-black bg-white py-2 px-2 rounded-r-full transition duration-200 hover:bg-gray-200 active:bg-gray-400">
+                <button onClick={() => setPaginationNumber((prev) => (prev + 1) > totalPagination ? prev : prev + 1)} className="text-black bg-white py-2 px-2 rounded-r-full transition duration-200 hover:bg-gray-200 active:bg-gray-400">
                     <ChevronRight />
                 </button>
             </div>
