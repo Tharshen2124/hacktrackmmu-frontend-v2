@@ -1,8 +1,8 @@
-import Link from "next/link"
+import Link from "next/link";
 
 interface SidebarProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
@@ -35,7 +35,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -60,7 +65,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </Link>
           </nav>
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Admin Mode</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+              Admin Mode
+            </p>
             <button className="w-full bg-gray-800 text-white dark:bg-white dark:text-black font-semibold py-2 px-4 rounded-md hover:bg-gray-700 dark:hover:bg-gray-100 transition duration-200">
               Logout
             </button>
@@ -68,8 +75,5 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
       </div>
     </>
-  )
+  );
 }
-
-
-
