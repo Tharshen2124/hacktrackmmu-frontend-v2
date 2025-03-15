@@ -8,7 +8,7 @@ interface OnboardingMemberModalProps {
   memberInfo?: any
 }
 
-export function OnboardingMemberModal({isModalOpen, handleCloseModal, memberInfo}: OnboardingMemberModalProps) {
+export function OnboardingMemberModal({isModalOpen, handleCloseModal}: OnboardingMemberModalProps) {
   const { showToast } = useToast()
   
   const copyToClipBoard = async () => {

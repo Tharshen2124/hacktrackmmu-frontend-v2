@@ -34,7 +34,7 @@ export default function Meetups() {
               setTotalPagination(response.data.meta.regular_meetups.total_pages);        
         } catch(error: any) {
             setIsError(true)
-            console.log("Error occured and caught")
+            console.log("Error occured and caught", error)
         }
     }
 

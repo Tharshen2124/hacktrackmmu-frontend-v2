@@ -1,7 +1,5 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { ErrorPage } from "@/components/errorComponent";
-import HackathonCard from "@/components/HackathonCard";
-import MeetupCard from "@/components/MeetupCard";
 import MemberCard from "@/components/MemberCard";
 import useAuthStore from "@/store/useAuthStore";
 import { apiUrl } from "@/utils/env";
@@ -86,7 +84,7 @@ export default function Members() {
       <div className="mt-10">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
           {members &&
-            members.map((member: any, index: number) => (
+            members.map((member: any) => (
               <MemberCard
                 key={member.id}
                 name={member.name}
