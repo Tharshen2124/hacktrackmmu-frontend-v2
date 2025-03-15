@@ -1,7 +1,7 @@
-import { motion } from "framer-motion"
-import { useEffect, useState } from "react"
-import dynamic from 'next/dynamic'
-import { useRouter } from "next/router"
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
 
 // Client-side only component using dynamic import with SSR disabled
 const FloatingPathsClient = ({ position }: { position: number }) => {
@@ -16,11 +16,15 @@ const FloatingPathsClient = ({ position }: { position: number }) => {
     } ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
     color: `rgba(15,23,42,${0.1 + i * 0.03})`,
     width: 0.5 + i * 0.03,
-  }))
+  }));
 
   return (
     <div className="absolute inset-0 pointer-events-none">
-      <svg className="w-full h-full text-blue-600 dark:text-blue-500" viewBox="0 0 696 316" fill="none">
+      <svg
+        className="w-full h-full text-blue-600 dark:text-blue-500"
+        viewBox="0 0 696 316"
+        fill="none"
+      >
         <title>Background Paths</title>
         {paths.map((path) => (
           <motion.path
@@ -44,17 +48,17 @@ const FloatingPathsClient = ({ position }: { position: number }) => {
         ))}
       </svg>
     </div>
-  )
-}
+  );
+};
 
 // Dynamic import with SSR disabled
 const FloatingPaths = dynamic(() => Promise.resolve(FloatingPathsClient), {
-  ssr: false
-})
+  ssr: false,
+});
 
 // Separate animation component for title animation
 const AnimatedTitle = ({ title }: { title: string }) => {
-  const words = title.split(" ")
+  const words = title.split(" ");
 
   return (
     <h1 className="text-5xl sm:text-7xl md:text-8xl font-bold mb-8 tracking-tighter">
@@ -81,21 +85,24 @@ const AnimatedTitle = ({ title }: { title: string }) => {
         </span>
       ))}
     </h1>
-  )
-}
+  );
+};
 
 // Main component with improved SSR handling
-export default function BackgroundPaths({title = "Hacktrack MMU",}: {title?: string}) {
-  
+export default function BackgroundPaths({
+  title = "Hacktrack MMU",
+}: {
+  title?: string;
+}) {
   // Control the mounting of client-side animations
-  const [isMounted, setIsMounted] = useState(false)
-  const router = useRouter()
-  
+  const [isMounted, setIsMounted] = useState(false);
+  const router = useRouter();
+
   // Handle client-side mounting
   useEffect(() => {
-    setIsMounted(true)
-  }, [])
-  
+    setIsMounted(true);
+  }, []);
+
   // Always render the container, even before client-side hydration
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-white dark:bg-neutral-950">
@@ -134,9 +141,14 @@ export default function BackgroundPaths({title = "Hacktrack MMU",}: {title?: str
                             text-black dark:text-white transition-all duration-300 
                             group-hover:-translate-y-0.5 border border-black/10 dark:border-white/10
                             hover:shadow-md dark:hover:shadow-neutral-800/50"
-              onClick={() => { router.push("/login") }}
+              onClick={() => {
+                router.push("/login");
+              }}
             >
-              <span className="opacity-90 group-hover:opacity-100 transition-opacity"> Login </span>
+              <span className="opacity-90 group-hover:opacity-100 transition-opacity">
+                {" "}
+                Login{" "}
+              </span>
               <span
                 className="ml-3 opacity-70 group-hover:opacity-100 group-hover:translate-x-1.5 
                                 transition-all duration-300"
@@ -148,5 +160,5 @@ export default function BackgroundPaths({title = "Hacktrack MMU",}: {title?: str
         </motion.div>
       </div>
     </div>
-  )
+  );
 }

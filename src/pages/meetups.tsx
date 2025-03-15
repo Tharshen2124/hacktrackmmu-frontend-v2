@@ -1,4 +1,5 @@
 import DashboardLayout from "@/components/DashboardLayout";
+import { ErrorPage } from "@/components/errorComponent";
 import HackathonCard from "@/components/HackathonCard";
 import MeetupCard from "@/components/MeetupCard";
 import useAuthStore from "@/store/useAuthStore";
@@ -8,49 +9,71 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function Meetups() {
-    const { token } = useAuthStore();
-    const [paginationNumber, setPaginationNumber] = useState<number>(1)
-    const [totalPagination, setTotalPagination] = useState<number>(1)
-    const [meetups, setMeetups] = useState<any>()
-    const [hackathons, setHackathons] = useState<any>()
-    // const 
-    // const [isLoading, setIsLoading] = useState();
-    // const [error, seError] = useState();
+  const { token } = useAuthStore();
+  const [paginationNumber, setPaginationNumber] = useState<number>(1);
+  const [totalPagination, setTotalPagination] = useState<number>(1);
+  const [meetups, setMeetups] = useState<any>();
+  const [hackathons, setHackathons] = useState<any>();
+  const [isError, setIsError] = useState<any>();
 
-    useEffect(() => {
-        async function getData() {
-            const response = await axios.get(`${apiUrl}/api/v1/meetups/?page=${paginationNumber}`, {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
-            setMeetups(response.data.data.regular_meetups)
-            setHackathons(response.data.data.hackathons)
-            setTotalPagination(response.data.meta.regular_meetups.total_pages)
+  useEffect(() => {
+    async function getData() {
+        try {
+            const response = await axios.get(
+                `${apiUrl}/api/v1/meetups/?page=${paginationNumber}`,
+                {
+                  headers: {
+                    Accept: "application/json",
+                    Authorization: `Bearer ${token}`,
+                  },
+                },
+              );
+        
+              setMeetups(response.data.data.regular_meetups);
+              setHackathons(response.data.data.hackathons);
+              setTotalPagination(response.data.meta.regular_meetups.total_pages);        
+        } catch(error: any) {
+            setIsError(true)
+            console.log("Error occured and caught")
         }
+    }
 
-        getData()
-    }, [paginationNumber]) 
-    
+    getData();
+  }, [paginationNumber]);
+
+  if(isError) {
+    return <ErrorPage />
+  }
+
   return (
     <DashboardLayout>
-        <div className="flex justify-between items-center">
-            <h1 className="text-4xl font-bold">Meetups</h1>
-            <div className="flex items-center border-2 border-gray-200 rounded-full w-fit">
-                <button onClick={() => setPaginationNumber((prev) => (prev - 1) < 1 ? prev : prev - 1)} className="text-black bg-white py-2 px-2 rounded-l-full transition duration-200 hover:bg-gray-200 active:bg-gray-400">
-                    <ChevronLeft />
-                </button>
-                <div className="text-black bg-white w-[75px] py-2 px-2 text-center">
-                    {paginationNumber} - {totalPagination}
-                </div>
-                <button onClick={() => setPaginationNumber((prev) => (prev + 1) > totalPagination ? prev : prev + 1)} className="text-black bg-white py-2 px-2 rounded-r-full transition duration-200 hover:bg-gray-200 active:bg-gray-400">
-                    <ChevronRight />
-                </button>
-            </div>
+      <div className="flex justify-between items-center">
+        <h1 className="text-4xl font-bold">Meetups</h1>
+        <div className="flex items-center border-2 border-gray-200 rounded-full w-fit">
+          <button
+            onClick={() =>
+              setPaginationNumber((prev) => (prev - 1 < 1 ? prev : prev - 1))
+            }
+            className="text-black bg-white py-2 px-2 rounded-l-full transition duration-200 hover:bg-gray-200 active:bg-gray-400"
+          >
+            <ChevronLeft />
+          </button>
+          <div className="text-black bg-white w-[75px] py-2 px-2 text-center">
+            {paginationNumber} - {totalPagination}
+          </div>
+          <button
+            onClick={() =>
+              setPaginationNumber((prev) =>
+                prev + 1 > totalPagination ? prev : prev + 1,
+              )
+            }
+            className="text-black bg-white py-2 px-2 rounded-r-full transition duration-200 hover:bg-gray-200 active:bg-gray-400"
+          >
+            <ChevronRight />
+          </button>
         </div>
-        {/* <div className="relative mt-4">
+      </div>
+      {/* <div className="relative mt-4">
             <input
                 type="text"
                 placeholder="Search meetups..."
@@ -62,43 +85,50 @@ export default function Meetups() {
                 <Search className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             </div>
         </div> */}
-        <div className="mt-10">
-            <div className="flex justify-between items-center">
-            <h2 className="text-3xl font-semibold">Regular Meetups</h2>
-            </div>
+      <div className="mt-10">
+        <div className="flex justify-between items-center">
+          <h2 className="text-3xl font-semibold">Regular Meetups</h2>
+        </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-            {meetups && meetups.map((meetup: any, index: number) => (
-                <MeetupCard 
-                    key={index} 
-                    number={meetup.number} 
-                    date={meetup.date} 
-                    numberOfUpdates={meetup.updates.length} 
-                    hostName={meetup.host && meetup.host.name && meetup.host.name || "N/A"}  
-                    updates={meetup.updates}
-                />
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
+          {meetups &&
+            meetups.map((meetup: any, index: number) => (
+              <MeetupCard
+                key={index}
+                number={meetup.number}
+                date={meetup.date}
+                numberOfUpdates={meetup.updates.length}
+                hostName={
+                  (meetup.host && meetup.host.name && meetup.host.name) || "N/A"
+                }
+                updates={meetup.updates}
+              />
             ))}
         </div>
+      </div>
 
+      <div className="mt-10">
+        <div className="flex justify-between items-center">
+          <h2 className="text-3xl flex items-center font-semibold">
+            Hackathons
+          </h2>
         </div>
-
-        <div className="mt-10">
-            <div className="flex justify-between items-center">
-            <h2 className="text-3xl flex items-center font-semibold">Hackathons</h2>
-            </div>            
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-            {hackathons && hackathons.map((meetup: any) => (
-                <HackathonCard
-                    key={meetup.id} 
-                    number={meetup.number} 
-                    date={meetup.date} 
-                    numberOfUpdates={meetup.updates.length} 
-                    hostName={meetup.host && meetup.host.name && meetup.host.name || "N/A"}  
-                    updates={meetup.updates}
-                />
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
+          {hackathons &&
+            hackathons.map((meetup: any) => (
+              <HackathonCard
+                key={meetup.id}
+                number={meetup.number}
+                date={meetup.date}
+                numberOfUpdates={meetup.updates.length}
+                hostName={
+                  (meetup.host && meetup.host.name && meetup.host.name) || "N/A"
+                }
+                updates={meetup.updates}
+              />
             ))}
-            </div>
         </div>
+      </div>
     </DashboardLayout>
-  )
+  );
 }

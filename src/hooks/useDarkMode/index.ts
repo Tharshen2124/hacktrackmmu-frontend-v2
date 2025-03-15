@@ -8,31 +8,30 @@ import { useEffect, useState } from "react";
  */
 
 interface DarkModeReturnProps {
-    isDarkMode: boolean
-    toggle: () => void
+  isDarkMode: boolean;
+  toggle: () => void;
 }
 
-export function useDarkMode():DarkModeReturnProps {
-    const [isDarkMode, setDarkMode] = useState<boolean>(false);
+export function useDarkMode(): DarkModeReturnProps {
+  const [isDarkMode, setDarkMode] = useState<boolean>(false);
 
-    useEffect(() => {
-        if(typeof window === "undefined") return
-            
-        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+  useEffect(() => {
+    if (typeof window === "undefined") return;
 
-        setDarkMode(mediaQuery.matches)
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-        const handleChange = (e: MediaQueryListEvent) => setDarkMode(e.matches)
+    setDarkMode(mediaQuery.matches);
 
-        mediaQuery.addEventListener("change", handleChange)
+    const handleChange = (e: MediaQueryListEvent) => setDarkMode(e.matches);
 
-        return () => {
-            mediaQuery.removeEventListener("change", handleChange);
-        }
+    mediaQuery.addEventListener("change", handleChange);
 
-    }, [])
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
+  }, []);
 
-    const toggle = () => setDarkMode((prev) => !prev)
-    
-    return { isDarkMode, toggle }
+  const toggle = () => setDarkMode((prev) => !prev);
+
+  return { isDarkMode, toggle };
 }

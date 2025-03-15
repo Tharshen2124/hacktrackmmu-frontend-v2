@@ -1,0 +1,12 @@
+<svg width="304" height="185" viewBox="0 0 304 185" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="6" y="6" width="292" height="137" stroke="white" stroke-width="12"/>
+<rect x="140.5" y="151.5" width="23" height="13" fill="white" stroke="white" stroke-width="5"/>
+<rect x="103.5" y="169.5" width="98" height="13" fill="white" stroke="white" stroke-width="5"/>
+<rect y="-0.705164" width="27.207" height="6.05174" rx="3.02587" transform="matrix(-0.709045 -0.705164 0.709045 -0.705164 118.5 64.6609)" fill="white" stroke="white"/>
+<rect x="0.709045" width="27.207" height="6.05174" rx="3.02587" transform="matrix(0.709045 -0.705164 0.709045 0.705164 98.2063 61.5273)" fill="white" stroke="white"/>
+<rect y="-0.705164" width="27.207" height="6.05174" rx="3.02587" transform="matrix(-0.709045 -0.705164 0.709045 -0.705164 201.793 64.6609)" fill="white" stroke="white"/>
+<rect x="0.709045" width="27.207" height="6.05174" rx="3.02587" transform="matrix(0.709045 -0.705164 0.709045 0.705164 181.5 61.5273)" fill="white" stroke="white"/>
+<rect x="124.5" y="83.5" width="55" height="7" fill="white" stroke="white"/>
+<path d="M159.5 88.5H177.5V98.5C177.5 103.471 173.471 107.5 168.5 107.5C163.529 107.5 159.5 103.471 159.5 98.5V88.5Z" fill="white" stroke="white" stroke-width="5"/>
+<rect x="166.5" y="91.5" width="4" height="8" fill="white" stroke="white"/>
+</svg>
