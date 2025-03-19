@@ -37,7 +37,7 @@ export default function Onboarding() {
               <th className="text-left flex items-center gap-x-3 py-4 px-4 bg-[#1e1e1e] rounded-tl-lg">
                 Status
                 <div className="border rounded-md p-[5px] bg-gray-900 border-gray-700 hover:bg-gray-800 active:border-gray-600 active:outline active:outline-1 active:outline-gray-600 transition duration-100">
-                  <Filter size="20"/>
+                  <Filter size="20" />
                 </div>
               </th>
               <th className="text-left pl-2 pr-8 bg-[#1e1e1e] rounded-tl-lg w-[297px]">
@@ -53,7 +53,7 @@ export default function Onboarding() {
               <OnboardingTableRow />
             </tr>
             <tr className="border border-gray-800">
-             <OnboardingTableRow />
+              <OnboardingTableRow />
             </tr>
             <tr className="border border-gray-800">
               <OnboardingTableRow />

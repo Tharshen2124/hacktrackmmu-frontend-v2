@@ -1,3 +1,4 @@
+import ControlPanel from "@/components/Admin/ControlPanel";
 import DashboardLayout from "@/components/DashboardLayout";
 import HackathonCard from "@/components/HackathonCard";
 import MeetupCard from "@/components/MeetupCard";
@@ -10,7 +11,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const { token } = useAuthStore();
+  const { token, isAdmin } = useAuthStore();
   const [members, setMembers] = useState<any>([]);
   const [meetups, setMeetups] = useState<any>([]);
   const [hackathons, setHackathons] = useState<any>([]);
@@ -87,6 +88,9 @@ export default function Home() {
     <>
       <DashboardLayout>
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
+
+        {isAdmin && <ControlPanel />}
+
         <div className="mt-10">
           <div className="flex justify-between items-center">
             <h2 className="text-3xl font-semibold">Meetups</h2>
@@ -98,7 +102,6 @@ export default function Home() {
               View All
             </Link>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
             {meetups &&
               meetups.map((meetup: any, index: number) => (

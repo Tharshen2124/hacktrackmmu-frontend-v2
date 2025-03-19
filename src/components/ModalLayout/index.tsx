@@ -6,7 +6,11 @@ interface ModalProps {
   children: React.ReactNode;
 }
 
-export const ModalLayout: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
+export const ModalLayout: React.FC<ModalProps> = ({
+  isOpen,
+  onClose,
+  children,
+}) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

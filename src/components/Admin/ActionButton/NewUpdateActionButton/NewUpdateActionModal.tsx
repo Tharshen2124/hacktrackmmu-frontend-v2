@@ -1,23 +1,17 @@
 import { ModalLayout } from "@/components/ModalLayout";
 import { useToast } from "@/components/Toast/ToastProvider";
-import { Copy, Edit, Trash } from "lucide-react";
+import { Edit, Trash } from "lucide-react";
 
-interface OnboardingMemberModalProps {
+interface NewUpdateActionModalProps {
   isModalOpen: boolean;
   handleCloseModal: () => void;
-  memberInfo?: any;
 }
 
-export function OnboardingMemberModal({
+export function NewUpdateActionModal({
   isModalOpen,
   handleCloseModal,
-}: OnboardingMemberModalProps) {
+}: NewUpdateActionModalProps) {
   const { showToast } = useToast();
-
-  const copyToClipBoard = async () => {
-    await navigator.clipboard.writeText("hello");
-    showToast("item copied to clipboard", "info");
-  };
 
   const status = "Active";
 
@@ -43,21 +37,11 @@ export function OnboardingMemberModal({
           <span className="font-semibold">Email:</span>{" "}
           tharshensurianbalan@gmail.com
         </p>
-        <Copy
-          onClick={() => copyToClipBoard()}
-          className="hover:text-gray-400 active:text-green-500"
-          size="16"
-        />
       </div>
       <div className="flex items-center justify-between border border-gray-700 py-3 px-4 rounded-md">
         <p>
           <span className="font-semibold">Contact Number:</span> 0123123123
         </p>
-        <Copy
-          onClick={() => copyToClipBoard()}
-          className="hover:text-gray-400 active:text-green-500"
-          size="16"
-        />
       </div>
 
       <h3 className="text-lg font-semibold mb-1 mt-4">Other Information</h3>
