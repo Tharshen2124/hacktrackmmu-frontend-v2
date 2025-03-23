@@ -1,11 +1,12 @@
 import { Speech } from "lucide-react";
 import { ActionButton } from "..";
 import { useState } from "react";
-import { NewProjectActionModal } from "../NewProjectActionButton/NewProjectActionModal";
+import { NewUpdateActionModal } from "./NewUpdateActionModal";
 
 export function NewUpdateActionButton() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  
+  const handleViewClick = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
   return (
@@ -13,13 +14,13 @@ export function NewUpdateActionButton() {
       <ActionButton
         label="New Update"
         icon={<Speech />}
-        onClick={handleCloseModal}
-        bgColor="border-purple-500"
-        textColor="text-purple-500"
-        hoverShadowColor="hover:shadow-purple-500/50"
+        onClick={handleViewClick}
+        bgColor="border-red-500"
+        textColor="text-red-500"
+        hoverShadowColor="hover:shadow-red-500/50"
       />
 
-      <NewProjectActionModal
+      <NewUpdateActionModal
         isModalOpen={isModalOpen}
         handleCloseModal={handleCloseModal}
       />

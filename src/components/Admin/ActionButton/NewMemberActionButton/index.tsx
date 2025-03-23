@@ -6,6 +6,7 @@ import { NewMemberActionModal } from "./NewMemberActionModal";
 export function NewMemberActionButton() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const handleViewClick = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
   return (
@@ -13,7 +14,7 @@ export function NewMemberActionButton() {
       <ActionButton
         label="New Member"
         icon={<UserPlus />}
-        onClick={handleCloseModal}
+        onClick={handleViewClick}
         bgColor="border-blue-500"
         textColor="text-blue-500"
         hoverShadowColor="hover:shadow-blue-500/50"
