@@ -89,7 +89,15 @@ export default function Home() {
       <DashboardLayout>
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
 
-        {isAdmin && <ControlPanel />}
+        {
+          isAdmin && 
+            <ControlPanel 
+              members={members}
+              meetups={meetups}
+              token={token}
+              // meetup={meetups}
+            />
+        }
 
         <div className="mt-10">
           <div className="flex justify-between items-center">

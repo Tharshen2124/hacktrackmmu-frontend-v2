@@ -3,7 +3,7 @@ import { useState } from "react";
 import { NewProjectActionModal } from "./NewProjectActionModal";
 import { FolderOpen } from "lucide-react";
 
-export function NewProjectActionButton() {
+export function NewProjectActionButton({ members }: any) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleViewClick = () => setIsModalOpen(true);
@@ -23,6 +23,7 @@ export function NewProjectActionButton() {
       <NewProjectActionModal
         isModalOpen={isModalOpen}
         handleCloseModal={handleCloseModal}
+        members={members}
       />
     </>
   );

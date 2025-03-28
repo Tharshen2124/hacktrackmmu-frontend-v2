@@ -1,16 +1,21 @@
 import { ModalLayout } from "@/components/ModalLayout";
 import { useToast } from "@/components/Toast/ToastProvider";
+import { useState } from "react";
 
 interface NewProjectActionModalProps {
   isModalOpen: boolean;
   handleCloseModal: () => void;
+  members?: any
 }
 
 export function NewProjectActionModal({
   isModalOpen,
   handleCloseModal,
+  members
 }: NewProjectActionModalProps) {
   const { showToast } = useToast();
+  const [projectName, setProjectName] = useState<string>("")
+  const [projectCategory, setProjectCategory] = useState<string>("")
 
   async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -25,7 +30,7 @@ export function NewProjectActionModal({
       <form action="" className="flex flex-col gap-y-4" onSubmit={(e: React.SyntheticEvent<HTMLFormElement>) => handleSubmit(e)}>
         <div>
           <label htmlFor="" className="font-semibold">Name</label>
-          <input type="text" className="mt-1 flex w-full dark:bg-[#333] dark:border-[#555] rounded-md border border-input bg-background px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus:ring-blue-400 dark:focus:ring-blue-500" />
+          <input type="text" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProjectName(e.target.value)} className="mt-1 flex w-full dark:bg-[#333] dark:border-[#555] rounded-md border border-input bg-background px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus:ring-blue-400 dark:focus:ring-blue-500" />
         </div>
         <div>
           <label htmlFor="" className="font-semibold">Member</label>
@@ -34,10 +39,10 @@ export function NewProjectActionModal({
         <div className="flex flex-col justify-center gap-x-2">
           <label htmlFor="" className="font-semibold">Category</label>
           <div className="flex items-center gap-x-1">
-          <input type="radio" value="project" className="bg-333"/><label>Project</label>
+            <input type="radio" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProjectCategory("project")} name="project_category" defaultChecked className="bg-333"/><label>Project</label>
           </div>
           <div className="flex items-center gap-x-1">
-            <input type="radio" value="group_project"/><label>Group Project</label>
+            <input type="radio" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProjectCategory("group_project")} name="project_category" /><label>Group Project</label>
           </div>
         </div>
         <input

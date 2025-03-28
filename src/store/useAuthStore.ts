@@ -59,3 +59,8 @@ const useAuthStore = create<useAuthStoreProps>((set) => {
 });
 
 export default useAuthStore;
+
+// tokens given from api last for an hour 
+// to check from frontend, making requests ot the backend to verify token can be expensive
+// store the validUntil and check it from there. 
+// 
