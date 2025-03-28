@@ -12,34 +12,34 @@ export default function Members() {
   const [paginationNumber, setPaginationNumber] = useState<number>(1);
   const [totalPagination, setTotalPagination] = useState<number>(1);
   const [members, setMembers] = useState<any>();
-	const [isError, setIsError] = useState<boolean>(false)
+  const [isError, setIsError] = useState<boolean>(false);
 
   useEffect(() => {
     async function getData() {
-        try {
-					const response = await axios.get(
-						`${apiUrl}/api/v1/members/?page=${paginationNumber}`,
-						{
-							headers: {
-								Accept: "application/json",
-								Authorization: `Bearer ${token}`,
-							},
-						},
-					);
-					setMembers(response.data.data);
-					setTotalPagination(response.data.meta.total_pages); 
-        } catch(error: any) {
-					setIsError(true)
-					console.log("Error occured and caughted:", error)
-				}
+      try {
+        const response = await axios.get(
+          `${apiUrl}/api/v1/members/?page=${paginationNumber}`,
+          {
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        setMembers(response.data.data);
+        setTotalPagination(response.data.meta.total_pages);
+      } catch (error: any) {
+        setIsError(true);
+        console.log("Error occured and caughted:", error);
+      }
     }
 
     getData();
   }, [paginationNumber]);
 
-	if(isError) {
-		return <ErrorPage />
-	}
+  if (isError) {
+    return <ErrorPage />;
+  }
 
   return (
     <DashboardLayout>

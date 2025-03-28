@@ -18,31 +18,31 @@ export default function Meetups() {
 
   useEffect(() => {
     async function getData() {
-        try {
-            const response = await axios.get(
-                `${apiUrl}/api/v1/meetups/?page=${paginationNumber}`,
-                {
-                  headers: {
-                    Accept: "application/json",
-                    Authorization: `Bearer ${token}`,
-                  },
-                },
-              );
-        
-              setMeetups(response.data.data.regular_meetups);
-              setHackathons(response.data.data.hackathons);
-              setTotalPagination(response.data.meta.regular_meetups.total_pages);        
-        } catch(error: any) {
-            setIsError(true)
-            console.log("Error occured and caught", error)
-        }
+      try {
+        const response = await axios.get(
+          `${apiUrl}/api/v1/meetups/?page=${paginationNumber}`,
+          {
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        setMeetups(response.data.data.regular_meetups);
+        setHackathons(response.data.data.hackathons);
+        setTotalPagination(response.data.meta.regular_meetups.total_pages);
+      } catch (error: any) {
+        setIsError(true);
+        console.log("Error occured and caught", error);
+      }
     }
 
     getData();
   }, [paginationNumber]);
 
-  if(isError) {
-    return <ErrorPage />
+  if (isError) {
+    return <ErrorPage />;
   }
 
   return (
