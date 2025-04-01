@@ -5,7 +5,7 @@ import { NewUpdateActionModal } from "./NewUpdateActionModal";
 
 export function NewUpdateActionButton() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   const handleViewClick = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 

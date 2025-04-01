@@ -14,8 +14,8 @@ export function NewUpdateActionModal({
   const { showToast } = useToast();
 
   async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
-    event.preventDefault()
-    handleCloseModal()
+    event.preventDefault();
+    handleCloseModal();
   }
 
   return (
@@ -23,33 +23,58 @@ export function NewUpdateActionModal({
       <div className="flex justify-between items-center  mb-4">
         <h2 className="text-2xl font-bold">New Update</h2>
       </div>
-      <form action="" className="flex flex-col gap-y-4" onSubmit={(e: React.SyntheticEvent<HTMLFormElement>) => handleSubmit(e)}>
+      <form
+        action=""
+        className="flex flex-col gap-y-4"
+        onSubmit={(e: React.SyntheticEvent<HTMLFormElement>) => handleSubmit(e)}
+      >
         <div className="flex flex-col justify-center gap-x-2">
-          <label htmlFor="" className="font-semibold">Category</label>
+          <label htmlFor="" className="font-semibold">
+            Category
+          </label>
           <div className="flex items-center gap-x-1">
-          <input type="radio" value="project" className="bg-333"/><label>Idea Talk</label>
+            <input type="radio" value="project" className="bg-333" />
+            <label>Idea Talk</label>
           </div>
           <div className="flex items-center gap-x-1">
-            <input type="radio" value="group_project"/><label>Progress Talk</label>
+            <input type="radio" value="group_project" />
+            <label>Progress Talk</label>
           </div>
         </div>
         <div>
-          <label htmlFor="" className="font-semibold">Member</label>
-          <input type="text" className="mt-1 flex w-full dark:bg-[#333] dark:border-[#555] rounded-md border border-input bg-background px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus:ring-blue-400 dark:focus:ring-blue-500" />
+          <label htmlFor="" className="font-semibold">
+            Member
+          </label>
+          <input
+            type="text"
+            className="mt-1 flex w-full dark:bg-[#333] dark:border-[#555] rounded-md border border-input bg-background px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus:ring-blue-400 dark:focus:ring-blue-500"
+          />
         </div>
         <div>
-          <label htmlFor="" className="font-semibold">Project Name</label>
-          <input type="text" className="mt-1 flex w-full dark:bg-[#333] dark:border-[#555] rounded-md border border-input bg-background px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus:ring-blue-400 dark:focus:ring-blue-500" />
+          <label htmlFor="" className="font-semibold">
+            Project Name
+          </label>
+          <input
+            type="text"
+            className="mt-1 flex w-full dark:bg-[#333] dark:border-[#555] rounded-md border border-input bg-background px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus:ring-blue-400 dark:focus:ring-blue-500"
+          />
         </div>
         <div>
-          <label htmlFor="" className="font-semibold">Update Date</label>
-          <input type="text" className="mt-1 flex w-full dark:bg-[#333] dark:border-[#555] rounded-md border border-input bg-background px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus:ring-blue-400 dark:focus:ring-blue-500" />
+          <label htmlFor="" className="font-semibold">
+            Update Date
+          </label>
+          <input
+            type="text"
+            className="mt-1 flex w-full dark:bg-[#333] dark:border-[#555] rounded-md border border-input bg-background px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus:ring-blue-400 dark:focus:ring-blue-500"
+          />
         </div>
         <div>
-          <label htmlFor="" className="font-semibold">Update Description</label>
+          <label htmlFor="" className="font-semibold">
+            Update Description
+          </label>
           <textarea className="mt-1 flex w-full dark:bg-[#333] dark:border-[#555] rounded-md border border-input bg-background px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus:ring-blue-400 dark:focus:ring-blue-500" />
         </div>
-        
+
         <input
           type="submit"
           value="Submit"

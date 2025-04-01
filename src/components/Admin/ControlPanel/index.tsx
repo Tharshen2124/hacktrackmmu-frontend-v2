@@ -6,15 +6,19 @@ import { useEffect, useState } from "react";
 import { apiUrl } from "@/utils/env";
 
 interface ControlPanelProps {
-  members: any
-  meetups: any
-  token: string
+  members: any;
+  meetups: any;
+  token: string;
 }
 
-export default function ControlPanel({ members, meetups, token }: ControlPanelProps) {
-  const recentMeetupNumber: number = meetups[0].number
-  const [fetchedMembers, setFetchedMembers] = useState<any>()
-  const [error, setError] = useState(false)
+export default function ControlPanel({
+  members,
+  meetups,
+  token,
+}: ControlPanelProps) {
+  const recentMeetupNumber: number = meetups[0].number;
+  const [fetchedMembers, setFetchedMembers] = useState<any>();
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     async function getData() {
@@ -24,19 +28,18 @@ export default function ControlPanel({ members, meetups, token }: ControlPanelPr
             Accept: "application/json",
             Authorization: `Bearer ${token}`,
           },
-        })
+        });
 
-        setFetchedMembers(response.data)
-      
-      } catch(error: any) {
-        setError(true)
+        setFetchedMembers(response.data);
+      } catch (error: any) {
+        setError(true);
       }
     }
 
-    getData()
-  }, [])
+    getData();
+  }, []);
 
-  console.log('members', fetchedMembers)
+  console.log("members", fetchedMembers);
 
   return (
     <>
@@ -45,13 +48,11 @@ export default function ControlPanel({ members, meetups, token }: ControlPanelPr
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* <NewMemberActionButton /> */}
-        <NewMeetupActionButton 
+        <NewMeetupActionButton
           members={members}
           recentMeetupNumber={recentMeetupNumber}
         />
-        <NewProjectActionButton 
-          members={members}
-        />
+        <NewProjectActionButton members={members} />
         <NewUpdateActionButton />
       </div>
     </>

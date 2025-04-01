@@ -1,6 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { ErrorPage } from "@/components/errorComponent";
 import MemberCard from "@/components/MemberCard";
+import SkeletonMemberCard from "@/components/skeletonComponents/SkeletonMemberCard";
 import useAuthStore from "@/store/useAuthStore";
 import { apiUrl } from "@/utils/env";
 import axios from "axios";
@@ -9,13 +10,15 @@ import { useEffect, useState } from "react";
 
 export default function Members() {
   const { token } = useAuthStore();
-  const [paginationNumber, setPaginationNumber] = useState<number>(1);
-  const [totalPagination, setTotalPagination] = useState<number>(1);
+  const [paginationNumber, setPaginationNumber] = useState(1);
+  const [totalPagination, setTotalPagination] = useState(1);
   const [members, setMembers] = useState<any>();
-  const [isError, setIsError] = useState<boolean>(false);
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function getData() {
+      setIsLoading(true);
       try {
         const response = await axios.get(
           `${apiUrl}/api/v1/members/?page=${paginationNumber}`,
@@ -28,7 +31,9 @@ export default function Members() {
         );
         setMembers(response.data.data);
         setTotalPagination(response.data.meta.total_pages);
+        setIsLoading(false);
       } catch (error: any) {
+        setIsLoading(false);
         setIsError(true);
         console.log("Error occured and caughted:", error);
       }
@@ -36,6 +41,19 @@ export default function Members() {
 
     getData();
   }, [paginationNumber]);
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <h1 className="text-4xl font-bold">Members</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
+          {[...Array(28)].map((_, index) => (
+            <SkeletonMemberCard key={index} />
+          ))}
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   if (isError) {
     return <ErrorPage />;
@@ -69,18 +87,6 @@ export default function Members() {
           </button>
         </div>
       </div>
-      {/* <div className="relative mt-4">
-            <input
-                type="text"
-                placeholder="Search meetups..."
-                value={searchQuery}
-                onChange={handleSearch}
-                className="w-full pl-10 pr-4 py-2 text-sm text-[#e0e0e0] bg-white border border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-[#333] dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            />
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <Search className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-            </div>
-        </div> */}
       <div className="mt-10">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
           {members &&
