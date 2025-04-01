@@ -1,42 +1,51 @@
-import axios, { AxiosError } from "axios";
+// import axios from "axios";
 import { NewMeetupActionButton } from "../ActionButton/NewMeetupActionButton";
 import { NewProjectActionButton } from "../ActionButton/NewProjectActionButton";
 import { NewUpdateActionButton } from "../ActionButton/NewUpdateActionButton";
-import { useEffect, useState } from "react";
-import { apiUrl } from "@/utils/env";
+// import { useState } from "react";
+// import { apiUrl } from "@/utils/env";
+// import { ErrorPage } from "@/components/errorComponent";
 
 interface ControlPanelProps {
-  members: any
-  meetups: any
-  token: string
+  members: any;
+  meetups: any;
+  token: string;
 }
 
-export default function ControlPanel({ members, meetups, token }: ControlPanelProps) {
-  const recentMeetupNumber: number = meetups[0].number
-  const [fetchedMembers, setFetchedMembers] = useState<any>()
-  const [error, setError] = useState(false)
+export default function ControlPanel({
+  members,
+  meetups,
+  // token,
+}: ControlPanelProps) {
+  const recentMeetupNumber: number = meetups[0].number;
+  // const [fetchedMembers, setFetchedMembers] = useState<any>();
+  // const [error, setError] = useState(false);
 
-  useEffect(() => {
-    async function getData() {
-      try {
-        const response = await axios.get(`${apiUrl}/api/v1/all-members`, {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        })
+  // useEffect(() => {
+  //   async function getData() {
+  //     try {
+  //       const response = await axios.get(`${apiUrl}/api/v1/all-members`, {
+  //         headers: {
+  //           Accept: "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       });
 
-        setFetchedMembers(response.data)
-      
-      } catch(error: any) {
-        setError(true)
-      }
-    }
+  //       setFetchedMembers(response.data);
+  //     } catch (error: any) {
+  //       setError(true);
+  //       console.error("Error caught during fetch:", error)
+  //     }
+  //   }
 
-    getData()
-  }, [])
+  //   getData();
+  // }, []);
 
-  console.log('members', fetchedMembers)
+  // console.log("members", fetchedMembers);
+
+  // if(error) {
+  //   return <ErrorPage />
+  // }
 
   return (
     <>
@@ -45,13 +54,11 @@ export default function ControlPanel({ members, meetups, token }: ControlPanelPr
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* <NewMemberActionButton /> */}
-        <NewMeetupActionButton 
+        <NewMeetupActionButton
           members={members}
           recentMeetupNumber={recentMeetupNumber}
         />
-        <NewProjectActionButton 
-          members={members}
-        />
+        <NewProjectActionButton members={members} />
         <NewUpdateActionButton />
       </div>
     </>

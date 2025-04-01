@@ -1,5 +1,5 @@
 import { ModalLayout } from "@/components/ModalLayout";
-import { useToast } from "@/components/Toast/ToastProvider";
+// import { useToast } from "@/components/Toast/ToastProvider";
 import { Edit, Trash } from "lucide-react";
 
 interface NewMemberActionModalProps {
@@ -12,7 +12,7 @@ export function NewMemberActionModal({
   isModalOpen,
   handleCloseModal,
 }: NewMemberActionModalProps) {
-  const { showToast } = useToast();
+  // const { showToast } = useToast();
 
   const status = "Active";
 
