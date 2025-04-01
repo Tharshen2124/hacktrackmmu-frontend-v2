@@ -1,6 +1,5 @@
 import { ModalLayout } from "@/components/ModalLayout";
-import { useToast } from "@/components/Toast/ToastProvider";
-import { Edit, Trash } from "lucide-react";
+// import { useToast } from "@/components/Toast/ToastProvider";
 
 interface NewUpdateActionModalProps {
   isModalOpen: boolean;
@@ -11,7 +10,7 @@ export function NewUpdateActionModal({
   isModalOpen,
   handleCloseModal,
 }: NewUpdateActionModalProps) {
-  const { showToast } = useToast();
+  // const { showToast } = useToast();
 
   async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();

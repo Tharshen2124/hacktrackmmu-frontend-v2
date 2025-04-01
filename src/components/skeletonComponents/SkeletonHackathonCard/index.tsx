@@ -1,4 +1,3 @@
-import { dateMod } from "@/utils/dateMod";
 import { Laptop, RefreshCcw, Timer, User } from "lucide-react";
 
 export default function SkeletonHackathonCard() {

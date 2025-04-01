@@ -73,14 +73,13 @@ export default function Home() {
       <DashboardLayout>
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
         {/* {
-              isAdmin && 
-                <ControlPanel 
-                  members={members}
-                  meetups={meetups}
-                  token={token}
-                  // meetup={meetups}
-                />
-            } */}
+          isAdmin && members && meetups &&
+            <ControlPanel 
+              members={members}
+              meetups={meetups}
+              token={token}
+            />
+        } */}
 
         <div className="mt-10">
           <div className="flex justify-between items-center">
@@ -154,15 +153,14 @@ export default function Home() {
       <DashboardLayout>
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
 
-        {/* {
+        {
           isAdmin && 
             <ControlPanel 
               members={members}
               meetups={meetups}
               token={token}
-              // meetup={meetups}
             />
-        } */}
+        }
 
         <div className="mt-10">
           <div className="flex justify-between items-center">
@@ -176,7 +174,7 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-            {meetups &&
+            {meetups?.length > 0 &&
               meetups.map((meetup: any, index: number) => (
                 <MeetupCard
                   key={index}
@@ -204,7 +202,7 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-            {hackathons &&
+            {hackathons?.length > 0 &&
               hackathons.map((meetup: any) => (
                 <HackathonCard
                   key={meetup.id}
@@ -230,7 +228,7 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-            {members &&
+            {members?.length > 0 &&
               members.map((member: any) => (
                 <MemberCard
                   key={member.id}

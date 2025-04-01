@@ -1,9 +1,10 @@
-import axios, { AxiosError } from "axios";
+// import axios from "axios";
 import { NewMeetupActionButton } from "../ActionButton/NewMeetupActionButton";
 import { NewProjectActionButton } from "../ActionButton/NewProjectActionButton";
 import { NewUpdateActionButton } from "../ActionButton/NewUpdateActionButton";
-import { useEffect, useState } from "react";
-import { apiUrl } from "@/utils/env";
+// import { useState } from "react";
+// import { apiUrl } from "@/utils/env";
+// import { ErrorPage } from "@/components/errorComponent";
 
 interface ControlPanelProps {
   members: any;
@@ -14,32 +15,37 @@ interface ControlPanelProps {
 export default function ControlPanel({
   members,
   meetups,
-  token,
+  // token,
 }: ControlPanelProps) {
   const recentMeetupNumber: number = meetups[0].number;
-  const [fetchedMembers, setFetchedMembers] = useState<any>();
-  const [error, setError] = useState(false);
+  // const [fetchedMembers, setFetchedMembers] = useState<any>();
+  // const [error, setError] = useState(false);
 
-  useEffect(() => {
-    async function getData() {
-      try {
-        const response = await axios.get(`${apiUrl}/api/v1/all-members`, {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+  // useEffect(() => {
+  //   async function getData() {
+  //     try {
+  //       const response = await axios.get(`${apiUrl}/api/v1/all-members`, {
+  //         headers: {
+  //           Accept: "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       });
 
-        setFetchedMembers(response.data);
-      } catch (error: any) {
-        setError(true);
-      }
-    }
+  //       setFetchedMembers(response.data);
+  //     } catch (error: any) {
+  //       setError(true);
+  //       console.error("Error caught during fetch:", error)
+  //     }
+  //   }
 
-    getData();
-  }, []);
+  //   getData();
+  // }, []);
 
-  console.log("members", fetchedMembers);
+  // console.log("members", fetchedMembers);
+
+  // if(error) {
+  //   return <ErrorPage />
+  // }
 
   return (
     <>

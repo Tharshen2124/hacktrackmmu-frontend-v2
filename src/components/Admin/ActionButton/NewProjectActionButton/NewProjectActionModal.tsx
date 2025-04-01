@@ -1,5 +1,5 @@
 import { ModalLayout } from "@/components/ModalLayout";
-import { useToast } from "@/components/Toast/ToastProvider";
+// import { useToast } from "@/components/Toast/ToastProvider";
 import { useState } from "react";
 
 interface NewProjectActionModalProps {
@@ -11,15 +11,18 @@ interface NewProjectActionModalProps {
 export function NewProjectActionModal({
   isModalOpen,
   handleCloseModal,
-  members,
+  // members,
 }: NewProjectActionModalProps) {
-  const { showToast } = useToast();
+  // const { showToast } = useToast();
   const [projectName, setProjectName] = useState<string>("");
   const [projectCategory, setProjectCategory] = useState<string>("");
 
   async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     handleCloseModal();
+
+    console.log('projectName', projectName)
+    console.log('projectCategory', projectCategory)
   }
 
   return (
@@ -60,7 +63,7 @@ export function NewProjectActionModal({
           <div className="flex items-center gap-x-1">
             <input
               type="radio"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={() =>
                 setProjectCategory("project")
               }
               name="project_category"
@@ -72,7 +75,7 @@ export function NewProjectActionModal({
           <div className="flex items-center gap-x-1">
             <input
               type="radio"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={() =>
                 setProjectCategory("group_project")
               }
               name="project_category"
