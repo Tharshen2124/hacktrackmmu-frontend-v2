@@ -23,7 +23,6 @@ export function NewProjectActionButton({ members }: any) {
       <NewProjectActionModal
         isModalOpen={isModalOpen}
         handleCloseModal={handleCloseModal}
-        members={members}
       />
     </>
   );

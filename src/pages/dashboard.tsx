@@ -52,9 +52,9 @@ export default function Home() {
 
         Promise.all([getMembers(), getMeetups(), getHackathons()]).then(
           function (results) {
-            setMembers(results[0].data.data);
-            setMeetups(results[1].data.data);
-            setHackathons(results[2].data.data);
+            setMembers(results[0].data);
+            setMeetups(results[1].data);
+            setHackathons(results[2].data);
 
             setIsLoading(false);
           },
@@ -72,14 +72,7 @@ export default function Home() {
     return (
       <DashboardLayout>
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
-        {/* {
-          isAdmin && members && meetups &&
-            <ControlPanel 
-              members={members}
-              meetups={meetups}
-              token={token}
-            />
-        } */}
+        {isAdmin && members && meetups && <ControlPanel />}
 
         <div className="mt-10">
           <div className="flex justify-between items-center">
@@ -153,14 +146,7 @@ export default function Home() {
       <DashboardLayout>
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
 
-        {
-          isAdmin && 
-            <ControlPanel 
-              members={members}
-              meetups={meetups}
-              token={token}
-            />
-        }
+        {isAdmin && <ControlPanel />}
 
         <div className="mt-10">
           <div className="flex justify-between items-center">

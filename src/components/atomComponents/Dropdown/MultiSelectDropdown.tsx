@@ -1,37 +1,37 @@
-"use client";
-
-import type React from "react";
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 
-interface SearchableDropdownProps {
+interface MultiSelectDropdownProps {
   label: string;
   id: string;
   name: string;
   placeholder?: string;
   options: { id: string; name: string }[];
-  value: string;
-  onChange: (value: string) => void;
+  selectedValues: string[];
+  onChange: (values: string[]) => void;
   className?: string;
 }
 
-export const SearchableDropdown = ({
+export const MultiSelectDropdown = ({
   label,
   id,
   name,
-  placeholder = "Search and select an option",
+  placeholder = "Search and select options",
   options,
-  value,
+  selectedValues,
   onChange,
   className = "",
-}: SearchableDropdownProps) => {
+}: MultiSelectDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const selectedOption = options.find((option) => option.id === value);
+  // Get selected options objects
+  const selectedOptions = options.filter((option) =>
+    selectedValues.includes(option.id),
+  );
 
   // Filter options based on search term
   const filteredOptions = options.filter((option) =>
@@ -49,20 +49,24 @@ export const SearchableDropdown = ({
   };
 
   const handleSelect = (optionId: string) => {
-    const option = options.find((opt) => opt.id === optionId);
-    onChange(optionId);
-    setSearchTerm(option ? option.name : "");
-    setIsOpen(false);
+    // Toggle selection
+    const newSelectedValues = selectedValues.includes(optionId)
+      ? selectedValues.filter((id) => id !== optionId) // Remove if already selected
+      : [...selectedValues, optionId]; // Add if not selected
+
+    onChange(newSelectedValues);
+    setSearchTerm(""); // Clear search after selection
+    // Keep dropdown open for additional selections
+  };
+
+  const handleRemoveSelection = (optionId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent dropdown from opening
+    onChange(selectedValues.filter((id) => id !== optionId));
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     setIsOpen(true);
-
-    // If input is cleared and there was a selected value, clear the selection
-    if (e.target.value === "" && value) {
-      onChange("");
-    }
   };
 
   // Close dropdown when clicking outside
@@ -73,26 +77,13 @@ export const SearchableDropdown = ({
         !dropdownRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
-
-        // Reset search term to selected option name or empty if nothing selected
-        if (selectedOption) {
-          setSearchTerm(selectedOption.name);
-        } else if (searchTerm && !value) {
-          setSearchTerm("");
-        }
+        setSearchTerm(""); // Clear search term when closing
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [selectedOption, searchTerm, value]);
-
-  // Set initial search term when selected value changes
-  useEffect(() => {
-    if (selectedOption && !isOpen) {
-      setSearchTerm(selectedOption.name);
-    }
-  }, [selectedOption, isOpen]);
+  }, []);
 
   // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -106,6 +97,7 @@ export const SearchableDropdown = ({
     switch (e.key) {
       case "Escape":
         setIsOpen(false);
+        setSearchTerm("");
         inputRef.current?.blur();
         break;
       case "ArrowDown":
@@ -134,7 +126,30 @@ export const SearchableDropdown = ({
       <label htmlFor={id} className="font-semibold">
         {label}
       </label>
-      <div className="relative mt-1">
+
+      {/* Selected items tags */}
+      {selectedOptions.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-2">
+          {selectedOptions.map((option) => (
+            <div
+              key={option.id}
+              className="flex items-center gap-1 rounded-md bg-blue-100 px-2 py-1 text-sm dark:bg-blue-900/30"
+            >
+              <span>{option.name}</span>
+              <button
+                type="button"
+                onClick={(e) => handleRemoveSelection(option.id, e)}
+                className="ml-1 rounded-full p-0.5 hover:bg-blue-200 dark:hover:bg-blue-800"
+              >
+                <X className="h-3 w-3" />
+                <span className="sr-only">Remove {option.name}</span>
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="relative mt-2">
         <input
           ref={inputRef}
           id={id}
@@ -153,7 +168,7 @@ export const SearchableDropdown = ({
           onChange={handleInputChange}
           onFocus={handleFocus}
           onKeyDown={handleKeyDown}
-          placeholder={placeholder}
+          placeholder={selectedOptions.length > 0 ? "Add more..." : placeholder}
           className={`w-full rounded-md border border-input bg-background px-4 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-[#333] dark:border-[#555] focus:ring-blue-400 dark:focus:ring-blue-500 ${className}`}
         />
         <button
@@ -176,6 +191,7 @@ export const SearchableDropdown = ({
         <ul
           id={`${id}-options`}
           role="listbox"
+          aria-multiselectable="true"
           aria-labelledby={`${id}-label`}
           className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-input bg-background py-1 shadow-lg dark:bg-[#333] dark:border-[#555]"
         >
@@ -184,40 +200,37 @@ export const SearchableDropdown = ({
               No matches found
             </li>
           ) : (
-            filteredOptions.map((option, index) => (
-              <li
-                key={option.id}
-                id={`${id}-option-${index}`}
-                role="option"
-                aria-selected={value === option.id}
-                className={`px-4 py-2 cursor-pointer ${
-                  highlightedIndex === index ? "bg-primary/10" : ""
-                } ${value === option.id ? "bg-primary/20" : ""} hover:bg-primary/10`}
-                onClick={() => handleSelect(option.id)}
-                onMouseEnter={() => setHighlightedIndex(index)}
-              >
-                {option.name}
-              </li>
-            ))
+            filteredOptions.map((option, index) => {
+              const isSelected = selectedValues.includes(option.id);
+              return (
+                <li
+                  key={option.id}
+                  id={`${id}-option-${index}`}
+                  role="option"
+                  aria-selected={isSelected}
+                  className={`px-4 py-2 cursor-pointer flex items-center ${
+                    highlightedIndex === index ? "bg-primary/10" : ""
+                  } ${isSelected ? "bg-primary/20" : ""} hover:bg-primary/10`}
+                  onClick={() => handleSelect(option.id)}
+                  onMouseEnter={() => setHighlightedIndex(index)}
+                >
+                  <div className="mr-2 h-4 w-4 rounded border border-primary flex-shrink-0 flex items-center justify-center">
+                    {isSelected && (
+                      <div className="h-2 w-2 rounded-sm bg-primary"></div>
+                    )}
+                  </div>
+                  {option.name}
+                </li>
+              );
+            })
           )}
         </ul>
       )}
 
-      {/* Hidden native select for form submission */}
-      <select
-        name={name}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="sr-only"
-        aria-hidden="true"
-      >
-        <option value="">{placeholder}</option>
-        {options.map((option) => (
-          <option key={option.id} value={option.id}>
-            {option.name}
-          </option>
-        ))}
-      </select>
+      {/* Hidden inputs for form submission */}
+      {selectedValues.map((value) => (
+        <input key={value} type="hidden" name={`${name}[]`} value={value} />
+      ))}
     </div>
   );
 };
