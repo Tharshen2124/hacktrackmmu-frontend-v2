@@ -3,15 +3,7 @@ import { ActionButton } from "..";
 import { useState } from "react";
 import { NewMeetupActionModal } from "./NewMeetupActionModal";
 
-interface NewMeetupProps {
-  members: any;
-  recentMeetupNumber: number;
-}
-
-export function NewMeetupActionButton({
-  members,
-  recentMeetupNumber,
-}: NewMeetupProps) {
+export function NewMeetupActionButton() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleViewClick = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
@@ -30,8 +22,6 @@ export function NewMeetupActionButton({
       <NewMeetupActionModal
         isModalOpen={isModalOpen}
         handleCloseModal={handleCloseModal}
-        members={members}
-        recentMeetupNumber={recentMeetupNumber}
       />
     </>
   );
