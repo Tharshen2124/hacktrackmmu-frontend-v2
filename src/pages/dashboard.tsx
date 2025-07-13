@@ -1,4 +1,3 @@
-import ControlPanel from "@/components/Admin/ControlPanel";
 import DashboardLayout from "@/components/DashboardLayout";
 import HackathonCard from "@/components/HackathonCard";
 import MeetupCard from "@/components/MeetupCard";
@@ -72,7 +71,6 @@ export default function Home() {
     return (
       <DashboardLayout>
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
-        {isAdmin && members && meetups && <ControlPanel />}
 
         <div className="mt-10">
           <div className="flex justify-between items-center">
@@ -145,9 +143,6 @@ export default function Home() {
     <>
       <DashboardLayout>
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
-
-        {isAdmin && <ControlPanel />}
-
         <div className="mt-10">
           <div className="flex justify-between items-center">
             <h2 className="text-3xl font-semibold">Meetups</h2>
