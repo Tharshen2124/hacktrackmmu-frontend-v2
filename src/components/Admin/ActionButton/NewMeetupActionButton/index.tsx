@@ -4,10 +4,10 @@ import { useState } from "react";
 import { NewMeetupActionModal } from "./NewMeetupActionModal";
 
 export function NewMeetupActionButton() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const handleViewClick = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
-
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const handleViewClick = () => setIsModalOpen(true)
+  // const handleCloseModal = () => setIsModalOpen(false);
+  console.log(isModalOpen)
   return (
     <>
       <ActionButton
@@ -20,8 +20,8 @@ export function NewMeetupActionButton() {
       />
 
       <NewMeetupActionModal
-        isModalOpen={isModalOpen}
-        handleCloseModal={handleCloseModal}
+        // isModalOpen={isModalOpen}
+        // handleCloseModal={handleCloseModal}
       />
     </>
   );
