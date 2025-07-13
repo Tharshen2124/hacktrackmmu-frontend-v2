@@ -157,6 +157,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
             {meetups?.length > 0 &&
               meetups.map((meetup: any, index: number) => (
+                console.log("Meetup:", meetup.host.name),
                 <MeetupCard
                   key={index}
                   number={meetup.number}
@@ -185,6 +186,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
             {hackathons?.length > 0 &&
               hackathons.map((meetup: any) => (
+                console.log("Hackathon:", meetup.host.name),
                 <HackathonCard
                   key={meetup.id}
                   number={meetup.number}
@@ -211,6 +213,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
             {members?.length > 0 &&
               members.map((member: any) => (
+                console.log("Member:", member.name),
                 <MemberCard
                   key={member.id}
                   name={member.name}
