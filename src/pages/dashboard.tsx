@@ -1,6 +1,6 @@
 import DashboardLayout from "@/components/DashboardLayout";
-import HackathonCard from "@/components/HackathonCard";
-import MeetupCard from "@/components/MeetupCard";
+// import HackathonCard from "@/components/HackathonCard";
+// import MeetupCard from "@/components/MeetupCard";
 import MemberCard from "@/components/MemberCard";
 import SkeletonHackathonCard from "@/components/skeletonComponents/SkeletonHackathonCard";
 import SkeletonMemberCard from "@/components/skeletonComponents/SkeletonMemberCard";
@@ -14,8 +14,8 @@ import { useEffect, useState } from "react";
 export default function Home() {
   const { token } = useAuthStore();
   const [members, setMembers] = useState<any>([]);
-  const [meetups, setMeetups] = useState<any>([]);
-  const [hackathons, setHackathons] = useState<any>([]);
+  // const [meetups, setMeetups] = useState<any>([]);
+  // const [hackathons, setHackathons] = useState<any>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showError, setShowError] = useState<boolean>(false);
 
@@ -52,8 +52,8 @@ export default function Home() {
         Promise.all([getMembers(), getMeetups(), getHackathons()]).then(
           function (results) {
             setMembers(results[0].data);
-            setMeetups(results[1].data);
-            setHackathons(results[2].data);
+            // setMeetups(results[1].data);
+            // setHackathons(results[2].data);
 
             setIsLoading(false);
           },
@@ -143,7 +143,7 @@ export default function Home() {
     <>
       <DashboardLayout>
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
-        <div className="mt-10">
+        {/* <div className="mt-10">
           <div className="flex justify-between items-center">
             <h2 className="text-3xl font-semibold">Meetups</h2>
             <Link
@@ -168,9 +168,9 @@ export default function Home() {
                 />
               ))}
           </div>
-        </div>
+        </div> */}
 
-        <div className="mt-10">
+        {/* <div className="mt-10">
           <div className="flex justify-between items-center">
             <h2 className="text-3xl flex items-center font-semibold">
               Hackathons
@@ -197,7 +197,7 @@ export default function Home() {
                 />
               ))}
           </div>
-        </div>
+        </div> */}
 
         <div className="mt-10">
           <div className="flex justify-between items-center">
