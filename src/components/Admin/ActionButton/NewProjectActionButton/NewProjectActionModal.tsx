@@ -1,5 +1,5 @@
 import { SubmitButton } from "@/components/atomComponents/SubmitButton";
-import { ErrorImage, ErrorPage } from "@/components/errorComponent";
+import { ErrorImage } from "@/components/errorComponent";
 import { ModalLayout } from "@/components/ModalLayout";
 import { useToast } from "@/components/Toast/ToastProvider";
 import useAuthStore from "@/store/useAuthStore";
@@ -174,6 +174,17 @@ export function NewProjectActionModal({
             />
             <label>Group Project</label>
           </div>
+        </div>
+        <div className="flex items-center mb-4">
+          <input
+            type="checkbox"
+            checked={isCompleted}
+            onChange={(e) => setIsCompleted(e.target.checked)}
+            className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+          />
+          <label className="ms-2 font-medium text-gray-900 dark:text-gray-300">
+            Is Project Completed?
+          </label>
         </div>
         <SubmitButton isSubmitting={isSubmitting} />
       </form>
