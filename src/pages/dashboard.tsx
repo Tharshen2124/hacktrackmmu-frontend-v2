@@ -12,7 +12,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const { token, isAdmin } = useAuthStore();
+  const { token } = useAuthStore();
   const [members, setMembers] = useState<any>([]);
   const [meetups, setMeetups] = useState<any>([]);
   const [hackathons, setHackathons] = useState<any>([]);
