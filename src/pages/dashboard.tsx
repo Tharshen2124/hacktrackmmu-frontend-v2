@@ -69,7 +69,7 @@ export default function Home() {
     getData();
   }, []);
 
-  if (!isLoading) {
+  if (isLoading) {
     return (
       <DashboardLayout>
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
