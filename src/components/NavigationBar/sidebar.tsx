@@ -3,9 +3,10 @@ import Link from "next/link";
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  isAdmin: "true" | "false";
 }
 
-export function Sidebar({ isOpen, onClose }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, isAdmin }: SidebarProps) {
   return (
     <>
       {/* Overlay */}
@@ -65,9 +66,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </Link>
           </nav>
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-              Admin Mode
-            </p>
+            {isAdmin == "true" &&
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                Admin Mode
+              </p>
+            }
             <button className="w-full bg-gray-800 text-white dark:bg-white dark:text-black font-semibold py-2 px-4 rounded-md hover:bg-gray-700 dark:hover:bg-gray-100 transition duration-200">
               Logout
             </button>

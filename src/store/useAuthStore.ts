@@ -3,11 +3,11 @@ import Cookies from "js-cookie";
 
 interface useAuthStoreProps {
   token: string;
-  isAdmin: string;
+  isAdmin: "true" | "false";
   validUntil: string;
 
   setToken: (token: string) => void;
-  setAdmin: (isAdmin: string) => void;
+  setAdmin: (isAdmin: "true" | "false") => void;
   setValidUntil: (validUntil: string) => void;
 
   clearToken: () => void;
@@ -18,7 +18,7 @@ interface useAuthStoreProps {
 const useAuthStore = create<useAuthStoreProps>((set) => {
   // Read initial values from cookies (if they exist)
   const storedToken = Cookies.get("token") || "0";
-  const storedIsAdmin = Cookies.get("isAdmin") || "false";
+  const storedIsAdmin = Cookies.get("isAdmin") === "true" ? "true" : "false";
   const storedValidUntil = Cookies.get("validUntil") || "0";
 
   return {
@@ -31,7 +31,7 @@ const useAuthStore = create<useAuthStoreProps>((set) => {
       Cookies.set("token", token, { expires: 7 });
     },
 
-    setAdmin: (isAdmin: string) => {
+    setAdmin: (isAdmin: "true" | "false") => {
       set({ isAdmin });
       Cookies.set("isAdmin", isAdmin, { expires: 7 });
     },
