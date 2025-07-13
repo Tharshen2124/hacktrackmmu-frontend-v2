@@ -24,8 +24,8 @@ export function NewMeetupActionModal({
   const { token } = useAuthStore();
   const { showToast } = useToast();
 
-  const [haveHosted, setHaveHosted] = useState<any>()
-  const [yetToHost, setYetToHost] = useState<any>()
+  // const [haveHosted, setHaveHosted] = useState<any>()
+  // const [yetToHost, setYetToHost] = useState<any>()
   const [members, setMembers] = useState<any>()
   const [meetupNumber, setMeetupNumber] = useState<number>(0)
   const [date, setDate] = useState<string>(
@@ -47,8 +47,8 @@ export function NewMeetupActionModal({
             },
           },
         );
-        setHaveHosted(response.data.hosts.HaveHosted)
-        setYetToHost(response.data.hosts.YetToHost)
+        // setHaveHosted(response.data.hosts.HaveHosted)
+        // setYetToHost(response.data.hosts.YetToHost)
         setMembers(response.data.members);
         setMeetupNumber(response.data.meetup_number.number)
         setIsLoading(false);
@@ -127,12 +127,12 @@ export function NewMeetupActionModal({
       <div className="flex justify-between items-center  mb-4">
         <h2 className="text-2xl font-bold">New Meetup</h2>
       </div>
-      <div className="border border-gray-700 py-3 px-4 rounded-md mb-3">
+      {/* <div className="border border-gray-700 py-3 px-4 rounded-md mb-3">
         <h1 className="font-semibold">Potential Host</h1>
         {haveHosted && haveHosted.map(([name, number]: [string, number], index: number) => (
           <p key={index} className="text-sm">{name}</p>
         ))}
-      </div>
+      </div> */}
       <form
         action=""
         className="flex flex-col gap-y-4"
