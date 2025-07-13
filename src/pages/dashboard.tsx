@@ -1,3 +1,4 @@
+import SkeletonActionButton from "@/components/Admin/ActionButton/SkeletonActionButton";
 import ControlPanel from "@/components/Admin/ControlPanel";
 import DashboardLayout from "@/components/DashboardLayout";
 import HackathonCard from "@/components/HackathonCard";
@@ -68,12 +69,18 @@ export default function Home() {
     getData();
   }, []);
 
-  if (isLoading) {
+  if (!isLoading) {
     return (
       <DashboardLayout>
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
-        {isAdmin && members && meetups && <ControlPanel />}
-
+        <div className="flex items-center mt-10">
+          <h2 className="text-3xl font-semibold mb-2">Control Panel</h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <SkeletonActionButton />
+          <SkeletonActionButton />
+          <SkeletonActionButton />
+        </div>
         <div className="mt-10">
           <div className="flex justify-between items-center">
             <h2 className="text-3xl font-semibold">Meetups</h2>
@@ -146,7 +153,7 @@ export default function Home() {
       <DashboardLayout>
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
 
-        {/* {isAdmin && <ControlPanel />} */}
+        {isAdmin && <ControlPanel />}
 
         <div className="mt-10">
           <div className="flex justify-between items-center">
