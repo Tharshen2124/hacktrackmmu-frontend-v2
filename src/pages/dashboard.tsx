@@ -1,6 +1,7 @@
+import ControlPanel from "@/components/Admin/ControlPanel";
 import DashboardLayout from "@/components/DashboardLayout";
 import HackathonCard from "@/components/HackathonCard";
-// import MeetupCard from "@/components/MeetupCard";
+import MeetupCard from "@/components/MeetupCard";
 import MemberCard from "@/components/MemberCard";
 import SkeletonHackathonCard from "@/components/skeletonComponents/SkeletonHackathonCard";
 import SkeletonMemberCard from "@/components/skeletonComponents/SkeletonMemberCard";
@@ -12,9 +13,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const { token } = useAuthStore();
+  const { token, isAdmin } = useAuthStore();
   const [members, setMembers] = useState<any>([]);
-  // const [meetups, setMeetups] = useState<any>([]);
+  const [meetups, setMeetups] = useState<any>([]);
   const [hackathons, setHackathons] = useState<any>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showError, setShowError] = useState<boolean>(false);
@@ -52,7 +53,7 @@ export default function Home() {
         Promise.all([getMembers(), getMeetups(), getHackathons()]).then(
           function (results) {
             setMembers(results[0].data);
-            // setMeetups(results[1].data);
+            setMeetups(results[1].data);
             setHackathons(results[2].data);
 
             setIsLoading(false);
@@ -71,6 +72,7 @@ export default function Home() {
     return (
       <DashboardLayout>
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
+        {isAdmin && members && meetups && <ControlPanel />}
 
         <div className="mt-10">
           <div className="flex justify-between items-center">
@@ -143,7 +145,10 @@ export default function Home() {
     <>
       <DashboardLayout>
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
-        {/* <div className="mt-10">
+
+        {isAdmin && <ControlPanel />}
+
+        <div className="mt-10">
           <div className="flex justify-between items-center">
             <h2 className="text-3xl font-semibold">Meetups</h2>
             <Link
@@ -157,7 +162,6 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
             {meetups?.length > 0 &&
               meetups.map((meetup: any, index: number) => (
-                console.log("Meetup:", meetup.host.name),
                 <MeetupCard
                   key={index}
                   number={meetup.number}
@@ -168,7 +172,7 @@ export default function Home() {
                 />
               ))}
           </div>
-        </div> */}
+        </div>
 
         <div className="mt-10">
           <div className="flex justify-between items-center">
@@ -186,13 +190,12 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
             {hackathons?.length > 0 &&
               hackathons.map((meetup: any) => (
-                console.log("Hackathon:", meetup.host.name),
                 <HackathonCard
                   key={meetup.id}
                   number={meetup.number}
                   date={meetup.date}
                   numberOfUpdates={meetup.updates.length}
-                  hostName={meetup.host?.name || "Unknown Host"}
+                  hostName={meetup.host.name}
                   updates={meetup.updates}
                 />
               ))}
@@ -213,7 +216,6 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
             {members?.length > 0 &&
               members.map((member: any) => (
-                console.log("Member:", member.name),
                 <MemberCard
                   key={member.id}
                   name={member.name}
