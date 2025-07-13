@@ -167,7 +167,7 @@ export default function Home() {
                   number={meetup.number}
                   date={meetup.date}
                   numberOfUpdates={meetup.updates.length}
-                  hostName={meetup.host.name}
+                  hostName={meetup.host?.name || "unknown host"}
                   updates={meetup.updates}
                 />
               ))}
@@ -195,7 +195,7 @@ export default function Home() {
                   number={meetup.number}
                   date={meetup.date}
                   numberOfUpdates={meetup.updates.length}
-                  hostName={meetup.host.name}
+                  hostName={meetup.host?.name || "unknown host"}
                   updates={meetup.updates}
                 />
               ))}
