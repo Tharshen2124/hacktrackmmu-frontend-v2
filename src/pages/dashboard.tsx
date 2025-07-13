@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/DashboardLayout";
-// import HackathonCard from "@/components/HackathonCard";
+import HackathonCard from "@/components/HackathonCard";
 // import MeetupCard from "@/components/MeetupCard";
 import MemberCard from "@/components/MemberCard";
 import SkeletonHackathonCard from "@/components/skeletonComponents/SkeletonHackathonCard";
@@ -15,7 +15,7 @@ export default function Home() {
   const { token } = useAuthStore();
   const [members, setMembers] = useState<any>([]);
   // const [meetups, setMeetups] = useState<any>([]);
-  // const [hackathons, setHackathons] = useState<any>([]);
+  const [hackathons, setHackathons] = useState<any>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showError, setShowError] = useState<boolean>(false);
 
@@ -170,7 +170,7 @@ export default function Home() {
           </div>
         </div> */}
 
-        {/* <div className="mt-10">
+        <div className="mt-10">
           <div className="flex justify-between items-center">
             <h2 className="text-3xl flex items-center font-semibold">
               Hackathons
@@ -197,7 +197,7 @@ export default function Home() {
                 />
               ))}
           </div>
-        </div> */}
+        </div>
 
         <div className="mt-10">
           <div className="flex justify-between items-center">
