@@ -53,7 +53,7 @@ export default function Home() {
           function (results) {
             setMembers(results[0].data);
             // setMeetups(results[1].data);
-            // setHackathons(results[2].data);
+            setHackathons(results[2].data);
 
             setIsLoading(false);
           },
