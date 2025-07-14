@@ -6,11 +6,15 @@ import Image from "next/image";
 import useAuthStore from "@/store/useAuthStore";
 import { useRouter } from "next/router";
 import { useDarkMode } from "@/hooks/useDarkMode";
+import axios from "axios";
+import { apiUrl } from "@/utils/env";
+import { useToast } from "@/components/Toast/ToastProvider";
 
 export default function NavigationBar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { clearToken, clearValidUntil, clearAdmin } = useAuthStore();
+  const { clearToken, clearValidUntil, clearAdmin, isAdmin, token } = useAuthStore();
   const { isDarkMode } = useDarkMode();
+  const { showToast } = useToast();
 
   const router = useRouter();
 
@@ -18,12 +22,38 @@ export default function NavigationBar() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  function handleLogout() {
-    clearAdmin();
-    clearValidUntil();
-    clearToken();
+  async function handleLogout() {
+    try {
+      const response = await axios.post(
+        `${apiUrl}/api/v1/logout`, 
+        {},
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        })
 
-    router.push("/");
+      if (response.status === 200) {
+        showToast(
+          "Logout successfully! Redirecting you to main page",
+          "success",
+        );
+
+        router.push("/");
+
+        clearAdmin();
+        clearValidUntil();
+        clearToken();
+      }
+    } catch (error: any) {
+      if (
+        error.response &&
+          error.response?.data?.message === "Invalid password"
+      ) {
+        showToast("Invalid password. Try again.", "error");
+      }
+    }
   }
 
   return (
@@ -64,7 +94,7 @@ export default function NavigationBar() {
             </Link>
           </div>
           <div className="hidden lg:flex items-center">
-            <p className="mr-6">Admin Mode</p>
+            {isAdmin == "true" && <p className="mr-6">Admin Mode</p>}
             <button
               onClick={handleLogout}
               className="flex items-center gap-2 dark:bg-white dark:text-black text-white bg-gray-800 font-semibold px-8 py-3 rounded-full"
@@ -82,7 +112,7 @@ export default function NavigationBar() {
           </div>
         </div>
       </nav>
-      <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
+      <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} isAdmin={isAdmin} />
     </>
   );
 }

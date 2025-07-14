@@ -72,7 +72,7 @@ export default function Home() {
     return (
       <DashboardLayout>
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
-        {isAdmin && members && meetups && <ControlPanel />}
+        {isAdmin === "true" && members && meetups && <ControlPanel />}
 
         <div className="mt-10">
           <div className="flex justify-between items-center">
