@@ -1,15 +1,22 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react"; // Add useMemo
 import { ChevronDown } from "lucide-react";
+
+interface Option {
+  id: string;
+  name?: string;
+  date?: string;
+}
 
 interface SearchableDropdownProps {
   label: string;
   id: string;
   name: string;
   placeholder?: string;
-  options: { id: string; name: string }[];
+  options: Option[];
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  displayKey?: 'name' | 'date';
 }
 
 export const SearchableDropdown = ({
@@ -21,6 +28,7 @@ export const SearchableDropdown = ({
   value,
   onChange,
   className = "",
+  displayKey = 'name',
 }: SearchableDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,12 +36,43 @@ export const SearchableDropdown = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const selectedOption = options.find((option) => option.id === value);
+  // Helper function to get the display value from an option
+  const getOptionDisplayName = (option: Option) => {
+    // If date is chosen as displayKey, format it as needed
+    if (displayKey === 'date' && option.date) {
+      try {
+        // Attempt to parse and format date for display
+        const dateObj = new Date(option.date);
+        // Example: "July 14, 2025" or "2025-07-14"
+        return dateObj.toLocaleDateString(undefined, {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      } catch (e) {
+        console.warn("Invalid date format for option:", option.date, e);
+        return option.date; // Fallback to raw date string if invalid
+      }
+    }
+    // Default to name or fallback if name is not available
+    return option.name || option.date || option.id; // Fallback to id if neither name nor date
+  };
 
-  // Filter options based on search term
-  const filteredOptions = options.filter((option) =>
-    option.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  // Find the selected option using the `value` (which is an `id`)
+  const selectedOption = useMemo(
+    () => options.find((option) => option.id === value),
+    [options, value]
   );
+
+  // Filter options based on search term and displayKey
+  const filteredOptions = useMemo(
+    () =>
+      options.filter((option) =>
+        getOptionDisplayName(option).toLowerCase().includes(searchTerm.toLowerCase())
+      ),
+    [options, searchTerm, getOptionDisplayName] // getOptionDisplayName should be stable or defined within useMemo
+  );
+
 
   useEffect(() => {
     // Reset highlighted index when filtered options change
@@ -48,7 +87,8 @@ export const SearchableDropdown = ({
   const handleSelect = (optionId: string) => {
     const option = options.find((opt) => opt.id === optionId);
     onChange(optionId);
-    setSearchTerm(option ? option.name : "");
+    // Set search term to the display name of the selected option
+    setSearchTerm(option ? getOptionDisplayName(option) : "");
     setIsOpen(false);
   };
 
@@ -73,7 +113,7 @@ export const SearchableDropdown = ({
 
         // Reset search term to selected option name or empty if nothing selected
         if (selectedOption) {
-          setSearchTerm(selectedOption.name);
+          setSearchTerm(getOptionDisplayName(selectedOption));
         } else if (searchTerm && !value) {
           setSearchTerm("");
         }
@@ -82,14 +122,14 @@ export const SearchableDropdown = ({
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [selectedOption, searchTerm, value]);
+  }, [selectedOption, searchTerm, value, getOptionDisplayName]); // Add getOptionDisplayName to dependencies
 
   // Set initial search term when selected value changes
   useEffect(() => {
     if (selectedOption && !isOpen) {
-      setSearchTerm(selectedOption.name);
+      setSearchTerm(getOptionDisplayName(selectedOption));
     }
-  }, [selectedOption, isOpen]);
+  }, [selectedOption, isOpen, getOptionDisplayName]); // Add getOptionDisplayName to dependencies
 
   // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -193,7 +233,7 @@ export const SearchableDropdown = ({
                 onClick={() => handleSelect(option.id)}
                 onMouseEnter={() => setHighlightedIndex(index)}
               >
-                {option.name}
+                {getOptionDisplayName(option)} {/* Use helper here */}
               </li>
             ))
           )}
@@ -211,7 +251,7 @@ export const SearchableDropdown = ({
         <option value="">{placeholder}</option>
         {options.map((option) => (
           <option key={option.id} value={option.id}>
-            {option.name}
+            {getOptionDisplayName(option)} {/* Use helper here */}
           </option>
         ))}
       </select>
