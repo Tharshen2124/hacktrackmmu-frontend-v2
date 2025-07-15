@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useToast } from "@/components/Toast/ToastProvider";
 import { useRouter } from "next/router";
 import { useDarkMode } from "@/hooks/useDarkMode";
+import { SubmitButton } from "@/components/atomComponents/SubmitButton";
 
 const images = [
   "/presentation.jpg",
@@ -153,21 +154,7 @@ export default function LoginPage() {
               </button>
             </div>
 
-            <div>
-              <button
-                type="submit"
-                className={`items-center rounded-full duration-200 transition hover:bg-blue-700 bg-blue-600 group relative w-full flex justify-center py-3 px-4 border border-transparent font-semibold text-white focus:ring-2 focus:ring-blue-300 ${
-                  isSubmitting
-                    ? "cursor-not-allowed bg-blue-400 hover:bg-blue-400 active:bg-blue-400 focus:ring-0"
-                    : ""
-                }`}
-              >
-                {isSubmitting && (
-                  <LoaderCircle className="animate-spin mr-2" size="20" />
-                )}
-                {isSubmitting ? "Logging in..." : "Login"}
-              </button>
-            </div>
+            <SubmitButton isSubmitting={isSubmitting} isLogin={true}/>
             <div className="text-center h-[24px]">
               <p
                 className={`text-gray-400 italic transition-opacity duration-1000 ${waitMessage && isSubmitting ? "opacity-100" : "opacity-0"}`}
