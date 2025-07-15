@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import useAuthStore from "@/store/useAuthStore";
 import { apiUrl } from "@/utils/env";
 import axios from "axios";
-import { LoaderCircle, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { useToast } from "@/components/Toast/ToastProvider";
 import { useRouter } from "next/router";
