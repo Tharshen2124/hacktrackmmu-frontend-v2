@@ -3,6 +3,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import HackathonCard from "@/components/HackathonCard";
 import MeetupCard from "@/components/MeetupCard";
 import MemberCard from "@/components/MemberCard";
+import SkeletonActionButton from "@/components/SkeletonActionButton";
 import SkeletonHackathonCard from "@/components/skeletonComponents/SkeletonHackathonCard";
 import SkeletonMemberCard from "@/components/skeletonComponents/SkeletonMemberCard";
 import useAuthStore from "@/store/useAuthStore";
@@ -10,17 +11,26 @@ import { apiUrl } from "@/utils/env";
 import { fetcherWithToken } from "@/utils/fetcher";
 import { CircleArrowRight } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 
 export default function Home() {
+  const [isClient, setIsClient] = useState(false);
+  
+  // Use the auth store directly instead of copying to local state
   const { token, isAdmin } = useAuthStore();
 
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Move all hooks before any conditional returns
   const {
     data: members,
     error: membersError,
     isLoading: membersLoading,
   } = useSWR(
-    token ? [`${apiUrl}/api/v1/dashboard/members`, token] : null,
+    isClient && token ? [`${apiUrl}/api/v1/dashboard/members`, token] : null,
     ([url, token]) => fetcherWithToken(url, token)
   );
 
@@ -30,7 +40,7 @@ export default function Home() {
     isLoading: meetupsLoading,
     mutate: mutateMeetups,
   } = useSWR(
-    token ? [`${apiUrl}/api/v1/dashboard/meetups`, token] : null,
+    isClient && token ? [`${apiUrl}/api/v1/dashboard/meetups`, token] : null,
     ([url, token]) => fetcherWithToken(url, token)
   );
 
@@ -39,9 +49,12 @@ export default function Home() {
     error: hackathonsError,
     isLoading: hackathonsLoading,
   } = useSWR(
-    token ? [`${apiUrl}/api/v1/dashboard/hackathons`, token] : null,
+    isClient && token ? [`${apiUrl}/api/v1/dashboard/hackathons`, token] : null,
     ([url, token]) => fetcherWithToken(url, token)
   );
+
+  // Now you can safely do conditional returns
+  if (!isClient) return null;
 
   const isLoading = membersLoading || meetupsLoading || hackathonsLoading;
   const isError = membersError || meetupsError || hackathonsError;
@@ -50,8 +63,16 @@ export default function Home() {
     return (
       <DashboardLayout>
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
-        {isAdmin === "true" && <ControlPanel mutateMeetups={mutateMeetups} />}
-
+        <div className="mt-10">
+          <div className="flex justify-between items-center">
+            <h2 className="text-3xl font-semibold">Regular Meetups</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
+           <SkeletonActionButton />
+           <SkeletonActionButton />
+           <SkeletonActionButton />
+          </div>
+        </div>
         <div className="mt-10">
           <div className="flex justify-between items-center">
             <h2 className="text-3xl font-semibold">Meetups</h2>
