@@ -94,7 +94,7 @@ export default function NavigationBar() {
             </Link>
           </div>
           <div className="hidden lg:flex items-center">
-            {isAdmin == "true" && <p className="mr-6">Admin Mode</p>}
+            {isAdmin == "true" && <div className="mr-6">Admin Mode</div>}
             <button
               onClick={handleLogout}
               className="flex items-center gap-2 dark:bg-white dark:text-black text-white bg-gray-800 font-semibold px-8 py-3 rounded-full"

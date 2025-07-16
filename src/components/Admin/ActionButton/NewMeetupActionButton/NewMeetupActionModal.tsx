@@ -11,11 +11,13 @@ import { useEffect, useState } from "react";
 interface NewMeetupActionModalProps {
   isModalOpen: boolean;
   handleCloseModal: () => void;
+  mutateMeetups: () => void;
 }
 
 export function NewMeetupActionModal({
   isModalOpen,
   handleCloseModal,
+  mutateMeetups,
 }: NewMeetupActionModalProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [isError, setIsError] = useState(false)
@@ -62,26 +64,26 @@ export function NewMeetupActionModal({
     getData();
   }, []);
 
-  async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setIsSubmitting(true);
+   async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setIsSubmitting(true)
 
-    if(selectedHostID === "") {
-      setIsSubmitting(false);
+    if (selectedHostID === "") {
+      setIsSubmitting(false)
       showToast("Host field is required.", "error")
       return
     }
 
     try {
       await axios.post(
-        `${apiUrl}/api/v1/meetups`, 
+        `${apiUrl}/api/v1/meetups`,
         {
           meetup: {
-            "date": date,
-            "number": meetupNumber,
-            "host_id": selectedHostID,
-            "category": category,
-          }
+            date: date,
+            number: meetupNumber,
+            host_id: selectedHostID,
+            category: category,
+          },
         },
         {
           headers: {
@@ -90,15 +92,17 @@ export function NewMeetupActionModal({
           },
         }
       );
-      setIsSubmitting(false);
-      handleCloseModal();
-      showToast("Successfully added meetup!", "success");  
+
+      await mutateMeetups() // ✅ Refresh SWR cache
+      setIsSubmitting(false)
+      handleCloseModal()
+      showToast("Successfully added meetup!", "success")
     } catch (error: any) {
-      setIsSubmitting(true);
+      setIsSubmitting(false) // Fix this: previously was true!
       console.log("Error caught in POST:", error)
-      showToast("Error occured, meetup was not saved.", "error")
+      showToast("Error occurred, meetup was not saved.", "error")
     }
-}
+  }
 
   if (isLoading) {
     return (
