@@ -24,15 +24,15 @@ export default function NavigationBar() {
 
   async function handleLogout() {
     try {
-      const response = await axios.post(
+      const response = await axios.delete(
         `${apiUrl}/api/v1/logout`, 
-        {},
         {
           headers: {
             Accept: "application/json",
             Authorization: `Bearer ${token}`,
           },
-        })
+        }
+      );
 
       if (response.status === 200) {
         showToast(
