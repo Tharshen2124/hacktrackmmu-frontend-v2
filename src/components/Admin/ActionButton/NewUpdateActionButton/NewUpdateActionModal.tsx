@@ -5,8 +5,10 @@ import { ModalLayout } from "@/components/ModalLayout";
 import { useToast } from "@/components/Toast/ToastProvider";
 import useAuthStore from "@/store/useAuthStore";
 import { apiUrl } from "@/utils/env";
+import { fetcherWithToken } from "@/utils/fetcher"; // Assuming you have this utility
 import axios from "axios";
 import { useEffect, useState } from "react";
+import useSWR from "swr";
 
 interface NewUpdateActionModalProps {
   isModalOpen: boolean;
@@ -15,6 +17,15 @@ interface NewUpdateActionModalProps {
 
 type Category = "idea_talk" | "progress_talk";
 
+export function useCreateUpdateData() {
+  const { token } = useAuthStore();
+  
+  return useSWR(
+    token ? [`${apiUrl}/api/v1/dashboard/create_update`, token] : null,
+    ([url, token]) => fetcherWithToken(url, token)
+  );
+}
+
 export function NewUpdateActionModal({
   isModalOpen,
   handleCloseModal,
@@ -22,49 +33,46 @@ export function NewUpdateActionModal({
   const { showToast } = useToast();
   const { token } = useAuthStore();
 
+  // Use the custom hook
+  const {
+    data: createUpdateData,
+    error,
+    isLoading,
+    mutate: mutateCreateUpdate
+  } = useCreateUpdateData();
+
   const [projects, setProjects] = useState<any>();
   const [category, setCategory] = useState<Category>("idea_talk");
-  const [members, setMembers] = useState<any>();
-  const [dates, setDates] = useState<any>();
-  const [isError, setIsError] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedMemberID, setSelectedMemberID] = useState<string>("")
   const [selectedProjectID, setSelectedProjectID] = useState<string>("")
   const [selectedMeetupID, setSelectedMeetupID] = useState<string>("")
   const [description, setDescription] = useState<string>("")
 
-  useEffect(() => {
-    async function getData() {
-      try {
-        const response = await axios.get(
-          `${apiUrl}/api/v1/dashboard/create_update`,
-          {
-            headers: {
-              Accept: "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-        setMembers(response.data.members);
-        setDates(response.data.dates)
-        setIsLoading(false);
-      } catch (error: any) {
-        setIsLoading(false);
-        setIsError(true);
-        console.error("Error occured during fetch", error);
-      }
-    }
+  // Extract members and dates from SWR data
+  const members = createUpdateData?.members;
+  const dates = createUpdateData?.dates;
+  const isError = !!error;
 
-    getData();
-  }, []);
-
+  // Update projects when selectedMemberID changes
   useEffect(() => {
-    if (selectedMemberID !== "") {
+    if (selectedMemberID !== "" && members) {
       const member = members.find((m: any) => m.id === selectedMemberID)
-      setProjects(member.projects)
+      setProjects(member?.projects || [])
     }
-  }, [selectedMemberID])
+  }, [selectedMemberID, members])
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!isModalOpen) {
+      setSelectedMemberID("");
+      setSelectedProjectID("");
+      setSelectedMeetupID("");
+      setDescription("");
+      setCategory("idea_talk");
+      setProjects(undefined);
+    }
+  }, [isModalOpen]);
 
   async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -117,7 +125,7 @@ export function NewUpdateActionModal({
       handleCloseModal();
       showToast("Successfully added updates!", "success");  
     } catch (error: any) {
-      setIsSubmitting(true);
+      setIsSubmitting(false); // Fixed: was setting to true
       console.log("Error caught in POST:", error)
       showToast("Error occured, update was not saved.", "error")
     }
@@ -184,7 +192,7 @@ export function NewUpdateActionModal({
             id="member"
             name="member"
             placeholder="Search for a member..."
-            options={members}
+            options={members || []}
             value={selectedMemberID}
             onChange={setSelectedMemberID}
           />
@@ -195,7 +203,7 @@ export function NewUpdateActionModal({
             id="project"
             name="project"
             placeholder="Search for a project..."
-            options={projects ? projects : []}
+            options={projects || []}
             value={selectedProjectID}
             onChange={setSelectedProjectID}
           />
@@ -206,7 +214,7 @@ export function NewUpdateActionModal({
             id="date"
             name="date"
             placeholder="Search for a meetup date..."
-            options={dates}
+            options={dates || []}
             value={selectedMeetupID}
             onChange={setSelectedMeetupID}
             displayKey={"date"}
