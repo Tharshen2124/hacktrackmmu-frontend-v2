@@ -7,18 +7,22 @@ import { apiUrl } from "@/utils/env";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { MultiSelectDropdown } from "@/components/atomComponents/Dropdown/MultiSelectDropdown";
+import { useCreateUpdateData } from "../NewUpdateActionButton/NewUpdateActionModal";
 
 interface NewProjectActionModalProps {
   isModalOpen: boolean;
   handleCloseModal: () => void;
+  mutateMembers: () => void;
 }
 
 export function NewProjectActionModal({
   isModalOpen,
   handleCloseModal,
+  mutateMembers,
 }: NewProjectActionModalProps) {
   const { showToast } = useToast();
   const { token } = useAuthStore();
+  const { mutate: mutateCreateUpdate } = useCreateUpdateData();
 
   const [members, setMembers] = useState<any>();
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([]);
@@ -88,14 +92,16 @@ export function NewProjectActionModal({
         }
       );
       setIsSubmitting(false);
+      await mutateMembers();
+      await mutateCreateUpdate();
       handleCloseModal();
       showToast("Successfully added project!", "success");  
     } catch (error: any) {
-      setIsSubmitting(true);
+      setIsSubmitting(false); // Fixed: was setting to true 
       console.log("Error caught in POST:", error)
       showToast("Error occured, project was not saved.", "error")
     }
-}
+  }
 
   if (isLoading) {
     return (

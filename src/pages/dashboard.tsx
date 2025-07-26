@@ -29,6 +29,7 @@ export default function Home() {
     data: members,
     error: membersError,
     isLoading: membersLoading,
+    mutate: mutateMembers
   } = useSWR(
     isClient && token ? [`${apiUrl}/api/v1/dashboard/members`, token] : null,
     ([url, token]) => fetcherWithToken(url, token)
@@ -38,7 +39,7 @@ export default function Home() {
     data: meetups,
     error: meetupsError,
     isLoading: meetupsLoading,
-    mutate: mutateMeetups,
+    mutate: mutateMeetups
   } = useSWR(
     isClient && token ? [`${apiUrl}/api/v1/dashboard/meetups`, token] : null,
     ([url, token]) => fetcherWithToken(url, token)
@@ -48,6 +49,7 @@ export default function Home() {
     data: hackathons,
     error: hackathonsError,
     isLoading: hackathonsLoading,
+    mutate: mutateHackathons
   } = useSWR(
     isClient && token ? [`${apiUrl}/api/v1/dashboard/hackathons`, token] : null,
     ([url, token]) => fetcherWithToken(url, token)
@@ -132,7 +134,13 @@ export default function Home() {
   return (
     <DashboardLayout>
       <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
-      {isAdmin === "true" && <ControlPanel mutateMeetups={mutateMeetups} />}
+      {isAdmin === "true" && 
+        <ControlPanel 
+          mutateMeetups={mutateMeetups} 
+          mutateHackathons={mutateHackathons} 
+          mutateMembers={mutateMembers} 
+        />
+      }
 
       {/* Meetups */}
       <div className="mt-10">
