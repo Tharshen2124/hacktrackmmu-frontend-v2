@@ -67,9 +67,9 @@ export default function Home() {
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
         <div className="mt-10">
           <div className="flex justify-between items-center">
-            <h2 className="text-3xl font-semibold">Regular Meetups</h2>
+            <h2 className="text-3xl font-semibold">Control Panel</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
            <SkeletonActionButton />
            <SkeletonActionButton />
            <SkeletonActionButton />

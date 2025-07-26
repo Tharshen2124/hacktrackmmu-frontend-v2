@@ -38,7 +38,6 @@ export function NewUpdateActionModal({
     data: createUpdateData,
     error,
     isLoading,
-    mutate: mutateCreateUpdate
   } = useCreateUpdateData();
 
   const [projects, setProjects] = useState<any>();
