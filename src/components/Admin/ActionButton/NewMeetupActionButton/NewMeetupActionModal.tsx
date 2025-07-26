@@ -12,20 +12,20 @@ interface NewMeetupActionModalProps {
   isModalOpen: boolean;
   handleCloseModal: () => void;
   mutateMeetups: () => void;
+  mutateHackathons: () => void;
 }
 
 export function NewMeetupActionModal({
   isModalOpen,
   handleCloseModal,
   mutateMeetups,
+  mutateHackathons,
 }: NewMeetupActionModalProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [isError, setIsError] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  
   const { token } = useAuthStore();
   const { showToast } = useToast();
-
   // const [haveHosted, setHaveHosted] = useState<any>()
   // const [yetToHost, setYetToHost] = useState<any>()
   const [members, setMembers] = useState<any>()
@@ -33,8 +33,7 @@ export function NewMeetupActionModal({
   const [date, setDate] = useState<string>(
     new Date().toISOString().split("T")[0],
   );  
-
-  const [category, setCategory] = useState<string>("regular_meetup");
+  const [category, setCategory] = useState<"regular_meetup" | "hackathon">("regular_meetup");
   const [selectedHostID, setSelectedHostID] = useState<string>("")
 
   useEffect(() => {
@@ -92,8 +91,11 @@ export function NewMeetupActionModal({
           },
         }
       );
-
-      await mutateMeetups() // ✅ Refresh SWR cache
+      if (category === "hackathon") {
+        await mutateHackathons()
+      } else if (category === "regular_meetup") {
+        await mutateMeetups()
+      }
       setIsSubmitting(false)
       handleCloseModal()
       showToast("Successfully added meetup!", "success")

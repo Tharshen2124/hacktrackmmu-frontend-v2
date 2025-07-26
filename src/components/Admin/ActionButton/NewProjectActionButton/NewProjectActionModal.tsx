@@ -11,11 +11,13 @@ import { MultiSelectDropdown } from "@/components/atomComponents/Dropdown/MultiS
 interface NewProjectActionModalProps {
   isModalOpen: boolean;
   handleCloseModal: () => void;
+  mutateMembers: () => void;
 }
 
 export function NewProjectActionModal({
   isModalOpen,
   handleCloseModal,
+  mutateMembers,
 }: NewProjectActionModalProps) {
   const { showToast } = useToast();
   const { token } = useAuthStore();
@@ -88,6 +90,7 @@ export function NewProjectActionModal({
         }
       );
       setIsSubmitting(false);
+      await mutateMembers();
       handleCloseModal();
       showToast("Successfully added project!", "success");  
     } catch (error: any) {
