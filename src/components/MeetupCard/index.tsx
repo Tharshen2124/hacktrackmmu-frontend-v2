@@ -98,8 +98,8 @@ export default function MeetupCard({
               <>
                 <div key={index} className="">
                   <p className="font-bold">
-                    {update.project.name.length > 30
-                      ? update.project.name.slice(0, 30) + "..."
+                    {update.project.name.length > 40
+                      ? update.project.name.slice(0, 40) + "..."
                       : update.project.name}
                   </p>
                   <p className="text-sm flex items-center">
