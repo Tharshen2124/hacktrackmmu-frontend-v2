@@ -4,7 +4,7 @@ export function SubmitButton({ isSubmitting, isLogin = false }: { isSubmitting: 
   return (
     <button
       type="submit"
-      className={`items-center rounded-md duration-200 transition active:bg-[#d9d9d9] hover:bg-[#e0e0e0] bg-white group relative w-full flex justify-center py-2 px-4 border border-transparent font-semibold dark:text-black focus:ring-2 focus:ring-blue-300 ${
+      className={`items-center rounded-full duration-200 transition active:bg-blue-800 hover:bg-blue-700 bg-blue-600 group relative w-full flex justify-center py-3 px-4 border border-transparent font-semibold text-white focus:ring-2 focus:ring-blue-300 ${
         isSubmitting
           ? "cursor-not-allowed bg-blue-400 hover:bg-blue-400 active:bg-blue-400 focus:ring-0"
           : ""
@@ -14,7 +14,7 @@ export function SubmitButton({ isSubmitting, isLogin = false }: { isSubmitting: 
       {isLogin ? (
         isSubmitting ? "Logging in..." : "Login"
       ) : (
-        isSubmitting ? "Submiting..." : "Subimt"
+        isSubmitting ? "Submiting..." : "Submit"
       )}
     </button>
   );
