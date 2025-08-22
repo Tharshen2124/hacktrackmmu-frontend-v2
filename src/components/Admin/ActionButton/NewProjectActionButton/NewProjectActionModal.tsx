@@ -55,7 +55,7 @@ export function NewProjectActionModal({
     }
 
     getData();
-  }, []);
+  }, [token]);
 
   async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();

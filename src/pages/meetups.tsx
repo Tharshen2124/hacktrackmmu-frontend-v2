@@ -44,7 +44,7 @@ export default function Meetups() {
     }
 
     getData();
-  }, [paginationNumber]);
+  }, [paginationNumber, token]);
 
   if (isLoading) {
     return (

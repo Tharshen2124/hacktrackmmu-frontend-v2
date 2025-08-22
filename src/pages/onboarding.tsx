@@ -10,19 +10,13 @@ import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 
 export default function Onboarding() {
-  const { token, isAdmin } = useAuthStore();
+  const { token } = useAuthStore();
   const [isClient, setIsClient] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string[]>([
     MemberStatus.Registered,
     MemberStatus.Contacted,
     MemberStatus.IdeaTalked,
   ]);
-
-  const statusColour = {
-    [MemberStatus.Registered]: "bg-green-500",
-    [MemberStatus.Contacted]: "bg-yellow-500",
-    [MemberStatus.IdeaTalked]: "bg-blue-500",
-  };
 
   useEffect(() => {
     setIsClient(true);
@@ -35,10 +29,6 @@ export default function Onboarding() {
     });
     return queryParams;
   };
-
-  const getStatusColour = (status: string) => {
-    return statusColour[status as keyof typeof statusColour] || "bg-gray-500";
-  }
 
   const {
     data: onboardingData,

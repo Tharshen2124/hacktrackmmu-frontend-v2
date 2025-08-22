@@ -2,12 +2,10 @@ import DashboardLayout from "@/components/DashboardLayout";
 import useAuthStore from "@/store/useAuthStore";
 import { apiUrl } from "@/utils/env";
 import { fetcherWithToken } from "@/utils/fetcher";
-import axios from "axios";
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
 import useSWR from "swr";
-import { Member, Project } from "@/types/types";
+import { Member } from "@/types/types";
 
 export default function MemberPage() {
   const { token } = useAuthStore();
@@ -16,12 +14,12 @@ export default function MemberPage() {
 
   const {
     data: member,
-    error: memberError,
-    isLoading: memberLoading,
-    mutate: mutateMember,
+    // error: memberError,
+    // isLoading: memberLoading,
+    // mutate: mutateMember,
   } = useSWR<Member>(
     token ? [`${apiUrl}/api/v1/members/${id}`, token] : null,
-    ([url, token]) => fetcherWithToken(url, token),
+    ([url, token]: [string, string]) => fetcherWithToken(url, token),
   );
 
   return (

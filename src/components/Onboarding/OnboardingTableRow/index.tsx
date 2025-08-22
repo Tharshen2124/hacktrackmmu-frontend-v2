@@ -11,15 +11,22 @@ interface OnboardingTableRowProps {
   mutateOnboarding: () => void;
 }
 
-const statusColour = {
+const statusColour: Record<MemberStatus, string> = {
   [MemberStatus.Registered]: "bg-red-700",
   [MemberStatus.Contacted]: "bg-blue-700",
   [MemberStatus.IdeaTalked]: "bg-green-800",
+  [MemberStatus.All]: "",
+  [MemberStatus.NeverActive]: "",
+  [MemberStatus.Active]: "",
+  [MemberStatus.SociallyActive]: "",
+  [MemberStatus.WasActive]: "",
+  [MemberStatus.WasSociallyInactive]: "",
+  [MemberStatus.Terminated]: ""
 };
 
 export default function OnboardingTableRow({
   member,
-  mutateOnboarding,
+  // mutateOnboarding,
 }: OnboardingTableRowProps) {
   // const { token } = useAuthStore()
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);

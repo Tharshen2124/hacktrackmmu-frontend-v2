@@ -1,4 +1,3 @@
-import { s } from "framer-motion/client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 

@@ -220,12 +220,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
           {Array.isArray(members) &&
             members.map((member: any) => (
-              <MemberCard
-                key={member.id}
-                name={member.name}
-                active={member.active}
-                projects={member.projects}
-              />
+              <MemberCard key={member.id} {...member} />
             ))}
         </div>
       </div>

@@ -47,6 +47,7 @@ export interface Meetup {
 export interface Update {
   id: number,
   meetup_id: number,
+  meetup: Meetup,
   project_id: number,
   project: Project,
   member_id: number,

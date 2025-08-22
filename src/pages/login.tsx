@@ -67,7 +67,7 @@ export default function LoginPage() {
         );
         setIsSubmitting(false);
         setToken(response.data.token);
-        setAdmin(response.data.isAdmin ? "true" : "false");
+        setAdmin(response.data.isAdmin);
         setValidUntil(response.data.valid_until);
         router.push("/dashboard");
       }

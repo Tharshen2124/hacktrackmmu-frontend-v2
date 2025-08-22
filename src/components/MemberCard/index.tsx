@@ -14,7 +14,7 @@ import { dateMod } from "@/utils/dateMod";
 import { ModalLayout } from "../ModalLayout";
 import useAuthStore from "@/store/useAuthStore";
 import Link from "next/link";
-import { Member } from "@/types/types";
+import { Member, Project, Update } from "@/types/types";
 
 
 export default function MemberCard({
@@ -137,7 +137,7 @@ export default function MemberCard({
 
                     <p className="text-sm">{update.description}</p>
                     <p className="text-[#777] mt-1 text-sm font-semibold">
-                      {dateMod(update.meetup.date)}
+                      {dateMod(update.meetup.date.toISOString())}
                     </p>
                   </div>
                 ))
