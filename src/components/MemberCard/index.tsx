@@ -5,46 +5,26 @@ import {
   FolderCode,
   Hammer,
   Lightbulb,
+  PenLine,
   Speech,
   User,
 } from "lucide-react";
 import { useState } from "react";
 import { dateMod } from "@/utils/dateMod";
 import { ModalLayout } from "../ModalLayout";
+import useAuthStore from "@/store/useAuthStore";
+import Link from "next/link";
+import { Member } from "@/types/types";
 
-interface MemberCardProps {
-  active: boolean;
-  comment?: string;
-  contact_number?: string;
-  email?: string;
-  name: string;
-  register_date?: string;
-  status?: string;
-  projects: Project[];
-}
 
-interface Project {
-  category: string;
-  completed: boolean;
-  name: string;
-  updates: Update[];
-  length: string;
-}
+export default function MemberCard({
+  id,
+  name,
+  projects,
+  status,
+}: Member) {
+  const { isAdmin } = useAuthStore();
 
-interface Update {
-  id: string;
-  category: string;
-  date: string;
-  description: string;
-  meetup: Meetup;
-}
-
-interface Meetup {
-  id: string;
-  date: string;
-}
-
-export default function MemberCard({ name, projects }: MemberCardProps) {
   const numberOfCompletedProjects = projects.filter(
     (project) => project.completed,
   ).length;
@@ -62,16 +42,30 @@ export default function MemberCard({ name, projects }: MemberCardProps) {
     setIsModalOpen(false);
   };
 
+  const formatStatus = (status: string | undefined) => {
+    if (!status) return "";
+
+    return status
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
   return (
     <>
       <div
         onClick={handleCardClick}
         className="bg-white dark:bg-[#222] rounded-lg p-4 border border-gray-600 hover:border-gray-200 hover:shadow-[0px_0px_8px_1px_rgba(0,_0,_0,_0.1)] hover:shadow-gray-200/50 active:shadow-none transition duration-200"
       >
-        <h1 className="text-lg flex items-center">
-          <User size="18" className="mr-2" />
-          <span className="font-bold">
-            {name.length > 20 ? name.slice(0, 30) + "..." : name}
+        <h1 className="text-lg flex justify-between">
+          <div className="flex items-center">
+            <User size="18" className="mr-2" />
+            <span className="font-bold">
+              {name.length > 20 ? name.slice(0, 30) + "..." : name}
+            </span>
+          </div>
+          <span className="text-gray-500 ml-2 text-[12px]">
+            {formatStatus(status)}
           </span>
         </h1>
         <hr className="border-gray-600 mb-2" />
@@ -90,7 +84,17 @@ export default function MemberCard({ name, projects }: MemberCardProps) {
       </div>
 
       <ModalLayout isOpen={isModalOpen} onClose={handleCloseModal}>
-        <h2 className="text-2xl font-bold mb-4">{name}</h2>
+        <div className="flex flex-row gap-2 items-center mb-4 justify-between">
+           <h2 className="text-2xl font-bold">{name}</h2>
+           {isAdmin && (
+             <Link href={`/member/${id}/edit`}>
+               <PenLine
+                 size={16}
+                 className="hover:cursor-pointer hover:text-blue-500 transition duration-200"
+               />
+             </Link>
+           )}
+        </div>
 
         <h3 className="text-lg font-semibold mb-1">Projects</h3>
         <div className="border border-gray-700 py-3 px-4 rounded-md mb-3 max-h-36 lg:max-h-48 overflow-y-auto">
@@ -154,7 +158,7 @@ export default function MemberCard({ name, projects }: MemberCardProps) {
             </p>
           )}
         </div>
-
+        {/* TODO: Add admin section to change status */}
         <button
           onClick={handleCloseModal}
           className="dark:bg-white hover:bg-white-600 dark:text-black bg-[#222] dark:hover:bg-[#e0e0e0] dark:active:bg-[#c7c7c7] text-white hover:bg-[#333] active:bg-[#444] font-bold py-2 px-4 rounded w-full transition duration-200"

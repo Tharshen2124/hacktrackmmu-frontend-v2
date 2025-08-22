@@ -1,10 +1,26 @@
 import { useState } from "react";
 import { OnboardingMemberModal } from "../OnboardingMemberModal";
+import { Member, MemberStatus } from "@/types/types";
+import dayjs from "dayjs";
 // import { apiUrl } from "@/utils/env";
 // import axios from "axios";
 // import useAuthStore from "@/store/useAuthStore";
 
-export default function OnboardingTableRow() {
+interface OnboardingTableRowProps {
+  member: Member;
+  mutateOnboarding: () => void;
+}
+
+const statusColour = {
+  [MemberStatus.Registered]: "bg-red-700",
+  [MemberStatus.Contacted]: "bg-blue-700",
+  [MemberStatus.IdeaTalked]: "bg-green-800",
+};
+
+export default function OnboardingTableRow({
+  member,
+  mutateOnboarding,
+}: OnboardingTableRowProps) {
   // const { token } = useAuthStore()
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   // const [onboardingMembers, setOnboardingMembers] = useState<any>()
@@ -40,15 +56,20 @@ export default function OnboardingTableRow() {
 
   return (
     <>
-      <td className="text-left pl-8 pr-2">John Doe</td>
-      <td className="text-left py-4 px-4">+60106673148</td>
-      <td className="text-left py-4 px-4">21/7/2025</td>
-      <td className="text-left py-2 px-4">
-        <div className="">
-          <p className="border-2 border-white py-2 text-sm w-24 text-center rounded-md font-bold text-white">
-            Active
-          </p>
-        </div>
+      <td className="pl-8 pr-2 py-4 min-w-[150px] overflow-auto">
+        {member.name}
+      </td>
+      <td className="py-4 px-4">{member.contact_number || "N/A"}</td>
+      <td className="py-4 px-4">
+        {dayjs(member.register_date || "N/A").format("MMM D, YYYY")}
+      </td>
+
+      <td className="py-4 px-4">
+        <span
+          className={`px-2 py-1 text-xs font-medium bg-transparent border-gray-200 border ${statusColour[member.status] || "text-blue-500"} rounded-full`}
+        >
+          {member.status.toUpperCase()}
+        </span>
       </td>
       <td className="text-left flex py-2 pl-2 pr-8 gap-x-2 flex-wrap w-[297px]">
         <button

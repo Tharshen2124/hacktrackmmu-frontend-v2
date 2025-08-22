@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { Sidebar } from "./sidebar";
@@ -12,11 +12,17 @@ import { useToast } from "@/components/Toast/ToastProvider";
 
 export default function NavigationBar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { clearToken, clearValidUntil, clearAdmin, isAdmin, token } = useAuthStore();
+  const [isClient, setIsClient] = useState(false);
+  const { clearToken, clearValidUntil, clearAdmin, isAdmin, token } =
+    useAuthStore();
   const { isDarkMode } = useDarkMode();
   const { showToast } = useToast();
 
   const router = useRouter();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -24,15 +30,12 @@ export default function NavigationBar() {
 
   async function handleLogout() {
     try {
-      const response = await axios.delete(
-        `${apiUrl}/api/v1/logout`, 
-        {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.delete(`${apiUrl}/api/v1/logout`, {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.status === 200) {
         showToast(
@@ -49,7 +52,7 @@ export default function NavigationBar() {
     } catch (error: any) {
       if (
         error.response &&
-          error.response?.data?.message === "Invalid password"
+        error.response?.data?.message === "Invalid password"
       ) {
         showToast("Invalid password. Try again.", "error");
       }
@@ -92,9 +95,14 @@ export default function NavigationBar() {
             <Link href="/meetups" className="ml-4 hover:text-blue-400">
               Meetups
             </Link>
+            {isClient && isAdmin && (
+              <Link href="/onboarding" className="ml-4 hover:text-blue-400">
+                Onboarding
+              </Link>
+            )}
           </div>
           <div className="hidden lg:flex items-center">
-            {isAdmin == "true" && <div className="mr-6">Admin Mode</div>}
+            {isClient && isAdmin && <div className="mr-6">Admin Mode</div>}
             <button
               onClick={handleLogout}
               className="flex items-center gap-2 dark:bg-white dark:text-black text-white bg-gray-800 font-semibold px-8 py-3 rounded-full"
@@ -112,7 +120,11 @@ export default function NavigationBar() {
           </div>
         </div>
       </nav>
-      <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} isAdmin={isAdmin} />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={toggleSidebar}
+        isAdmin={isAdmin}
+      />
     </>
   );
 }

@@ -1,12 +1,20 @@
+import { s } from "framer-motion/client";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  isAdmin: "true" | "false";
+  isAdmin: boolean;
 }
 
 export function Sidebar({ isOpen, onClose, isAdmin }: SidebarProps) {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   return (
     <>
       {/* Overlay */}
@@ -66,7 +74,7 @@ export function Sidebar({ isOpen, onClose, isAdmin }: SidebarProps) {
             </Link>
           </nav>
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-            {isAdmin == "true" &&
+            {isClient && isAdmin &&
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
                 Admin Mode
               </p>
