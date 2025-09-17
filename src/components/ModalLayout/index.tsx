@@ -38,7 +38,7 @@ export const ModalLayout: React.FC<ModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div
         ref={modalRef}
-        className="bg-white dark:bg-[#111] border border-gray-600 rounded-lg p-6 w-full max-w-md"
+        className="bg-white dark:bg-[#111] border border-gray-600 rounded-lg p-6 w-full max-w-md max-h-[80vh] overflow-y-auto"
       >
         <button
           onClick={onClose}

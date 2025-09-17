@@ -3,11 +3,11 @@ import Cookies from "js-cookie";
 
 interface useAuthStoreProps {
   token: string;
-  isAdmin: "true" | "false";
+  isAdmin: boolean; // Changed from "true" | "false" to boolean
   validUntil: string;
 
   setToken: (token: string) => void;
-  setAdmin: (isAdmin: "true" | "false") => void;
+  setAdmin: (isAdmin: boolean) => void; // Changed parameter type to boolean
   setValidUntil: (validUntil: string) => void;
 
   clearToken: () => void;
@@ -18,7 +18,7 @@ interface useAuthStoreProps {
 const useAuthStore = create<useAuthStoreProps>((set) => {
   // Read initial values from cookies (if they exist)
   const storedToken = Cookies.get("token") || "0";
-  const storedIsAdmin = Cookies.get("isAdmin") === "true" ? "true" : "false";
+  const storedIsAdmin = Cookies.get("isAdmin") === "true";
   const storedValidUntil = Cookies.get("validUntil") || "0";
 
   return {
@@ -31,9 +31,9 @@ const useAuthStore = create<useAuthStoreProps>((set) => {
       Cookies.set("token", token, { expires: 7 });
     },
 
-    setAdmin: (isAdmin: "true" | "false") => {
+    setAdmin: (isAdmin: boolean) => {
       set({ isAdmin });
-      Cookies.set("isAdmin", isAdmin, { expires: 7 });
+      Cookies.set("isAdmin", isAdmin.toString(), { expires: 7 });
     },
 
     setValidUntil: (validUntil: string) => {
@@ -47,7 +47,7 @@ const useAuthStore = create<useAuthStoreProps>((set) => {
     },
 
     clearAdmin: () => {
-      set({ isAdmin: "false" });
+      set({ isAdmin: false });
       Cookies.remove("isAdmin");
     },
 
@@ -59,8 +59,3 @@ const useAuthStore = create<useAuthStoreProps>((set) => {
 });
 
 export default useAuthStore;
-
-// tokens given from api last for an hour
-// to check from frontend, making requests ot the backend to verify token can be expensive
-// store the validUntil and check it from there.
-//

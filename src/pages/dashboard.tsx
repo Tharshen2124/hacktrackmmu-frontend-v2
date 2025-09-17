@@ -16,7 +16,7 @@ import useSWR from "swr";
 
 export default function Home() {
   const [isClient, setIsClient] = useState(false);
-  
+
   // Use the auth store directly instead of copying to local state
   const { token, isAdmin } = useAuthStore();
 
@@ -29,30 +29,30 @@ export default function Home() {
     data: members,
     error: membersError,
     isLoading: membersLoading,
-    mutate: mutateMembers
+    mutate: mutateMembers,
   } = useSWR(
     isClient && token ? [`${apiUrl}/api/v1/dashboard/members`, token] : null,
-    ([url, token]) => fetcherWithToken(url, token)
+    ([url, token]) => fetcherWithToken(url, token),
   );
 
   const {
     data: meetups,
     error: meetupsError,
     isLoading: meetupsLoading,
-    mutate: mutateMeetups
+    mutate: mutateMeetups,
   } = useSWR(
     isClient && token ? [`${apiUrl}/api/v1/dashboard/meetups`, token] : null,
-    ([url, token]) => fetcherWithToken(url, token)
+    ([url, token]) => fetcherWithToken(url, token),
   );
 
   const {
     data: hackathons,
     error: hackathonsError,
     isLoading: hackathonsLoading,
-    mutate: mutateHackathons
+    mutate: mutateHackathons,
   } = useSWR(
     isClient && token ? [`${apiUrl}/api/v1/dashboard/hackathons`, token] : null,
-    ([url, token]) => fetcherWithToken(url, token)
+    ([url, token]) => fetcherWithToken(url, token),
   );
 
   // Now you can safely do conditional returns
@@ -70,15 +70,18 @@ export default function Home() {
             <h2 className="text-3xl font-semibold">Control Panel</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
-           <SkeletonActionButton />
-           <SkeletonActionButton />
-           <SkeletonActionButton />
+            <SkeletonActionButton />
+            <SkeletonActionButton />
+            <SkeletonActionButton />
           </div>
         </div>
         <div className="mt-10">
           <div className="flex justify-between items-center">
             <h2 className="text-3xl font-semibold">Meetups</h2>
-            <Link href="/meetups" className="flex items-center gap-x-2 dark:bg-white dark:hover:bg-[#e0e0e0] dark:text-black transition duration-200 bg-gray-800 hover:bg-gray-950 py-2 px-6 rounded-full font-semibold text-white">
+            <Link
+              href="/meetups"
+              className="flex items-center gap-x-2 dark:bg-white dark:hover:bg-[#e0e0e0] dark:text-black transition duration-200 bg-gray-800 hover:bg-gray-950 py-2 px-6 rounded-full font-semibold text-white"
+            >
               <CircleArrowRight size="18" />
               View All
             </Link>
@@ -93,7 +96,10 @@ export default function Home() {
         <div className="mt-10">
           <div className="flex justify-between items-center">
             <h2 className="text-3xl font-semibold">Hackathons</h2>
-            <Link href="/meetups" className="flex items-center gap-x-2 dark:bg-white dark:hover:bg-[#e0e0e0] dark:text-black transition duration-200 bg-gray-800 hover:bg-gray-950 py-2 px-6 rounded-full font-semibold text-white">
+            <Link
+              href="/meetups"
+              className="flex items-center gap-x-2 dark:bg-white dark:hover:bg-[#e0e0e0] dark:text-black transition duration-200 bg-gray-800 hover:bg-gray-950 py-2 px-6 rounded-full font-semibold text-white"
+            >
               <CircleArrowRight size="18" />
               View All
             </Link>
@@ -108,7 +114,10 @@ export default function Home() {
         <div className="mt-10">
           <div className="flex justify-between items-center">
             <h2 className="text-3xl font-semibold">Members</h2>
-            <Link href="/members" className="flex items-center gap-x-2 dark:bg-white dark:hover:bg-[#e0e0e0] dark:text-black transition duration-200 bg-gray-800 hover:bg-gray-950 py-2 px-6 rounded-full font-semibold text-white">
+            <Link
+              href="/members"
+              className="flex items-center gap-x-2 dark:bg-white dark:hover:bg-[#e0e0e0] dark:text-black transition duration-200 bg-gray-800 hover:bg-gray-950 py-2 px-6 rounded-full font-semibold text-white"
+            >
               <CircleArrowRight size="18" />
               View All
             </Link>
@@ -134,19 +143,22 @@ export default function Home() {
   return (
     <DashboardLayout>
       <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
-      {isAdmin === "true" && 
-        <ControlPanel 
-          mutateMeetups={mutateMeetups} 
-          mutateHackathons={mutateHackathons} 
-          mutateMembers={mutateMembers} 
+      {isAdmin && (
+        <ControlPanel
+          mutateMeetups={mutateMeetups}
+          mutateHackathons={mutateHackathons}
+          mutateMembers={mutateMembers}
         />
-      }
+      )}
 
       {/* Meetups */}
       <div className="mt-10">
         <div className="flex justify-between items-center">
           <h2 className="text-3xl font-semibold">Meetups</h2>
-          <Link href="/meetups" className="flex items-center gap-x-2 dark:bg-white dark:hover:bg-[#e0e0e0] dark:text-black transition duration-200 bg-gray-800 hover:bg-gray-950 py-2 px-6 rounded-full font-semibold text-white">
+          <Link
+            href="/meetups"
+            className="flex items-center gap-x-2 dark:bg-white dark:hover:bg-[#e0e0e0] dark:text-black transition duration-200 bg-gray-800 hover:bg-gray-950 py-2 px-6 rounded-full font-semibold text-white"
+          >
             <CircleArrowRight size="18" />
             View All
           </Link>
@@ -170,7 +182,10 @@ export default function Home() {
       <div className="mt-10">
         <div className="flex justify-between items-center">
           <h2 className="text-3xl font-semibold">Hackathons</h2>
-          <Link href="/meetups" className="flex items-center gap-x-2 dark:bg-white dark:hover:bg-[#e0e0e0] dark:text-black transition duration-200 bg-gray-800 hover:bg-gray-950 py-2 px-6 rounded-full font-semibold text-white">
+          <Link
+            href="/meetups"
+            className="flex items-center gap-x-2 dark:bg-white dark:hover:bg-[#e0e0e0] dark:text-black transition duration-200 bg-gray-800 hover:bg-gray-950 py-2 px-6 rounded-full font-semibold text-white"
+          >
             <CircleArrowRight size="18" />
             View All
           </Link>
@@ -193,8 +208,11 @@ export default function Home() {
       {/* Members */}
       <div className="mt-10">
         <div className="flex justify-between items-center">
-          <h2 className="text-3xl font-semibold">Members</h2>
-          <Link href="/members" className="flex items-center gap-x-2 dark:bg-white dark:hover:bg-[#e0e0e0] dark:text-black transition duration-200 bg-gray-800 hover:bg-gray-950 py-2 px-6 rounded-full font-semibold text-white">
+          <h2 className="text-3xl font-semibold">Active Members</h2>
+          <Link
+            href="/members"
+            className="flex items-center gap-x-2 dark:bg-white dark:hover:bg-[#e0e0e0] dark:text-black transition duration-200 bg-gray-800 hover:bg-gray-950 py-2 px-6 rounded-full font-semibold text-white"
+          >
             <CircleArrowRight size="18" />
             View All
           </Link>
@@ -202,12 +220,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
           {Array.isArray(members) &&
             members.map((member: any) => (
-              <MemberCard
-                key={member.id}
-                name={member.name}
-                active={member.active}
-                projects={member.projects}
-              />
+              <MemberCard key={member.id} {...member} />
             ))}
         </div>
       </div>

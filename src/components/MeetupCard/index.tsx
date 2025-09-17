@@ -9,6 +9,7 @@ import {
 import { useState } from "react";
 import { dateMod } from "@/utils/dateMod";
 import { ModalLayout } from "../ModalLayout";
+import { Update } from "@/types/types";
 
 interface MeetupCardProps {
   number: number;
@@ -16,24 +17,6 @@ interface MeetupCardProps {
   date: string;
   hostName: string;
   updates: Update[];
-}
-
-interface Project {
-  category: string;
-  completed: boolean;
-  name: string;
-}
-
-interface Update {
-  category: string;
-  description: string;
-  member: Member;
-  project: Project;
-}
-
-interface Member {
-  name: string;
-  active: boolean;
 }
 
 export default function MeetupCard({
