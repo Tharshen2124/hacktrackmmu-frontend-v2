@@ -15,7 +15,7 @@ import { ModalLayout } from "../ModalLayout";
 import useAuthStore from "@/store/useAuthStore";
 import Link from "next/link";
 import { Member, Project, Update } from "@/types/types";
-import dayjs from "dayjs";
+
 
 export default function MemberCard({
   id,
@@ -87,7 +87,7 @@ export default function MemberCard({
         <div className="flex flex-row gap-2 items-center mb-4 justify-between">
            <h2 className="text-2xl font-bold">{name}</h2>
            {isAdmin && (
-             <Link href={`/member/${id}/edit?source=members`} passHref>
+             <Link href={`/member/${id}/edit`}>
                <PenLine
                  size={16}
                  className="hover:cursor-pointer hover:text-blue-500 transition duration-200"
@@ -137,7 +137,7 @@ export default function MemberCard({
 
                     <p className="text-sm">{update.description}</p>
                     <p className="text-[#777] mt-1 text-sm font-semibold">
-                      {dayjs(update.meetup.date).format(" h:mm A, MMM D YYYY")}
+                      {dateMod(update.meetup.date.toISOString())}
                     </p>
                   </div>
                 ))

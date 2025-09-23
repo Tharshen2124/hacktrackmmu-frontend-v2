@@ -2,8 +2,6 @@ import { useState } from "react";
 import { OnboardingMemberModal } from "../OnboardingMemberModal";
 import { Member, MemberStatus } from "@/types/types";
 import dayjs from "dayjs";
-import { useDeviceType } from "@/hooks/useDeviceType";
-import Link from "next/link";
 // import { apiUrl } from "@/utils/env";
 // import axios from "axios";
 // import useAuthStore from "@/store/useAuthStore";
@@ -28,10 +26,9 @@ const statusColour: Record<MemberStatus, string> = {
 
 export default function OnboardingTableRow({
   member,
-  mutateOnboarding,
+  // mutateOnboarding,
 }: OnboardingTableRowProps) {
   // const { token } = useAuthStore()
-  const deviceType = useDeviceType();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   // const [onboardingMembers, setOnboardingMembers] = useState<any>()
   // const [paginationNumber, setPaginationNumber] = useState<number>(1);
@@ -65,7 +62,7 @@ export default function OnboardingTableRow({
   const handleCloseModal = () => setIsModalOpen(false);
 
   return (
-    <tr className="border border-gray-800">
+    <>
       <td className="pl-8 pr-2 py-4 min-w-[150px] overflow-auto">
         {member.name}
       </td>
@@ -76,40 +73,30 @@ export default function OnboardingTableRow({
 
       <td className="py-4 px-4">
         <span
-          className={`px-2 py-1 text-xs font-medium border-gray-200 border ${statusColour[member.status] || "text-blue-500"} rounded-full`}
+          className={`px-2 py-1 text-xs font-medium bg-transparent border-gray-200 border ${statusColour[member.status] || "text-blue-500"} rounded-full`}
         >
           {member.status.toUpperCase()}
         </span>
       </td>
-      <td className="text-left py-2 pl-2 pr-8 w-[297px] items-center ">
-        <div className="button-container flex gap-x-2 gap-y-2 flex-wrap justify-center">
-          <button
-            onClick={handleViewClick}
-            className="w-[80px] text-black text-sm font-semibold bg-[#d9d9d9] py-2 px-3 rounded-full transition duration-200 hover:bg-gray-200 active:bg-gray-400"
-          >
-            View
-          </button>
-          <Link href={`/member/${member.id}/edit?source=onboarding`} passHref>
-            <button className="w-[80px] text-white text-sm font-semibold bg-blue-800 py-2 px-3 rounded-full transition duration-200 hover:bg-blue-700 active:bg-gray-400">
-              Edit
-            </button>
-          </Link>
-          <button className="w-[80px] text-white text-sm font-semibold bg-red-800 py-2 px-3 rounded-full transition duration-200 hover:bg-red-700 active:bg-gray-400">
-            Delete
-          </button>
-        </div>
-
+      <td className="text-left flex py-2 pl-2 pr-8 gap-x-2 flex-wrap w-[297px]">
+        <button
+          onClick={handleViewClick}
+          className="w-[80px] text-black text-sm font-semibold bg-[#d9d9d9] py-2 px-3 rounded-full transition duration-200 hover:bg-gray-200 active:bg-gray-400"
+        >
+          View
+        </button>
+        <button className="w-[80px] text-white text-sm font-semibold bg-blue-800 py-2 px-3 rounded-full transition duration-200 hover:bg-blue-700 active:bg-gray-400">
+          Edit
+        </button>
+        <button className="w-[80px] text-white text-sm font-semibold bg-red-800 py-2 px-3 rounded-full transition duration-200 hover:bg-red-700 active:bg-gray-400">
+          Delete
+        </button>
       </td>
 
       <OnboardingMemberModal
         isModalOpen={isModalOpen}
         handleCloseModal={handleCloseModal}
-        member={member}
-        mutateOnboarding={mutateOnboarding}
       />
-    </tr>
+    </>
   );
 }
-
-
-

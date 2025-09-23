@@ -5,10 +5,9 @@ interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   isAdmin: boolean;
-  handleLogout: () => void;
 }
 
-export function Sidebar({ isOpen, onClose, isAdmin, handleLogout }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, isAdmin }: SidebarProps) {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -19,15 +18,17 @@ export function Sidebar({ isOpen, onClose, isAdmin, handleLogout }: SidebarProps
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300 ease-in-out ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
+        className={`fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300 ease-in-out ${
+          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
         onClick={onClose}
       ></div>
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 w-64 h-full bg-white dark:bg-gray-800 z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
+        className={`fixed top-0 left-0 w-64 h-full bg-white dark:bg-gray-800 z-50 transform transition-transform duration-300 ease-in-out ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
         <div className="flex flex-col h-full">
           <div className="flex justify-end p-4">
@@ -70,12 +71,6 @@ export function Sidebar({ isOpen, onClose, isAdmin, handleLogout }: SidebarProps
             >
               Meetups
             </Link>
-            {isClient && isAdmin && (
-              <Link href="/onboarding" className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-              >
-                Onboarding
-              </Link>
-            )}
           </nav>
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
             {isClient && isAdmin &&
@@ -83,9 +78,7 @@ export function Sidebar({ isOpen, onClose, isAdmin, handleLogout }: SidebarProps
                 Admin Mode
               </p>
             }
-            <button
-              onClick={handleLogout}
-              className="w-full bg-gray-800 text-white dark:bg-white dark:text-black font-semibold py-2 px-4 rounded-md hover:bg-gray-700 dark:hover:bg-gray-100 transition duration-200">
+            <button className="w-full bg-gray-800 text-white dark:bg-white dark:text-black font-semibold py-2 px-4 rounded-md hover:bg-gray-700 dark:hover:bg-gray-100 transition duration-200">
               Logout
             </button>
           </div>
