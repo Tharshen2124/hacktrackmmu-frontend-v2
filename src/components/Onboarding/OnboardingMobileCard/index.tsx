@@ -72,6 +72,7 @@ export default function OnboardingMobileCard({
         isModalOpen={isModalOpen}
         handleCloseModal={handleCloseModal}
         member={member}
+        mutateOnboarding={mutateOnboarding}
       />
     </div>
   );

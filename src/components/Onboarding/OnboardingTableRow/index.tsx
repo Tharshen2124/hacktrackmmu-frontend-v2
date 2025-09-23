@@ -2,7 +2,6 @@ import { useState } from "react";
 import { OnboardingMemberModal } from "../OnboardingMemberModal";
 import { Member, MemberStatus } from "@/types/types";
 import dayjs from "dayjs";
-import { useDeviceType } from "@/hooks/useDeviceType";
 import Link from "next/link";
 // import { apiUrl } from "@/utils/env";
 // import axios from "axios";
@@ -31,7 +30,6 @@ export default function OnboardingTableRow({
   mutateOnboarding,
 }: OnboardingTableRowProps) {
   // const { token } = useAuthStore()
-  const deviceType = useDeviceType();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   // const [onboardingMembers, setOnboardingMembers] = useState<any>()
   // const [paginationNumber, setPaginationNumber] = useState<number>(1);

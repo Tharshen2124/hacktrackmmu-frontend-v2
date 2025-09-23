@@ -136,6 +136,7 @@ export default function Onboarding() {
                 members.map((member: Member) => (
                   // <tr key={member.id} className="border border-gray-800">
                   <OnboardingTableRow
+                    key={member.id}
                     member={member}
                     mutateOnboarding={mutateOnboarding}
                   />

@@ -6,14 +6,12 @@ import { apiUrl } from "@/utils/env";
 import axios from "axios";
 import dayjs from "dayjs";
 import {
-  ArrowBigDown,
   ArrowDown,
   ArrowUp,
   Check,
   Copy,
   Edit,
   Mail,
-  Phone,
   Trash,
 } from "lucide-react";
 import Image from "next/image";
@@ -24,7 +22,7 @@ interface OnboardingMemberModalProps {
   isModalOpen: boolean;
   handleCloseModal: () => void;
   member: Member;
-  mutateOnboarding?: () => void;
+  mutateOnboarding: () => void;
 }
 
 const convertToWhatsapp = (phoneNumber: string) => {
@@ -64,7 +62,7 @@ export function OnboardingMemberModal({
 
   useEffect(() => {
     setIsClient(true);
-  });
+  }, []);
 
   const updateStatus = async (
     change: "up" | "down",
@@ -98,7 +96,7 @@ export function OnboardingMemberModal({
           },
         },
       );
-      mutateOnboarding && mutateOnboarding();
+      mutateOnboarding();
       showToast("Member status updated successfully", "success");
     } catch (error: any) {
       console.error("Error occured during fetch", error);
@@ -130,7 +128,11 @@ export function OnboardingMemberModal({
       <div className="flex justify-between items-center  mb-4">
         <h2 className="text-2xl font-bold">{member.name}</h2>
         <div className="flex gap-x-2">
-          <Link href={`/member/${member.id}/edit?source=onboarding`} passHref className="border p-[5px] border-blue-600 bg-blue-600 rounded-md">
+          <Link
+            href={`/member/${member.id}/edit?source=onboarding`}
+            passHref
+            className="border p-[5px] border-blue-600 bg-blue-600 rounded-md"
+          >
             <Edit size="16" />
           </Link>
           <div className="border p-[5px] border-red-600 bg-red-600 rounded-md">
@@ -144,58 +146,63 @@ export function OnboardingMemberModal({
           Status:{" "}
           {member.status.charAt(0).toUpperCase() + member.status.slice(1)}
         </h3>
-        <div className="arrow-containers flex flex-row gap-x-2 items-center">
-          {MemberStatusMap[member.status] === 2 && (
-            <Link href={`/member/${member.id}/edit?source=onboarding`} passHref>
-              <button
-                className="bg-green-600 p-1 rounded-md"
-                title="Assign Status in Edit Page"
+        {isClient && (
+          <div className="arrow-containers flex flex-row gap-x-2 items-center">
+            {MemberStatusMap[member.status] === 2 && (
+              <Link
+                href={`/member/${member.id}/edit?source=onboarding`}
+                passHref
               >
-                <Check size="16" />
+                <button
+                  className="bg-green-600 p-1 rounded-md"
+                  title="Assign Status in Edit Page"
+                >
+                  <Check size="16" />
+                </button>
+              </Link>
+            )}
+            {MemberStatusMap[member.status] < 2 &&
+            MemberStatusMap[member.status] >= 0 ? (
+              <button
+                title={`Promote to ${
+                  Object.keys(MemberStatusMap).find(
+                    (key) =>
+                      MemberStatusMap[key as MemberStatus] ===
+                      MemberStatusMap[member.status] + 1,
+                  ) || ""
+                }`}
+                className="bg-blue-600 p-1 rounded-md"
+                onClick={() => updateStatus("up", member.status)}
+              >
+                <ArrowUp size="16" />
               </button>
-            </Link>
-          )}
-          {MemberStatusMap[member.status] < 2 &&
-          MemberStatusMap[member.status] >= 0 ? (
-            <button
-              title={`Promote to ${
-                Object.keys(MemberStatusMap).find(
-                  (key) =>
-                    MemberStatusMap[key as MemberStatus] ===
-                    MemberStatusMap[member.status] + 1,
-                ) || ""
-              }`}
-              className="bg-blue-600 p-1 rounded-md"
-              onClick={() => updateStatus("up", member.status)}
-            >
-              <ArrowUp size="16" />
-            </button>
-          ) : (
-            <div className="bg-gray-600 p-1 rounded-md">
-              <ArrowUp size="16" />
-            </div>
-          )}
-          {MemberStatusMap[member.status] > 0 &&
-          MemberStatusMap[member.status] <= 2 ? (
-            <button
-              title={`Demote to ${
-                Object.keys(MemberStatusMap).find(
-                  (key) =>
-                    MemberStatusMap[key as MemberStatus] ===
-                    MemberStatusMap[member.status] - 1,
-                ) || ""
-              }`}
-              className="bg-yellow-500 p-1 rounded-md"
-              onClick={() => updateStatus("down", member.status)}
-            >
-              <ArrowDown size="16" />
-            </button>
-          ) : (
-            <div className="bg-gray-600 p-1 rounded-md">
-              <ArrowDown size="16" />
-            </div>
-          )}
-        </div>
+            ) : (
+              <div className="bg-gray-600 p-1 rounded-md">
+                <ArrowUp size="16" />
+              </div>
+            )}
+            {MemberStatusMap[member.status] > 0 &&
+            MemberStatusMap[member.status] <= 2 ? (
+              <button
+                title={`Demote to ${
+                  Object.keys(MemberStatusMap).find(
+                    (key) =>
+                      MemberStatusMap[key as MemberStatus] ===
+                      MemberStatusMap[member.status] - 1,
+                  ) || ""
+                }`}
+                className="bg-yellow-500 p-1 rounded-md"
+                onClick={() => updateStatus("down", member.status)}
+              >
+                <ArrowDown size="16" />
+              </button>
+            ) : (
+              <div className="bg-gray-600 p-1 rounded-md">
+                <ArrowDown size="16" />
+              </div>
+            )}
+          </div>
+        )}
       </div>
       {MemberStatusMap[member.status] === 2 ? (
         <div className="bg-green-500 text-black font-bold text-sm p-2 rounded-md mt-2">
