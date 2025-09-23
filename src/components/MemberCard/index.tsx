@@ -13,6 +13,7 @@ import { useState } from "react";
 import { ModalLayout } from "../ModalLayout";
 import useAuthStore from "@/store/useAuthStore";
 import Link from "next/link";
+import dayjs from "dayjs";
 import { Member, Project, Update } from "@/types/types";
 
 
@@ -136,7 +137,7 @@ export default function MemberCard({
 
                     <p className="text-sm">{update.description}</p>
                     <p className="text-[#777] mt-1 text-sm font-semibold">
-                      {dateMod(update.meetup.date.toISOString())}
+                      {dayjs(update.meetup.date).format("MMM D, YYYY")}
                     </p>
                   </div>
                 ))
