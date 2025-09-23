@@ -10,7 +10,7 @@ import { Member } from "@/types/types";
 export default function MemberPage() {
   const { token } = useAuthStore();
   const router = useRouter();
-  const { id, source } = router.query;
+  const { id } = router.query;
 
   const {
     data: member,
@@ -29,12 +29,7 @@ export default function MemberPage() {
         onClick={() => router.back()}
       >
         <ChevronLeft />
-        <span>
-          Back to{" "}
-          {typeof source === "string"
-            ? source.slice(0, 1).toUpperCase() + source.slice(1)
-            : "Members"}
-        </span>
+        <span>Back to Members</span>
       </button>
       <h1>Member Details</h1>
       <p>Member ID: {member?.id}</p>

@@ -124,7 +124,6 @@ export default function NavigationBar() {
         isOpen={isSidebarOpen}
         onClose={toggleSidebar}
         isAdmin={isAdmin}
-        handleLogout={handleLogout}
       />
     </>
   );

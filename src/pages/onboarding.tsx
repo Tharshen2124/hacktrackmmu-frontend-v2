@@ -8,12 +8,9 @@ import { fetcherWithToken } from "@/utils/fetcher";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
-import { useDeviceType } from "@/hooks/useDeviceType";
-import OnboardingMobileCard from "@/components/Onboarding/OnboardingMobileCard";
 
 export default function Onboarding() {
   const { token } = useAuthStore();
-  const deviceType = useDeviceType();
   const [isClient, setIsClient] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string[]>([
     MemberStatus.Registered,
@@ -41,9 +38,9 @@ export default function Onboarding() {
   } = useSWR(
     token && isClient
       ? [
-        `${apiUrl}/api/v1/members/filtered?${createQueryParams().toString()}`,
-        token,
-      ]
+          `${apiUrl}/api/v1/members/filtered?${createQueryParams().toString()}`,
+          token,
+        ]
       : null,
     ([url, token]) => fetcherWithToken(url, token),
   );
@@ -87,89 +84,59 @@ export default function Onboarding() {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-row justify-between items-center mt-6">
-        <h1 className="text-4xl font-bold">Onboarding</h1>
-        {deviceType === "mobile" && (
-          <MemberFilter
-            onStatusChange={handleStatusChange}
-            currentStatus={getCurrentSingleStatus()}
-            isOnboarding={true}
-          />
-        )}
-      </div>
-
+      <h1 className="text-4xl font-bold mt-6">Onboarding</h1>
       {onboardingLoading && <p>Loading onboarding data...</p>}
       {onboardingError && <p>Error loading data</p>}
 
-      {deviceType === "desktop" || deviceType === "tablet" ? (
-        // Desktop/Tablet View
-        <div className="mt-4 border w-full border-gray-800 rounded-lg active:shadow-none transition duration-200">
-          <table className="w-full">
-            <thead className="border-b pb-3">
-              <tr className="border-b border-gray-800 pb-3">
-                <th className="text-left pl-8 pr-2 bg-[#1e1e1e] rounded-tl-lg min-w-[150px]">
-                  Name
-                </th>
-                <th className="text-left py-4 px-4 bg-[#1e1e1e]">
-                  Contact Number
-                </th>
-                <th className="text-left py-4 px-4 bg-[#1e1e1e]">
-                  Register Date
-                </th>
-                <th className="text-left py-4 px-4 bg-[#1e1e1e]">
-                  <div className="flex items-center gap-x-3">
-                    Status
-                    <MemberFilter
-                      onStatusChange={handleStatusChange}
-                      currentStatus={getCurrentSingleStatus()}
-                      isOnboarding={true}
-                    />
-                  </div>
-                </th>
-                <th className="text-left pl-2 pr-8 bg-[#1e1e1e] rounded-tr-lg w-[297px]">
-                  Options
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {members.length > 0 ? (
-                members.map((member: Member) => (
-                  // <tr key={member.id} className="border border-gray-800">
+      <div className="mt-4 border w-full border-gray-800 rounded-lg active:shadow-none transition duration-200">
+        <table className="w-full">
+          <thead className="border-b pb-3">
+            <tr className="border-b border-gray-800 pb-3">
+              <th className="text-left pl-8 pr-2 bg-[#1e1e1e] rounded-tl-lg min-w-[150px]">
+                Name
+              </th>
+              <th className="text-left py-4 px-4 bg-[#1e1e1e]">
+                Contact Number
+              </th>
+              <th className="text-left py-4 px-4 bg-[#1e1e1e]">
+                Register Date
+              </th>
+              <th className="text-left py-4 px-4 bg-[#1e1e1e]">
+                <div className="flex items-center gap-x-3">
+                  Status
+                  <MemberFilter
+                    onStatusChange={handleStatusChange}
+                    currentStatus={getCurrentSingleStatus()}
+                    isOnboarding={true}
+                  />
+                </div>
+              </th>
+              <th className="text-left pl-2 pr-8 bg-[#1e1e1e] rounded-tr-lg w-[297px]">
+                Options
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {members.length > 0 ? (
+              members.map((member: Member) => (
+                <tr key={member.id} className="border border-gray-800">
                   <OnboardingTableRow
                     key={member.id}
                     member={member}
                     mutateOnboarding={mutateOnboarding}
                   />
-                  // </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={5} className="text-center py-8 text-gray-500">
-                    {onboardingLoading ? "Loading..." : "No members found"}
-                  </td>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>) : (
-        // Mobile View
-        <div className="mt-4">
-          {members.length > 0 ? (
-            members.map((member: Member) => (
-              <OnboardingMobileCard
-                key={member.id}
-                member={member}
-                mutateOnboarding={mutateOnboarding}
-              />
-            ))
-          ) : (
-            <p className="text-center py-8 text-gray-500">
-              {onboardingLoading ? "Loading..." : "No members found"}
-            </p>
-          )}
-        </div>
-      )
-      }
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="text-center py-8 text-gray-500">
+                  {onboardingLoading ? "Loading..." : "No members found"}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </DashboardLayout>
   );
 }

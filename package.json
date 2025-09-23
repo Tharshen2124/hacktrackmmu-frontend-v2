@@ -12,7 +12,7 @@
   "dependencies": {
     "@tailwindcss/forms": "^0.5.10",
     "axios": "^1.7.9",
-    "dayjs": "^1.11.18",
+    "dayjs": "^1.11.13",
     "framer-motion": "^12.4.7",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.475.0",
