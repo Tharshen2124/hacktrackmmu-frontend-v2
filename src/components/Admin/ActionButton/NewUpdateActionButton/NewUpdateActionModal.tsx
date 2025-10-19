@@ -19,10 +19,10 @@ type Category = "idea_talk" | "progress_talk";
 
 export function useCreateUpdateData() {
   const { token } = useAuthStore();
-  
+
   return useSWR(
     token ? [`${apiUrl}/api/v1/dashboard/create_update`, token] : null,
-    ([url, token]) => fetcherWithToken(url, token)
+    ([url, token]) => fetcherWithToken(url, token),
   );
 }
 
@@ -34,19 +34,15 @@ export function NewUpdateActionModal({
   const { token } = useAuthStore();
 
   // Use the custom hook
-  const {
-    data: createUpdateData,
-    error,
-    isLoading,
-  } = useCreateUpdateData();
+  const { data: createUpdateData, error, isLoading } = useCreateUpdateData();
 
   const [projects, setProjects] = useState<any>();
   const [category, setCategory] = useState<Category>("idea_talk");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedMemberID, setSelectedMemberID] = useState<string>("")
-  const [selectedProjectID, setSelectedProjectID] = useState<string>("")
-  const [selectedMeetupID, setSelectedMeetupID] = useState<string>("")
-  const [description, setDescription] = useState<string>("")
+  const [selectedMemberID, setSelectedMemberID] = useState<string>("");
+  const [selectedProjectID, setSelectedProjectID] = useState<string>("");
+  const [selectedMeetupID, setSelectedMeetupID] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
 
   // Extract members and dates from SWR data
   const members = createUpdateData?.members;
@@ -56,10 +52,10 @@ export function NewUpdateActionModal({
   // Update projects when selectedMemberID changes
   useEffect(() => {
     if (selectedMemberID !== "" && members) {
-      const member = members.find((m: any) => m.id === selectedMemberID)
-      setProjects(member?.projects || [])
+      const member = members.find((m: any) => m.id === selectedMemberID);
+      setProjects(member?.projects || []);
     }
-  }, [selectedMemberID, members])
+  }, [selectedMemberID, members]);
 
   // Reset form when modal closes
   useEffect(() => {
@@ -77,56 +73,56 @@ export function NewUpdateActionModal({
     event.preventDefault();
     setIsSubmitting(true);
 
-    if(selectedMemberID === "") {
+    if (selectedMemberID === "") {
       setIsSubmitting(false);
-      showToast("Host field is required.", "error")
-      return
+      showToast("Host field is required.", "error");
+      return;
     }
 
-    if(selectedProjectID === "") {
+    if (selectedProjectID === "") {
       setIsSubmitting(false);
-      showToast("Project field is required.", "error")
-      return
+      showToast("Project field is required.", "error");
+      return;
     }
 
-    if(selectedMeetupID === "") {
+    if (selectedMeetupID === "") {
       setIsSubmitting(false);
-      showToast("Date field is required.", "error")
-      return
+      showToast("Date field is required.", "error");
+      return;
     }
 
-    if(description === "") {
+    if (description === "") {
       setIsSubmitting(false);
-      showToast("Description field is required.", "error")
-      return
+      showToast("Description field is required.", "error");
+      return;
     }
 
     try {
       await axios.post(
-        `${apiUrl}/api/v1/updates`, 
+        `${apiUrl}/api/v1/updates`,
         {
           update: {
-            "meetup_id": selectedMeetupID,
-            "project_id": selectedProjectID,
-            "member_id": selectedMemberID,
-            "category": category,
-            "description": description,
-          }
+            meetup_id: selectedMeetupID,
+            project_id: selectedProjectID,
+            member_id: selectedMemberID,
+            category: category,
+            description: description,
+          },
         },
         {
           headers: {
             Accept: "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       setIsSubmitting(false);
       handleCloseModal();
-      showToast("Successfully added updates!", "success");  
+      showToast("Successfully added updates!", "success");
     } catch (error: any) {
       setIsSubmitting(false); // Fixed: was setting to true
-      console.log("Error caught in POST:", error)
-      showToast("Error occured, update was not saved.", "error")
+      console.log("Error caught in POST:", error);
+      showToast("Error occured, update was not saved.", "error");
     }
   }
 
@@ -230,7 +226,7 @@ export function NewUpdateActionModal({
           />
         </div>
 
-        <SubmitButton isSubmitting={isSubmitting}/>
+        <SubmitButton isSubmitting={isSubmitting} />
       </form>
     </ModalLayout>
   );

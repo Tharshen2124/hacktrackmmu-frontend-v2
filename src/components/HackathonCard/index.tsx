@@ -12,7 +12,6 @@ interface MeetupCardProps {
   updates: Update[];
 }
 
-
 export default function HackathonCard({
   number,
   numberOfUpdates,

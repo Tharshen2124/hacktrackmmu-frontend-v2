@@ -55,11 +55,13 @@ export default function MemberFilter({
 }: MemberFilterProps) {
   const filterPopoverRef = useRef<{ closePopover: () => void }>(null);
 
-  const availableStatuses = isOnboarding 
+  const availableStatuses = isOnboarding
     ? [MemberStatus.All, ...onboardingStatuses]
     : Object.values(MemberStatus);
 
-  const currentStatusMapping = isOnboarding ? onboardingStatusMapping : statusMapping;
+  const currentStatusMapping = isOnboarding
+    ? onboardingStatusMapping
+    : statusMapping;
 
   const [selectedStatus, setSelectedStatus] = useState<string>(
     reverseStatusMapping[currentStatus] || MemberStatus.All,
@@ -88,7 +90,11 @@ export default function MemberFilter({
   };
 
   return (
-    <FilterPopover filterTitle={"Member Filter"} ref={filterPopoverRef} isOnboarding={isOnboarding}>
+    <FilterPopover
+      filterTitle={"Member Filter"}
+      ref={filterPopoverRef}
+      isOnboarding={isOnboarding}
+    >
       <div className="space-y-3">
         <Selector
           label="Status"

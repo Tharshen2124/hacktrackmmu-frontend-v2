@@ -14,7 +14,7 @@ export default function Selector({
       <label className="block text-sm font-medium text-gray-700 mb-1">
         {label}
       </label>
-      <select 
+      <select
         className="w-full p-2 border border-gray-300 rounded-md text-gray-700"
         value={value || ""}
         onChange={(e) => onChange(e.target.value)}

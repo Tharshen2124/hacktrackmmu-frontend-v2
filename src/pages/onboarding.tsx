@@ -14,7 +14,7 @@ import useSWR from "swr";
 export default function Onboarding() {
   const { token } = useAuthStore();
   const [isClient, setIsClient] = useState(false);
-  const isMaxWidth768px = useMediaQuery('(max-width: 768px)')
+  const isMaxWidth768px = useMediaQuery("(max-width: 768px)");
   const [statusFilter, setStatusFilter] = useState<string[]>([
     MemberStatus.Registered,
     MemberStatus.Contacted,

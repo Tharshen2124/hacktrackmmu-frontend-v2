@@ -61,45 +61,45 @@ export function NewProjectActionModal({
     event.preventDefault();
     setIsSubmitting(true);
 
-    if(projectName === "") {
+    if (projectName === "") {
       setIsSubmitting(false);
-      showToast("Project Name is required.", "error")
-      return
+      showToast("Project Name is required.", "error");
+      return;
     }
 
-    if(selectedMemberIds.length === 0) {
+    if (selectedMemberIds.length === 0) {
       setIsSubmitting(false);
-      showToast("Select at least one member for the project", "error")
-      return
+      showToast("Select at least one member for the project", "error");
+      return;
     }
 
     try {
       await axios.post(
-        `${apiUrl}/api/v1/projects`, 
+        `${apiUrl}/api/v1/projects`,
         {
           project: {
             name: projectName,
             category: projectCategory,
             completed: isCompleted,
             member_ids: selectedMemberIds,
-          }
+          },
         },
         {
           headers: {
             Accept: "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       setIsSubmitting(false);
       await mutateMembers();
       await mutateCreateUpdate();
       handleCloseModal();
-      showToast("Successfully added project!", "success");  
+      showToast("Successfully added project!", "success");
     } catch (error: any) {
-      setIsSubmitting(false); // Fixed: was setting to true 
-      console.log("Error caught in POST:", error)
-      showToast("Error occured, project was not saved.", "error")
+      setIsSubmitting(false); // Fixed: was setting to true
+      console.log("Error caught in POST:", error);
+      showToast("Error occured, project was not saved.", "error");
     }
   }
 

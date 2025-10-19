@@ -7,7 +7,9 @@ interface NewProjectActionButtonProps {
   mutateMembers: () => void;
 }
 
-export function NewProjectActionButton({ mutateMembers }: NewProjectActionButtonProps) {
+export function NewProjectActionButton({
+  mutateMembers,
+}: NewProjectActionButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleViewClick = () => setIsModalOpen(true);

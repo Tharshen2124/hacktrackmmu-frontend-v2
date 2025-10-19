@@ -16,13 +16,7 @@ import Link from "next/link";
 import dayjs from "dayjs";
 import { Member, Project, Update } from "@/types/types";
 
-
-export default function MemberCard({
-  id,
-  name,
-  projects,
-  status,
-}: Member) {
+export default function MemberCard({ id, name, projects, status }: Member) {
   const { isAdmin } = useAuthStore();
 
   const numberOfCompletedProjects = projects.filter(
@@ -85,15 +79,15 @@ export default function MemberCard({
 
       <ModalLayout isOpen={isModalOpen} onClose={handleCloseModal}>
         <div className="flex flex-row gap-2 items-center mb-4 justify-between">
-           <h2 className="text-2xl font-bold">{name}</h2>
-           {isAdmin && (
-             <Link href={`/member/${id}/edit`}>
-               <PenLine
-                 size={16}
-                 className="hover:cursor-pointer hover:text-blue-500 transition duration-200"
-               />
-             </Link>
-           )}
+          <h2 className="text-2xl font-bold">{name}</h2>
+          {isAdmin && (
+            <Link href={`/member/${id}/edit`}>
+              <PenLine
+                size={16}
+                className="hover:cursor-pointer hover:text-blue-500 transition duration-200"
+              />
+            </Link>
+          )}
         </div>
 
         <h3 className="text-lg font-semibold mb-1">Projects</h3>

@@ -8,7 +8,10 @@ interface NewMeetupActionButtonProps {
   mutateHackathons: () => void;
 }
 
-export function NewMeetupActionButton({ mutateMeetups, mutateHackathons }: NewMeetupActionButtonProps) {
+export function NewMeetupActionButton({
+  mutateMeetups,
+  mutateHackathons,
+}: NewMeetupActionButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleViewClick = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);

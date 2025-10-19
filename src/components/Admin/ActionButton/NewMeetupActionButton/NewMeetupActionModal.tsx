@@ -21,20 +21,22 @@ export function NewMeetupActionModal({
   mutateMeetups,
   mutateHackathons,
 }: NewMeetupActionModalProps) {
-  const [isLoading, setIsLoading] = useState(true)
-  const [isError, setIsError] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { token } = useAuthStore();
   const { showToast } = useToast();
   // const [haveHosted, setHaveHosted] = useState<any>()
   // const [yetToHost, setYetToHost] = useState<any>()
-  const [members, setMembers] = useState<any>()
-  const [meetupNumber, setMeetupNumber] = useState<number>(0)
+  const [members, setMembers] = useState<any>();
+  const [meetupNumber, setMeetupNumber] = useState<number>(0);
   const [date, setDate] = useState<string>(
     new Date().toISOString().split("T")[0],
-  );  
-  const [category, setCategory] = useState<"regular_meetup" | "hackathon">("regular_meetup");
-  const [selectedHostID, setSelectedHostID] = useState<string>("")
+  );
+  const [category, setCategory] = useState<"regular_meetup" | "hackathon">(
+    "regular_meetup",
+  );
+  const [selectedHostID, setSelectedHostID] = useState<string>("");
 
   useEffect(() => {
     async function getData() {
@@ -51,7 +53,7 @@ export function NewMeetupActionModal({
         // setHaveHosted(response.data.hosts.HaveHosted)
         // setYetToHost(response.data.hosts.YetToHost)
         setMembers(response.data.members);
-        setMeetupNumber(response.data.meetup_number.number)
+        setMeetupNumber(response.data.meetup_number.number);
         setIsLoading(false);
       } catch (error: any) {
         setIsLoading(false);
@@ -63,14 +65,14 @@ export function NewMeetupActionModal({
     getData();
   }, [token]);
 
-   async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
-    event.preventDefault()
-    setIsSubmitting(true)
+  async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsSubmitting(true);
 
     if (selectedHostID === "") {
-      setIsSubmitting(false)
-      showToast("Host field is required.", "error")
-      return
+      setIsSubmitting(false);
+      showToast("Host field is required.", "error");
+      return;
     }
 
     try {
@@ -89,20 +91,20 @@ export function NewMeetupActionModal({
             Accept: "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       if (category === "hackathon") {
-        await mutateHackathons()
+        await mutateHackathons();
       } else if (category === "regular_meetup") {
-        await mutateMeetups()
+        await mutateMeetups();
       }
-      setIsSubmitting(false)
-      handleCloseModal()
-      showToast("Successfully added meetup!", "success")
+      setIsSubmitting(false);
+      handleCloseModal();
+      showToast("Successfully added meetup!", "success");
     } catch (error: any) {
-      setIsSubmitting(false) // Fix this: previously was true!
-      console.log("Error caught in POST:", error)
-      showToast("Error occurred, meetup was not saved.", "error")
+      setIsSubmitting(false); // Fix this: previously was true!
+      console.log("Error caught in POST:", error);
+      showToast("Error occurred, meetup was not saved.", "error");
     }
   }
 
@@ -204,9 +206,9 @@ export function NewMeetupActionModal({
               />
               <label>Hackathon</label>
             </div>
-          </div> 
+          </div>
         </div>
-        <SubmitButton isSubmitting={isSubmitting}/>
+        <SubmitButton isSubmitting={isSubmitting} />
       </form>
     </ModalLayout>
   );

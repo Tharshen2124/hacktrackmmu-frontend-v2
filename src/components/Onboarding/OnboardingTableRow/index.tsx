@@ -22,7 +22,7 @@ const statusColour: Record<MemberStatus, string> = {
   [MemberStatus.SociallyActive]: "",
   [MemberStatus.WasActive]: "",
   [MemberStatus.WasSociallyInactive]: "",
-  [MemberStatus.Terminated]: ""
+  [MemberStatus.Terminated]: "",
 };
 
 export default function OnboardingTableRow({
@@ -107,6 +107,3 @@ export default function OnboardingTableRow({
     </>
   );
 }
-
-
-
