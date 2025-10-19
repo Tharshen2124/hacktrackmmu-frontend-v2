@@ -63,7 +63,7 @@ export default function OnboardingTableRow({
   const handleCloseModal = () => setIsModalOpen(false);
 
   return (
-    <tr className="border border-gray-800">
+    <>
       <td className="pl-8 pr-2 py-4 min-w-[150px] overflow-auto">
         {member.name}
       </td>
@@ -96,7 +96,6 @@ export default function OnboardingTableRow({
             Delete
           </button>
         </div>
-
       </td>
 
       <OnboardingMemberModal
@@ -105,7 +104,7 @@ export default function OnboardingTableRow({
         member={member}
         mutateOnboarding={mutateOnboarding}
       />
-    </tr>
+    </>
   );
 }
 

@@ -31,7 +31,7 @@ export default function OnboardingMobileCard({
   const handleCloseModal = () => setIsModalOpen(false);
 
   return (
-    <div className="border border-gray-300 rounded-lg p-4 mb-5 ">
+    <div className="border border-gray-700 rounded-lg p-4 mb-5 ">
       <div className="upper-part flex justify-between">
         <div className="left-side">
           <h2 className="text-lg font-bold mb-2">{member.name}</h2>
@@ -53,17 +53,17 @@ export default function OnboardingMobileCard({
         </div>
       </div>
       <div className="bottom-part mt-3">
-        <div className="button-container flex justify-evenly gap-7">
+        <div className="button-container flex justify-evenly gap-x-2">
           <button
-            className="w-full text-black text-sm font-semibold bg-[#d9d9d9] py-2 px-3 rounded-full transition duration-200 hover:bg-gray-200 active:bg-gray-400"
+            className="w-full text-black text-sm font-semibold bg-[#d9d9d9] py-2 rounded-md transition duration-200 hover:bg-gray-200 active:bg-gray-400"
             onClick={handleViewClick}
           >
             View
           </button>
-          <button className="w-full text-white text-sm font-semibold bg-blue-800 py-2 px-3 rounded-full transition duration-200 hover:bg-blue-700 active:bg-gray-400">
+          <button className="w-full text-white text-sm font-semibold bg-blue-800 py-2 rounded-md transition duration-200 hover:bg-blue-700 active:bg-gray-400">
             Edit
           </button>
-          <button className="w-full text-white text-sm font-semibold bg-red-800 py-2 px-3 rounded-full transition duration-200 hover:bg-red-700 active:bg-gray-400">
+          <button className="w-full text-white text-sm font-semibold bg-red-800 py-2 rounded-md transition duration-200 hover:bg-red-700 active:bg-gray-400">
             Delete
           </button>
         </div>
