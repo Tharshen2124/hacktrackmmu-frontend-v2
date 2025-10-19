@@ -1,6 +1,8 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import MemberFilter from "@/components/FilterPopover/memberFilter";
+import OnboardingMobileCard from "@/components/Onboarding/OnboardingMobileCard";
 import OnboardingTableRow from "@/components/Onboarding/OnboardingTableRow";
+import { useMediaQuery } from "@/hooks";
 import useAuthStore from "@/store/useAuthStore";
 import { MemberStatus, Member } from "@/types/types";
 import { apiUrl } from "@/utils/env";
@@ -12,6 +14,7 @@ import useSWR from "swr";
 export default function Onboarding() {
   const { token } = useAuthStore();
   const [isClient, setIsClient] = useState(false);
+  const isMaxWidth768px = useMediaQuery('(max-width: 768px)')
   const [statusFilter, setStatusFilter] = useState<string[]>([
     MemberStatus.Registered,
     MemberStatus.Contacted,
@@ -89,53 +92,71 @@ export default function Onboarding() {
       {onboardingError && <p>Error loading data</p>}
 
       <div className="mt-4 border w-full border-gray-800 rounded-lg active:shadow-none transition duration-200">
-        <table className="w-full">
-          <thead className="border-b pb-3">
-            <tr className="border-b border-gray-800 pb-3">
-              <th className="text-left pl-8 pr-2 bg-[#1e1e1e] rounded-tl-lg min-w-[150px]">
-                Name
-              </th>
-              <th className="text-left py-4 px-4 bg-[#1e1e1e]">
-                Contact Number
-              </th>
-              <th className="text-left py-4 px-4 bg-[#1e1e1e]">
-                Register Date
-              </th>
-              <th className="text-left py-4 px-4 bg-[#1e1e1e]">
-                <div className="flex items-center gap-x-3">
-                  Status
-                  <MemberFilter
-                    onStatusChange={handleStatusChange}
-                    currentStatus={getCurrentSingleStatus()}
-                    isOnboarding={true}
-                  />
-                </div>
-              </th>
-              <th className="text-left pl-2 pr-8 bg-[#1e1e1e] rounded-tr-lg w-[297px]">
-                Options
-              </th>
-            </tr>
-          </thead>
-          <tbody>
+        {!isMaxWidth768px ? (
+          <table className="w-full">
+            <thead className="border-b pb-3">
+              <tr className="border-b border-gray-800 pb-3">
+                <th className="text-left pl-8 pr-2 bg-[#1e1e1e] rounded-tl-lg min-w-[150px]">
+                  Name
+                </th>
+                <th className="text-left py-4 px-4 bg-[#1e1e1e]">
+                  Contact Number
+                </th>
+                <th className="text-left py-4 px-4 bg-[#1e1e1e]">
+                  Register Date
+                </th>
+                <th className="text-left py-4 px-4 bg-[#1e1e1e]">
+                  <div className="flex items-center gap-x-3">
+                    Status
+                    <MemberFilter
+                      onStatusChange={handleStatusChange}
+                      currentStatus={getCurrentSingleStatus()}
+                      isOnboarding={true}
+                    />
+                  </div>
+                </th>
+                <th className="text-left pl-2 pr-8 bg-[#1e1e1e] rounded-tr-lg w-[297px]">
+                  Options
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {members.length > 0 ? (
+                members.map((member: Member) => (
+                  <tr key={member.id} className="border border-gray-800">
+                    <OnboardingTableRow
+                      key={member.id}
+                      member={member}
+                      mutateOnboarding={mutateOnboarding}
+                    />
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="text-center py-8 text-gray-500">
+                    {onboardingLoading ? "Loading..." : "No members found"}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        ) : (
+          <>
             {members.length > 0 ? (
               members.map((member: Member) => (
-                <tr key={member.id} className="border border-gray-800">
-                  <OnboardingTableRow
-                    key={member.id}
-                    member={member}
-                    mutateOnboarding={mutateOnboarding}
-                  />
-                </tr>
+                <OnboardingMobileCard
+                  key={member.id}
+                  member={member}
+                  mutateOnboarding={mutateOnboarding}
+                />
               ))
             ) : (
-              <tr>
-                <td colSpan={5} className="text-center py-8 text-gray-500">
-                  {onboardingLoading ? "Loading..." : "No members found"}
-                </td>
-              </tr>
+              <div className="text-center py-8 text-gray-500">
+                {onboardingLoading ? "Loading..." : "No members found"}
+              </div>
             )}
-          </tbody>
-        </table>
+          </>
+        )}
       </div>
     </DashboardLayout>
   );
