@@ -1,6 +1,12 @@
 import { LoaderCircle } from "lucide-react";
 
-export function SubmitButton({ isSubmitting, isLogin = false }: { isSubmitting: boolean, isLogin?: boolean }) {
+export function SubmitButton({
+  isSubmitting,
+  isLogin = false,
+}: {
+  isSubmitting: boolean;
+  isLogin?: boolean;
+}) {
   return (
     <button
       type="submit"
@@ -11,11 +17,13 @@ export function SubmitButton({ isSubmitting, isLogin = false }: { isSubmitting: 
       }`}
     >
       {isSubmitting && <LoaderCircle className="animate-spin mr-2" size="20" />}
-      {isLogin ? (
-        isSubmitting ? "Logging in..." : "Login"
-      ) : (
-        isSubmitting ? "Submiting..." : "Submit"
-      )}
+      {isLogin
+        ? isSubmitting
+          ? "Logging in..."
+          : "Login"
+        : isSubmitting
+          ? "Submiting..."
+          : "Submit"}
     </button>
   );
 }

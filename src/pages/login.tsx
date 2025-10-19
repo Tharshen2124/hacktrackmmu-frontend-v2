@@ -154,7 +154,7 @@ export default function LoginPage() {
               </button>
             </div>
 
-            <SubmitButton isSubmitting={isSubmitting} isLogin={true}/>
+            <SubmitButton isSubmitting={isSubmitting} isLogin={true} />
             <div className="text-center h-[24px]">
               <p
                 className={`text-gray-400 italic transition-opacity duration-1000 ${waitMessage && isSubmitting ? "opacity-100" : "opacity-0"}`}

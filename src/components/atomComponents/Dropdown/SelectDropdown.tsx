@@ -16,7 +16,7 @@ interface SearchableDropdownProps {
   value: string;
   onChange: (value: string) => void;
   className?: string;
-  displayKey?: 'name' | 'date';
+  displayKey?: "name" | "date";
 }
 
 export const SearchableDropdown = ({
@@ -28,7 +28,7 @@ export const SearchableDropdown = ({
   value,
   onChange,
   className = "",
-  displayKey = 'name',
+  displayKey = "name",
 }: SearchableDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -39,15 +39,15 @@ export const SearchableDropdown = ({
   // Helper function to get the display value from an option
   const getOptionDisplayName = (option: Option) => {
     // If date is chosen as displayKey, format it as needed
-    if (displayKey === 'date' && option.date) {
+    if (displayKey === "date" && option.date) {
       try {
         // Attempt to parse and format date for display
         const dateObj = new Date(option.date);
         // Example: "July 14, 2025" or "2025-07-14"
         return dateObj.toLocaleDateString(undefined, {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
+          year: "numeric",
+          month: "long",
+          day: "numeric",
         });
       } catch (e) {
         console.warn("Invalid date format for option:", option.date, e);
@@ -61,18 +61,19 @@ export const SearchableDropdown = ({
   // Find the selected option using the `value` (which is an `id`)
   const selectedOption = useMemo(
     () => options.find((option) => option.id === value),
-    [options, value]
+    [options, value],
   );
 
   // Filter options based on search term and displayKey
   const filteredOptions = useMemo(
     () =>
       options.filter((option) =>
-        getOptionDisplayName(option).toLowerCase().includes(searchTerm.toLowerCase())
+        getOptionDisplayName(option)
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()),
       ),
-    [options, searchTerm, getOptionDisplayName] // getOptionDisplayName should be stable or defined within useMemo
+    [options, searchTerm, getOptionDisplayName], // getOptionDisplayName should be stable or defined within useMemo
   );
-
 
   useEffect(() => {
     // Reset highlighted index when filtered options change
