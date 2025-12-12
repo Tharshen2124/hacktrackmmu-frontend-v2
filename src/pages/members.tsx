@@ -58,6 +58,9 @@ export default function Members() {
             },
           },
         );
+
+        console.log("Fetched members:", response.data.data)
+
         setMembers(response.data.data);
         setTotalPagination(response.data.meta.total_pages);
         setIsLoading(false);

@@ -2,6 +2,10 @@ import { Member, MemberStatus } from "@/types/types";
 import dayjs from "dayjs";
 import { OnboardingMemberModal } from "../OnboardingMemberModal";
 import { useState } from "react";
+import { apiUrl } from "@/utils/env";
+import axios from "axios";
+import useAuthStore from "@/store/useAuthStore";
+import { useToast } from "@/components/Toast/ToastProvider";
 
 interface OnboardingMobileCardProps {
   member: Member;
@@ -21,14 +25,52 @@ const statusColour: Record<MemberStatus, string> = {
   [MemberStatus.Terminated]: "",
 };
 
+const onboardingStatuses = [
+  MemberStatus.Registered,
+  MemberStatus.Contacted,
+  MemberStatus.IdeaTalked,
+];
+
 export default function OnboardingMobileCard({
   member,
   mutateOnboarding,
 }: OnboardingMobileCardProps) {
+  const { token } = useAuthStore();
+  const { showToast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
   const handleViewClick = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
+
+  const handleStatusChange = async (newStatus: MemberStatus) => {
+    if (newStatus === member.status) return;
+
+    setIsUpdating(true);
+    try {
+      await axios.put(
+        `${apiUrl}/api/v1/members/${member.id}`,
+        {
+          member: {
+            status: newStatus,
+          },
+        },
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      mutateOnboarding();
+      showToast("Member status updated successfully", "success");
+    } catch (error: any) {
+      console.error("Error updating status", error);
+      showToast("Failed to update status", "error");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   return (
     <div className="border border-gray-700 rounded-lg p-4 mb-5 ">
@@ -45,11 +87,18 @@ export default function OnboardingMobileCard({
           </p>
         </div>
         <div className="right-side">
-          <span
-            className={`truncate px-2 py-1 text-xs font-medium border-gray-200 border ${statusColour[member.status] || "text-blue-500"} rounded-full`}
+          <select
+            value={member.status}
+            onChange={(e) => handleStatusChange(e.target.value as MemberStatus)}
+            disabled={isUpdating}
+            className={`truncate px-2 py-1 text-xs font-medium border-gray-200 border ${statusColour[member.status] || "text-blue-500"} rounded-full bg-transparent cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
           >
-            {member.status.toUpperCase()}
-          </span>
+            {onboardingStatuses.map((status) => (
+              <option key={status} value={status} className="bg-[#1e1e1e] text-white">
+                {status.toUpperCase()}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
       <div className="bottom-part mt-3">
