@@ -1,70 +1,37 @@
 import { useRef, useState } from "react";
 import FilterPopover from ".";
 import Selector from "./FilterComponent/selector";
+import { MemberStatus, MemberStatusLabels } from "@/types/types";
 
-enum MemberStatus {
-  All = "All",
-  Registered = "Registered",
-  Contacted = "Contacted",
-  IdeaTalked = "Idea Talked",
-  NeverActive = "Never Active",
-  Active = "Active",
-  Inactive = "Inactive",
-  Terminated = "Terminated",
-}
-
-const statusMapping = {
-  [MemberStatus.All]: ["all"],
-  [MemberStatus.Registered]: ["registered"],
-  [MemberStatus.Contacted]: ["contacted"],
-  [MemberStatus.IdeaTalked]: ["ideatalked"],
-  [MemberStatus.NeverActive]: ["never_active"],
-  [MemberStatus.Active]: ["active", "socially_active"],
-  [MemberStatus.Inactive]: ["was_active", "was_socially_active"],
-  [MemberStatus.Terminated]: ["terminated"],
-};
-
-const onboardingStatusMapping = {
-  ...statusMapping,
-  [MemberStatus.All]: ["registered", "contacted", "ideatalked"],
-};
-
-const reverseStatusMapping: { [key: string]: string } = {};
-Object.entries(statusMapping).forEach(([displayValue, backendValues]) => {
-  backendValues.forEach((backendValue) => {
-    reverseStatusMapping[backendValue] = displayValue;
-  });
-});
-
-const onboardingStatuses = [
-  MemberStatus.Registered,
-  MemberStatus.Contacted,
-  MemberStatus.IdeaTalked,
-];
+const ALL_OPTION = "all";
+const ALL_LABEL = "All";
 
 interface MemberFilterProps {
   onStatusChange: (status: string[]) => void;
   currentStatus: string;
-  isOnboarding?: boolean;
+  availableStatuses?: MemberStatus[]
+  defaultStatuses?: MemberStatus[]
 }
 
 export default function MemberFilter({
   onStatusChange,
   currentStatus,
-  isOnboarding = false,
+  availableStatuses = Object.values(MemberStatus), // Default: all statuses
+  defaultStatuses = [MemberStatus.Active, MemberStatus.SociallyActive], // Default: active members
 }: MemberFilterProps) {
   const filterPopoverRef = useRef<{ closePopover: () => void }>(null);
+  const isOnboarding = availableStatuses.length < Object.values(MemberStatus).length;
 
-  const availableStatuses = isOnboarding
-    ? [MemberStatus.All, ...onboardingStatuses]
-    : Object.values(MemberStatus);
-
-  const currentStatusMapping = isOnboarding
-    ? onboardingStatusMapping
-    : statusMapping;
+  const selectorOptions = [
+    { value: ALL_OPTION, label: ALL_LABEL },
+    ...availableStatuses.map((status) => ({
+      value: status,
+      label: MemberStatusLabels[status],
+    })),
+  ];
 
   const [selectedStatus, setSelectedStatus] = useState<string>(
-    reverseStatusMapping[currentStatus] || MemberStatus.All,
+    currentStatus === "all" ? ALL_OPTION : currentStatus
   );
 
   const handleStatusSelect = (value: string) => {
@@ -72,33 +39,31 @@ export default function MemberFilter({
   };
 
   const handleApplyFilter = () => {
-    const selectedStatusValue = selectedStatus as MemberStatus;
-    const backendValue = currentStatusMapping[selectedStatusValue];
-    onStatusChange(backendValue);
+    const statusesToSend =
+      selectedStatus === ALL_OPTION
+        ? availableStatuses
+        : [selectedStatus];
+
+    onStatusChange(statusesToSend);
     filterPopoverRef.current?.closePopover();
   };
 
   const handleClear = () => {
-    if (isOnboarding) {
-      setSelectedStatus(MemberStatus.All);
-      onStatusChange(["registered", "contacted", "ideatalked"]);
-    } else {
-      setSelectedStatus(MemberStatus.Active);
-      onStatusChange(["active", "socially_active"]);
-    }
+    setSelectedStatus(ALL_OPTION);
+    onStatusChange(defaultStatuses);
     filterPopoverRef.current?.closePopover();
   };
 
   return (
     <FilterPopover
-      filterTitle={"Member Filter"}
+      filterTitle="Member Filter"
       ref={filterPopoverRef}
       isOnboarding={isOnboarding}
     >
       <div className="space-y-3">
         <Selector
           label="Status"
-          selection={availableStatuses}
+          options={selectorOptions}
           value={selectedStatus}
           onChange={handleStatusSelect}
         />

@@ -1,5 +1,4 @@
 export enum MemberStatus {
-  All = "all",
   Registered = "registered",
   Contacted = "contacted",
   IdeaTalked = "ideatalked",
@@ -7,9 +6,27 @@ export enum MemberStatus {
   Active = "active",
   SociallyActive = "socially_active",
   WasActive = "was_active",
-  WasSociallyInactive = "was_socially_inactive",
+  WasSociallyActive = "was_socially_active",
   Terminated = "terminated",
 }
+
+// Display labels for the UI
+export const MemberStatusLabels: Record<MemberStatus, string> = {
+  [MemberStatus.Registered]: "Registered",
+  [MemberStatus.Contacted]: "Contacted",
+  [MemberStatus.IdeaTalked]: "Idea Talked",
+  [MemberStatus.NeverActive]: "Never Active",
+  [MemberStatus.Active]: "Active",
+  [MemberStatus.SociallyActive]: "Socially Active",
+  [MemberStatus.WasActive]: "Was Active",
+  [MemberStatus.WasSociallyActive]: "Was Socially Active",
+  [MemberStatus.Terminated]: "Terminated",
+};
+
+// Helper to get label from backend value
+export const getStatusLabel = (status: string): string => {
+  return MemberStatusLabels[status as MemberStatus] || status;
+};
 
 export interface Member {
   id: number;

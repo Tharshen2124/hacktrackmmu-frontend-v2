@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { OnboardingMemberModal } from "../OnboardingMemberModal";
-import { Member, MemberStatus } from "@/types/types";
+import { Member, MemberStatus, MemberStatusLabels } from "@/types/types";
 import dayjs from "dayjs";
 import Link from "next/link";
 import { apiUrl } from "@/utils/env";
@@ -13,20 +13,14 @@ interface OnboardingTableRowProps {
   mutateOnboarding: () => void;
 }
 
-const statusColour: Record<MemberStatus, string> = {
+const statusColour: Partial<Record<MemberStatus, string>> = {
   [MemberStatus.Registered]: "bg-red-700",
   [MemberStatus.Contacted]: "bg-blue-700",
   [MemberStatus.IdeaTalked]: "bg-green-800",
-  [MemberStatus.All]: "",
-  [MemberStatus.NeverActive]: "",
-  [MemberStatus.Active]: "",
-  [MemberStatus.SociallyActive]: "",
-  [MemberStatus.WasActive]: "",
-  [MemberStatus.WasSociallyInactive]: "",
-  [MemberStatus.Terminated]: "",
 };
 
-const onboardingStatuses = [
+// Easy to modify: just add/remove statuses here
+const ONBOARDING_STATUSES = [
   MemberStatus.Registered,
   MemberStatus.Contacted,
   MemberStatus.IdeaTalked,
@@ -38,8 +32,8 @@ export default function OnboardingTableRow({
 }: OnboardingTableRowProps) {
   const { token } = useAuthStore();
   const { showToast } = useToast();
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const handleViewClick = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
@@ -53,8 +47,8 @@ export default function OnboardingTableRow({
         `${apiUrl}/api/v1/members/${member.id}`,
         {
           member: {
-            status: newStatus,
-          },
+            status: newStatus
+          }
         },
         {
           headers: {
@@ -65,7 +59,7 @@ export default function OnboardingTableRow({
       );
       mutateOnboarding();
       showToast("Member status updated successfully", "success");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error updating status", error);
       showToast("Failed to update status", "error");
     } finally {
@@ -88,11 +82,13 @@ export default function OnboardingTableRow({
           value={member.status}
           onChange={(e) => handleStatusChange(e.target.value as MemberStatus)}
           disabled={isUpdating}
-          className={`px-2 py-1 text-xs font-medium border-gray-200 border ${statusColour[member.status] || "text-blue-500"} rounded-full bg-transparent cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`px-2 py-1 text-xs font-medium border-gray-200 border ${
+            statusColour[member.status as MemberStatus] || "text-blue-500"
+          } rounded-full bg-transparent cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
         >
-          {onboardingStatuses.map((status) => (
+          {ONBOARDING_STATUSES.map((status) => (
             <option key={status} value={status} className="bg-[#1e1e1e] text-white">
-              {status.toUpperCase()}
+              {MemberStatusLabels[status].toUpperCase()}
             </option>
           ))}
         </select>

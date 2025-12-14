@@ -1,14 +1,21 @@
-export default function Selector({
-  label,
-  selection,
-  value,
-  onChange,
-}: {
+interface SelectorOption {
+  value: string;
   label: string;
-  selection: string[];
+}
+
+interface SelectorProps {
+  label: string;
+  options: SelectorOption[];
   value?: string;
   onChange: (value: string) => void;
-}) {
+}
+
+export default function Selector({
+  label,
+  options,
+  value,
+  onChange,
+}: SelectorProps) {
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -19,9 +26,9 @@ export default function Selector({
         value={value || ""}
         onChange={(e) => onChange(e.target.value)}
       >
-        {selection.map((option) => (
-          <option key={option} value={option}>
-            {option}
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
           </option>
         ))}
       </select>
