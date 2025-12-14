@@ -11,15 +11,17 @@ import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 
+const ONBOARDING_STATUSES = [
+  MemberStatus.Registered,
+  MemberStatus.Contacted,
+  MemberStatus.IdeaTalked,
+];
+
 export default function Onboarding() {
   const { token } = useAuthStore();
   const [isClient, setIsClient] = useState(false);
   const isMaxWidth768px = useMediaQuery("(max-width: 768px)");
-  const [statusFilter, setStatusFilter] = useState<string[]>([
-    MemberStatus.Registered,
-    MemberStatus.Contacted,
-    MemberStatus.IdeaTalked,
-  ]);
+  const [statusFilter, setStatusFilter] = useState<string[]>(ONBOARDING_STATUSES);
 
   useEffect(() => {
     setIsClient(true);
@@ -65,15 +67,8 @@ export default function Onboarding() {
   };
 
   const getCurrentSingleStatus = () => {
-    if (
-      statusFilter.length === 3 &&
-      statusFilter.includes(MemberStatus.Registered) &&
-      statusFilter.includes(MemberStatus.Contacted) &&
-      statusFilter.includes(MemberStatus.IdeaTalked)
-    ) {
-      return "all";
-    }
-    return statusFilter[0] || MemberStatus.Registered;
+    if (statusFilter.length === ONBOARDING_STATUSES.length) return "all";
+    return statusFilter[0] || "all";
   };
 
   if (!isClient) {
@@ -111,7 +106,8 @@ export default function Onboarding() {
                     <MemberFilter
                       onStatusChange={handleStatusChange}
                       currentStatus={getCurrentSingleStatus()}
-                      isOnboarding={true}
+                      availableStatuses={ONBOARDING_STATUSES}
+                      defaultStatuses={ONBOARDING_STATUSES}
                     />
                   </div>
                 </th>
@@ -125,7 +121,6 @@ export default function Onboarding() {
                 members.map((member: Member) => (
                   <tr key={member.id} className="border border-gray-800">
                     <OnboardingTableRow
-                      key={member.id}
                       member={member}
                       mutateOnboarding={mutateOnboarding}
                     />
