@@ -1,7 +1,7 @@
 import { ModalLayout } from "@/components/ModalLayout";
 import { useToast } from "@/components/Toast/ToastProvider";
 import useAuthStore from "@/store/useAuthStore";
-import { Member, MemberStatus } from "@/types/types";
+import { Member, MemberStatus, MemberStatusLabels } from "@/types/types";
 import { apiUrl } from "@/utils/env";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -36,17 +36,24 @@ const convertToWhatsapp = (phoneNumber: string) => {
   }
 };
 
-const MemberStatusMap: Record<MemberStatus, number> = {
-  [MemberStatus.Registered]: 0,
-  [MemberStatus.Contacted]: 1,
-  [MemberStatus.IdeaTalked]: 2,
-  [MemberStatus.NeverActive]: 3,
-  [MemberStatus.Active]: 4,
-  [MemberStatus.SociallyActive]: 5,
-  [MemberStatus.WasActive]: 6,
-  [MemberStatus.WasSociallyInactive]: 7,
-  [MemberStatus.Terminated]: 8,
-  [MemberStatus.All]: -10,
+const STATUS_ORDER = [
+  MemberStatus.Registered,
+  MemberStatus.Contacted,
+  MemberStatus.IdeaTalked,
+  MemberStatus.NeverActive,
+  MemberStatus.Active,
+  MemberStatus.SociallyActive,
+  MemberStatus.WasActive,
+  MemberStatus.WasSociallyActive,
+  MemberStatus.Terminated,
+];
+
+const getStatusIndex = (status: MemberStatus): number => {
+  return STATUS_ORDER.indexOf(status);
+};
+
+const getStatusByIndex = (index: number): MemberStatus | undefined => {
+  return STATUS_ORDER[index];
 };
 
 export function OnboardingMemberModal({
@@ -56,7 +63,6 @@ export function OnboardingMemberModal({
   mutateOnboarding,
 }: OnboardingMemberModalProps) {
   const [isClient, setIsClient] = useState(false);
-
   const { showToast } = useToast();
   const { token } = useAuthStore();
 
@@ -64,31 +70,24 @@ export function OnboardingMemberModal({
     setIsClient(true);
   }, []);
 
-  const updateStatus = async (
-    change: "up" | "down",
-    currentStatus: MemberStatus,
-  ) => {
-    const currentStatusValue = MemberStatusMap[currentStatus];
-    let newStatusValue = currentStatusValue;
+  const currentStatusIndex = getStatusIndex(member.status as MemberStatus);
+  const maxOnboardingIndex = getStatusIndex(MemberStatus.IdeaTalked);
+  const minOnboardingIndex = getStatusIndex(MemberStatus.Registered);
 
-    if (change === "up" && currentStatusValue < 8) {
-      newStatusValue += 1;
-    } else if (change === "down" && currentStatusValue > 0) {
-      newStatusValue -= 1;
-    }
+  const canPromote = currentStatusIndex < maxOnboardingIndex && currentStatusIndex >= minOnboardingIndex;
+  const canDemote = currentStatusIndex > minOnboardingIndex && currentStatusIndex <= maxOnboardingIndex;
+  const isAtFinalOnboardingStatus = currentStatusIndex === maxOnboardingIndex;
 
-    const newStatus = Object.keys(MemberStatusMap).find(
-      (key) => MemberStatusMap[key as MemberStatus] === newStatusValue,
-    ) as MemberStatus | undefined;
+  const updateStatus = async (change: "up" | "down") => {
+    const newIndex = change === "up" ? currentStatusIndex + 1 : currentStatusIndex - 1;
+    const newStatus = getStatusByIndex(newIndex);
+
+    if (!newStatus) return;
 
     try {
       await axios.put(
         `${apiUrl}/api/v1/members/${member.id}`,
-        {
-          member: {
-            status: newStatus || currentStatus,
-          },
-        },
+        { member: { status: newStatus } },
         {
           headers: {
             Accept: "application/json",
@@ -98,9 +97,9 @@ export function OnboardingMemberModal({
       );
       mutateOnboarding();
       showToast("Member status updated successfully", "success");
-    } catch (error: any) {
-      console.error("Error occured during fetch", error);
-      return;
+    } catch (error) {
+      console.error("Error occurred during fetch", error);
+      showToast("Failed to update status", "error");
     }
   };
 
@@ -123,9 +122,19 @@ export function OnboardingMemberModal({
     window.open(whatsappLink, "_blank");
   };
 
+  const getNextStatusLabel = (): string => {
+    const nextStatus = getStatusByIndex(currentStatusIndex + 1);
+    return nextStatus ? MemberStatusLabels[nextStatus] : "";
+  };
+
+  const getPreviousStatusLabel = (): string => {
+    const prevStatus = getStatusByIndex(currentStatusIndex - 1);
+    return prevStatus ? MemberStatusLabels[prevStatus] : "";
+  };
+
   return (
     <ModalLayout isOpen={isModalOpen} onClose={handleCloseModal}>
-      <div className="flex justify-between items-center  mb-4">
+      <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">{member.name}</h2>
         <div className="flex gap-x-2">
           <Link
@@ -135,7 +144,7 @@ export function OnboardingMemberModal({
           >
             <Edit size="16" />
           </Link>
-          <div className="border p-[5px] border-red-600 bg-red-600 rounded-md">
+          <div className="border p-[5px] border-red-600 bg-red-600 rounded-md cursor-pointer">
             <Trash size="16" />
           </div>
         </div>
@@ -143,16 +152,12 @@ export function OnboardingMemberModal({
 
       <div className="status-container flex flex-row justify-between items-center">
         <h3 className="text-lg font-semibold">
-          Status:{" "}
-          {member.status.charAt(0).toUpperCase() + member.status.slice(1)}
+          Status: {MemberStatusLabels[member.status as MemberStatus] || member.status}
         </h3>
         {isClient && (
           <div className="arrow-containers flex flex-row gap-x-2 items-center">
-            {MemberStatusMap[member.status] === 2 && (
-              <Link
-                href={`/member/${member.id}/edit?source=onboarding`}
-                passHref
-              >
+            {isAtFinalOnboardingStatus && (
+              <Link href={`/member/${member.id}/edit?source=onboarding`} passHref>
                 <button
                   className="bg-green-600 p-1 rounded-md"
                   title="Assign Status in Edit Page"
@@ -161,18 +166,11 @@ export function OnboardingMemberModal({
                 </button>
               </Link>
             )}
-            {MemberStatusMap[member.status] < 2 &&
-            MemberStatusMap[member.status] >= 0 ? (
+            {canPromote ? (
               <button
-                title={`Promote to ${
-                  Object.keys(MemberStatusMap).find(
-                    (key) =>
-                      MemberStatusMap[key as MemberStatus] ===
-                      MemberStatusMap[member.status] + 1,
-                  ) || ""
-                }`}
+                title={`Promote to ${getNextStatusLabel()}`}
                 className="bg-blue-600 p-1 rounded-md"
-                onClick={() => updateStatus("up", member.status)}
+                onClick={() => updateStatus("up")}
               >
                 <ArrowUp size="16" />
               </button>
@@ -181,18 +179,11 @@ export function OnboardingMemberModal({
                 <ArrowUp size="16" />
               </div>
             )}
-            {MemberStatusMap[member.status] > 0 &&
-            MemberStatusMap[member.status] <= 2 ? (
+            {canDemote ? (
               <button
-                title={`Demote to ${
-                  Object.keys(MemberStatusMap).find(
-                    (key) =>
-                      MemberStatusMap[key as MemberStatus] ===
-                      MemberStatusMap[member.status] - 1,
-                  ) || ""
-                }`}
+                title={`Demote to ${getPreviousStatusLabel()}`}
                 className="bg-yellow-500 p-1 rounded-md"
-                onClick={() => updateStatus("down", member.status)}
+                onClick={() => updateStatus("down")}
               >
                 <ArrowDown size="16" />
               </button>
@@ -204,15 +195,16 @@ export function OnboardingMemberModal({
           </div>
         )}
       </div>
-      {MemberStatusMap[member.status] === 2 ? (
+
+      {isAtFinalOnboardingStatus && (
         <div className="bg-green-500 text-black font-bold text-sm p-2 rounded-md mt-2">
           <p>Select Tick Icon to Assign Status in Edit Page.</p>
         </div>
-      ) : null}
+      )}
 
       <h3 className="text-lg font-semibold mt-4 mb-1">Contact Information</h3>
       <div className="flex items-center justify-between border border-gray-700 py-3 px-4 rounded-md mb-2 gap-3">
-        <p className=" min-w-0 truncate">
+        <p className="min-w-0 truncate">
           <span className="font-bold">Email:</span> {member.email || "N/A"}
         </p>
         <div className="flex flex-row gap-x-4">
@@ -222,24 +214,18 @@ export function OnboardingMemberModal({
             size="16"
           />
           <Link href={`mailto:${member.email}`} passHref>
-            <Mail
-              onClick={() => {}}
-              className="hover:text-gray-400 active:text-blue-500"
-              size="16"
-            />
+            <Mail className="hover:text-gray-400 active:text-blue-500" size="16" />
           </Link>
         </div>
       </div>
       <div className="flex items-center justify-between border border-gray-700 py-3 px-4 rounded-md gap-3">
-        <p className=" min-w-0 truncate">
+        <p className="min-w-0 truncate">
           <span className="font-bold">Contact Number:</span>{" "}
           {member.contact_number || "N/A"}
         </p>
         <div className="flex flex-row gap-x-4">
           <Copy
-            onClick={() =>
-              copyToClipBoard(member.contact_number, "Contact Number")
-            }
+            onClick={() => copyToClipBoard(member.contact_number, "Contact Number")}
             className="hover:text-gray-400 hover:cursor-pointer active:text-green-500"
             size="16"
           />
@@ -260,12 +246,9 @@ export function OnboardingMemberModal({
           <span className="font-semibold">Register Date:</span>{" "}
           {dayjs(member.created_at).format("DD/MM/YYYY HH:mm")}
         </p>
-
         <p>
-          <span className="font-semibold">Comment:</span>{" "}
-          {member.comment || "N/A"}
+          <span className="font-semibold">Comment:</span> {member.comment || "N/A"}
         </p>
-
         <p>
           <span className="font-semibold">Old Status:</span>{" "}
           {typeof member.active === "boolean"
@@ -275,6 +258,7 @@ export function OnboardingMemberModal({
             : "N/A"}
         </p>
       </div>
+
       <button
         onClick={handleCloseModal}
         className="dark:bg-white mt-5 hover:bg-white-600 dark:text-black bg-[#222] dark:hover:bg-[#e0e0e0] dark:active:bg-[#c7c7c7] text-white hover:bg-[#333] active:bg-[#444] font-bold py-2 px-4 rounded w-full transition duration-200"
