@@ -86,7 +86,11 @@ export default function OnboardingMobileCard({
             } rounded-full bg-transparent cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {ONBOARDING_STATUSES.map((status) => (
-              <option key={status} value={status} className="bg-[#1e1e1e] text-white">
+              <option
+                key={status}
+                value={status}
+                className="bg-[#1e1e1e] text-white"
+              >
                 {MemberStatusLabels[status].toUpperCase()}
               </option>
             ))}
@@ -101,7 +105,11 @@ export default function OnboardingMobileCard({
           >
             View
           </button>
-          <Link href={`/member/${member.id}/edit?source=onboarding`} passHref className="w-full">
+          <Link
+            href={`/member/${member.id}/edit?source=onboarding`}
+            passHref
+            className="w-full"
+          >
             <button className="w-full text-white text-sm font-semibold bg-blue-800 py-2 rounded-md transition duration-200 hover:bg-blue-700 active:bg-gray-400">
               Edit
             </button>

@@ -47,8 +47,8 @@ export default function OnboardingTableRow({
         `${apiUrl}/api/v1/members/${member.id}`,
         {
           member: {
-            status: newStatus
-          }
+            status: newStatus,
+          },
         },
         {
           headers: {
@@ -87,7 +87,11 @@ export default function OnboardingTableRow({
           } rounded-full bg-transparent cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           {ONBOARDING_STATUSES.map((status) => (
-            <option key={status} value={status} className="bg-[#1e1e1e] text-white">
+            <option
+              key={status}
+              value={status}
+              className="bg-[#1e1e1e] text-white"
+            >
               {MemberStatusLabels[status].toUpperCase()}
             </option>
           ))}

@@ -74,12 +74,17 @@ export function OnboardingMemberModal({
   const maxOnboardingIndex = getStatusIndex(MemberStatus.IdeaTalked);
   const minOnboardingIndex = getStatusIndex(MemberStatus.Registered);
 
-  const canPromote = currentStatusIndex < maxOnboardingIndex && currentStatusIndex >= minOnboardingIndex;
-  const canDemote = currentStatusIndex > minOnboardingIndex && currentStatusIndex <= maxOnboardingIndex;
+  const canPromote =
+    currentStatusIndex < maxOnboardingIndex &&
+    currentStatusIndex >= minOnboardingIndex;
+  const canDemote =
+    currentStatusIndex > minOnboardingIndex &&
+    currentStatusIndex <= maxOnboardingIndex;
   const isAtFinalOnboardingStatus = currentStatusIndex === maxOnboardingIndex;
 
   const updateStatus = async (change: "up" | "down") => {
-    const newIndex = change === "up" ? currentStatusIndex + 1 : currentStatusIndex - 1;
+    const newIndex =
+      change === "up" ? currentStatusIndex + 1 : currentStatusIndex - 1;
     const newStatus = getStatusByIndex(newIndex);
 
     if (!newStatus) return;
@@ -152,12 +157,16 @@ export function OnboardingMemberModal({
 
       <div className="status-container flex flex-row justify-between items-center">
         <h3 className="text-lg font-semibold">
-          Status: {MemberStatusLabels[member.status as MemberStatus] || member.status}
+          Status:{" "}
+          {MemberStatusLabels[member.status as MemberStatus] || member.status}
         </h3>
         {isClient && (
           <div className="arrow-containers flex flex-row gap-x-2 items-center">
             {isAtFinalOnboardingStatus && (
-              <Link href={`/member/${member.id}/edit?source=onboarding`} passHref>
+              <Link
+                href={`/member/${member.id}/edit?source=onboarding`}
+                passHref
+              >
                 <button
                   className="bg-green-600 p-1 rounded-md"
                   title="Assign Status in Edit Page"
@@ -214,7 +223,10 @@ export function OnboardingMemberModal({
             size="16"
           />
           <Link href={`mailto:${member.email}`} passHref>
-            <Mail className="hover:text-gray-400 active:text-blue-500" size="16" />
+            <Mail
+              className="hover:text-gray-400 active:text-blue-500"
+              size="16"
+            />
           </Link>
         </div>
       </div>
@@ -225,7 +237,9 @@ export function OnboardingMemberModal({
         </p>
         <div className="flex flex-row gap-x-4">
           <Copy
-            onClick={() => copyToClipBoard(member.contact_number, "Contact Number")}
+            onClick={() =>
+              copyToClipBoard(member.contact_number, "Contact Number")
+            }
             className="hover:text-gray-400 hover:cursor-pointer active:text-green-500"
             size="16"
           />
@@ -247,7 +261,8 @@ export function OnboardingMemberModal({
           {dayjs(member.created_at).format("DD/MM/YYYY HH:mm")}
         </p>
         <p>
-          <span className="font-semibold">Comment:</span> {member.comment || "N/A"}
+          <span className="font-semibold">Comment:</span>{" "}
+          {member.comment || "N/A"}
         </p>
         <p>
           <span className="font-semibold">Old Status:</span>{" "}

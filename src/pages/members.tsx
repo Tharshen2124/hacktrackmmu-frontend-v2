@@ -75,7 +75,9 @@ export default function Members() {
     setPaginationNumber(1);
   }, [statusFilter]);
 
-  const currentStatusLabels = statusFilter.map((status) => getStatusLabel(status));
+  const currentStatusLabels = statusFilter.map((status) =>
+    getStatusLabel(status),
+  );
 
   const handleStatusChange = (statuses: string[]) => {
     setStatusFilter(statuses);
@@ -92,7 +94,8 @@ export default function Members() {
   };
 
   const getCurrentSingleStatus = () => {
-    if (statusFilter.length === Object.values(MemberStatus).length) return "all";
+    if (statusFilter.length === Object.values(MemberStatus).length)
+      return "all";
     return statusFilter[0] || "all";
   };
 
@@ -129,18 +132,16 @@ export default function Members() {
       <div className="mt-10 mb-[70px]">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
           {isLoading && !isSearching
-            ? [...Array(8)].map((_, index) =>
-              <SkeletonMemberCard key={index} />
-            )
+            ? [...Array(8)].map((_, index) => (
+                <SkeletonMemberCard key={index} />
+              ))
             : displayMembers?.map((member: Member) => (
                 <MemberCard key={member.id} {...member} />
               ))}
         </div>
         <div className="fixed flex items-center border-2 border-gray-200 rounded-full w-fit bottom-4 right-4 z-50">
           <button
-            onClick={() =>
-              setPaginationNumber((prev) =>  Math.max(1, prev - 1))
-            }
+            onClick={() => setPaginationNumber((prev) => Math.max(1, prev - 1))}
             className="text-black bg-white py-2 px-2 rounded-l-full transition duration-200 hover:bg-gray-200 active:bg-gray-400"
             disabled={isLoading}
           >
@@ -151,9 +152,7 @@ export default function Members() {
           </div>
           <button
             onClick={() =>
-              setPaginationNumber((prev) =>
-                Math.min(totalPagination, prev + 1)
-              )
+              setPaginationNumber((prev) => Math.min(totalPagination, prev + 1))
             }
             className="text-black bg-white py-2 px-2 rounded-r-full transition duration-200 hover:bg-gray-200 active:bg-gray-400"
             disabled={isLoading}

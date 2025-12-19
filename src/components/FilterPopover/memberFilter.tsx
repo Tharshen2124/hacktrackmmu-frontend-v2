@@ -9,8 +9,8 @@ const ALL_LABEL = "All";
 interface MemberFilterProps {
   onStatusChange: (status: string[]) => void;
   currentStatus: string;
-  availableStatuses?: MemberStatus[]
-  defaultStatuses?: MemberStatus[]
+  availableStatuses?: MemberStatus[];
+  defaultStatuses?: MemberStatus[];
 }
 
 export default function MemberFilter({
@@ -20,7 +20,8 @@ export default function MemberFilter({
   defaultStatuses = [MemberStatus.Active, MemberStatus.SociallyActive], // Default: active members
 }: MemberFilterProps) {
   const filterPopoverRef = useRef<{ closePopover: () => void }>(null);
-  const isOnboarding = availableStatuses.length < Object.values(MemberStatus).length;
+  const isOnboarding =
+    availableStatuses.length < Object.values(MemberStatus).length;
 
   const selectorOptions = [
     { value: ALL_OPTION, label: ALL_LABEL },
@@ -31,7 +32,7 @@ export default function MemberFilter({
   ];
 
   const [selectedStatus, setSelectedStatus] = useState<string>(
-    currentStatus === "all" ? ALL_OPTION : currentStatus
+    currentStatus === "all" ? ALL_OPTION : currentStatus,
   );
 
   const handleStatusSelect = (value: string) => {
@@ -40,9 +41,7 @@ export default function MemberFilter({
 
   const handleApplyFilter = () => {
     const statusesToSend =
-      selectedStatus === ALL_OPTION
-        ? availableStatuses
-        : [selectedStatus];
+      selectedStatus === ALL_OPTION ? availableStatuses : [selectedStatus];
 
     onStatusChange(statusesToSend);
     filterPopoverRef.current?.closePopover();
