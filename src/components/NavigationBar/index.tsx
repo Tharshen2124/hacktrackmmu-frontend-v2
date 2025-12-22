@@ -38,12 +38,8 @@ export default function NavigationBar() {
       });
 
       if (response.status === 200) {
-        showToast(
-          "Logout successfully! Redirecting you to main page",
-          "success",
-        );
-
-        router.push("/");
+        localStorage.setItem("manualLogout", "true");
+        router.push("/login");
 
         clearAdmin();
         clearValidUntil();

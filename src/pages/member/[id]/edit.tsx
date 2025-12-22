@@ -43,7 +43,9 @@ export default function EditMemberPage() {
   }, [member]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -69,7 +71,7 @@ export default function EditMemberPage() {
         throw new Error(data.error || "Failed to update member");
       }
 
-      router.back()
+      router.back();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -146,7 +148,10 @@ export default function EditMemberPage() {
             </div>
 
             <div>
-              <label htmlFor="status" className="block text-sm font-medium mb-1">
+              <label
+                htmlFor="status"
+                className="block text-sm font-medium mb-1"
+              >
                 Status
               </label>
               <select
@@ -166,7 +171,10 @@ export default function EditMemberPage() {
             </div>
 
             <div>
-              <label htmlFor="comment" className="block text-sm font-medium mb-1">
+              <label
+                htmlFor="comment"
+                className="block text-sm font-medium mb-1"
+              >
                 Comment
               </label>
               <textarea
