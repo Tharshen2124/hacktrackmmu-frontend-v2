@@ -33,7 +33,7 @@ export default function HackathonCard({
     <>
       <div
         onClick={handleCardClick}
-        className="bg-white dark:bg-[#222] rounded-lg p-4 border border-red-400 dark:border-gray-600 hover:border-red-600 hover:shadow-[0px_0px_8px_1px_rgba(0,_0,_0,_0.1)] hover:shadow-red-500/50 active:shadow-none transition duration-200"
+        className="bg-white dark:bg-[#222] rounded-lg p-4 border-2 dark:border border-neutral-300 dark:border-gray-600 hover:border-red-600 hover:shadow-[0px_0px_8px_1px_rgba(0,_0,_0,_0.1)] hover:shadow-red-500/50 active:shadow-none transition duration-200"
       >
         <h1 className="text-lg flex items-center">
           <Laptop size="18" className="mr-2" />
@@ -85,7 +85,7 @@ export default function HackathonCard({
 
         <button
           onClick={handleCloseModal}
-          className="bg-white hover:bg-white-600 text-black font-bold py-2 px-4 rounded w-full"
+          className="dark:bg-white hover:bg-white-600 dark:text-black bg-[#222] dark:hover:bg-[#e0e0e0] dark:active:bg-[#c7c7c7] text-white hover:bg-[#333] active:bg-[#444] font-bold py-2 px-4 rounded w-full transition duration-200"
         >
           Close
         </button>
