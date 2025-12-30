@@ -143,7 +143,7 @@ export default function EditMemberPage() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border-2 dark:border border-neutral-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-[]"
+                className="w-full px-3 py-2 border-2 dark:border border-neutral-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-[#333]"
               />
             </div>
 
