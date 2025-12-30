@@ -107,7 +107,7 @@ export default function EditMemberPage() {
         <span>Back</span>
       </button>
       <div className="flex justify-center">
-        <div className="p-6 bg-[#222] border border-gray-700 w-[500px] rounded-lg">
+        <div className="p-6 bg-white dark:bg-[#222] border-2 dark:border border-neutral-400 dark:border-gray-700 w-[500px] rounded-lg">
           <h1 className="text-3xl font-bold mb-4 mt-2">Edit Member</h1>
 
           {error && (
@@ -128,7 +128,7 @@ export default function EditMemberPage() {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-600 rounded-md bg-[#333]"
+                className="w-full px-3 py-2 border-2 dark:border border-neutral-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-[#333]"
               />
             </div>
 
@@ -143,7 +143,7 @@ export default function EditMemberPage() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-600 rounded-md bg-[#333]"
+                className="w-full px-3 py-2 border-2 dark:border border-neutral-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-[]"
               />
             </div>
 
@@ -159,7 +159,7 @@ export default function EditMemberPage() {
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-600 rounded-md text-blac bg-[#333]"
+                className="w-full px-3 py-2 border-2 dark:border border-neutral-300 dark:border-gray-600 rounded-md text-black dark:text-white bg-gray-50 dark:bg-[#333]"
               >
                 <option value="">Select a status</option>
                 {Object.values(MemberStatus).map((status) => (
@@ -183,7 +183,7 @@ export default function EditMemberPage() {
                 value={formData.comment}
                 onChange={handleChange}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-600 rounded-md bg-[#333]"
+                className="w-full px-3 py-2 border-2 dark:border border-neutral-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-[#333]"
               />
             </div>
 
@@ -191,14 +191,14 @@ export default function EditMemberPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="transition px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                className="transition px-4 py-2 bg-blue-600 dark:text-gray-50 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
               >
                 {isSubmitting ? "Saving..." : "Save Changes"}
               </button>
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="transition px-4 py-2 bg-gray-100 text-black rounded-md hover:bg-gray-400"
+                className="transition px-4 py-2 bg-red-400 dark:bg-gray-100 text-gray-100 dark:text-black rounded-md hover:bg-gray-400"
               >
                 Cancel
               </button>
