@@ -15,6 +15,11 @@ interface NewMeetupActionModalProps {
   mutateHackathons: () => void;
 }
 
+type Host = {
+  id: string,
+  name: string
+}
+
 export function NewMeetupActionModal({
   isModalOpen,
   handleCloseModal,
@@ -26,9 +31,9 @@ export function NewMeetupActionModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { token } = useAuthStore();
   const { showToast } = useToast();
-  // const [haveHosted, setHaveHosted] = useState<any>()
-  // const [yetToHost, setYetToHost] = useState<any>()
-  const [members, setMembers] = useState<any>();
+  const [haveHosted, setHaveHosted] = useState<Host[]>()
+  const [yetToHost, setYetToHost] = useState<Host[]>()
+
   const [meetupNumber, setMeetupNumber] = useState<number>(0);
   const [date, setDate] = useState<string>(
     new Date().toISOString().split("T")[0],
@@ -39,31 +44,41 @@ export function NewMeetupActionModal({
   const [selectedHostID, setSelectedHostID] = useState<string>("");
 
   useEffect(() => {
-    async function getData() {
-      try {
-        const response = await axios.get(
-          `${apiUrl}/api/v1/dashboard/create_meetup`,
-          {
-            headers: {
-              Accept: "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-        // setHaveHosted(response.data.hosts.HaveHosted)
-        // setYetToHost(response.data.hosts.YetToHost)
-        setMembers(response.data.members);
-        setMeetupNumber(response.data.meetup_number.number);
-        setIsLoading(false);
-      } catch (error: any) {
-        setIsLoading(false);
-        setIsError(true);
-        console.error("Error occured during fetch", error);
-      }
+    if (isModalOpen) {
+      getData();
+      // Reset form fields when modal opens
+      setSelectedHostID("");
+      setCategory("regular_meetup");
+      setIsSubmitting(false);
+      setIsError(false);
     }
+  }, [token, isModalOpen]);
 
-    getData();
-  }, [token]);
+  async function getData() {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(
+        `${apiUrl}/api/v1/dashboard/create_meetup`,
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      const transformHosts = (hosts: [string, number][]) => hosts.map(([name, id]) => ({ id: id.toString(), name }));
+
+      setHaveHosted(transformHosts(response.data.hosts["Have Hosted"]))
+      setYetToHost(transformHosts(response.data.hosts["Yet To Host"]))
+
+      setMeetupNumber(response.data.meetup_number.number);
+      setIsLoading(false);
+    } catch (error: any) {
+      setIsLoading(false);
+      setIsError(true);
+      console.error("Error occured during fetch", error);
+    }
+  }
 
   async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -178,7 +193,10 @@ export function NewMeetupActionModal({
             id="host"
             name="host"
             placeholder="Search for a host..."
-            options={members}
+            groups={[
+              { label: "Have Hosted", options: haveHosted || [] },
+              { label: "Yet To Host", options: yetToHost || [] },
+            ]}
             value={selectedHostID}
             onChange={setSelectedHostID}
           />
