@@ -49,7 +49,7 @@ export default function MemberCard({ id, name, projects, status }: Member) {
     <>
       <div
         onClick={handleCardClick}
-        className="bg-white dark:bg-[#222] rounded-lg p-4 border-2 dark:boder border-neutral-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-200 hover:shadow-gray-600/50 hover:shadow-[0px_0px_8px_1px_rgba(0,_0,_0,_0.1)] dark:hover:shadow-gray-200/50 active:shadow-none transition duration-200"
+        className="bg-white dark:bg-[#222] rounded-lg p-4 border-2 dark:border border-neutral-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-200 hover:shadow-gray-600/50 hover:shadow-[0px_0px_8px_1px_rgba(0,_0,_0,_0.1)] dark:hover:shadow-gray-200/50 active:shadow-none transition duration-200"
       >
         <h1 className="text-lg flex justify-between">
           <div className="flex items-center">

@@ -111,7 +111,7 @@ export default function MeetupCard({
 
         <button
           onClick={handleCloseModal}
-          className="bg-white hover:bg-white-600 text-black font-bold py-2 px-4 rounded w-full"
+          className="dark:bg-white hover:bg-white-600 dark:text-black bg-[#222] dark:hover:bg-[#e0e0e0] dark:active:bg-[#c7c7c7] text-white hover:bg-[#333] active:bg-[#444] font-bold py-2 px-4 rounded w-full transition duration-200"
         >
           Close
         </button>
