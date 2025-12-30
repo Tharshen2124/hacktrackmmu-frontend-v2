@@ -22,9 +22,9 @@ export function NewMeetupActionButton({
         label="New Meetup"
         icon={<CalendarPlus />}
         onClick={handleViewClick}
-        bgColor="border-white"
-        textColor="text-white"
-        hoverShadowColor="hover:shadow-white/50"
+        bgColor="border-purple-600 dark:border-white"
+        textColor="text-purple-600 dark:text-white"
+        hoverShadowColor="hover:shadow-purple-600/40 dark:hover:shadow-white/50"
       />
 
       <NewMeetupActionModal
