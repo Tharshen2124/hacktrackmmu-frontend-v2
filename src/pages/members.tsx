@@ -15,7 +15,7 @@ const DEFAULT_STATUSES = [MemberStatus.Active, MemberStatus.SociallyActive];
 
 const MemberStatusComponent = ({ status }: { status: string }) => {
   return (
-    <div className="border border-gray-200 px-4 py-1 rounded-2xl text-center items-center flex">
+    <div className="border-neutral-400 border dark:border-gray-200 px-4 py-1 rounded-2xl text-center items-center flex">
       <p>{status}</p>
     </div>
   );
