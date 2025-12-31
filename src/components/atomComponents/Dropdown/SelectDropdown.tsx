@@ -7,12 +7,18 @@ interface Option {
   date?: string;
 }
 
+interface Group {
+  label: string;
+  options: Option[];
+}
+
 interface SearchableDropdownProps {
   label: string;
   id: string;
   name: string;
   placeholder?: string;
-  options: Option[];
+  options?: Option[];
+  groups?: Group[];
   value: string;
   onChange: (value: string) => void;
   className?: string;
@@ -24,7 +30,8 @@ export const SearchableDropdown = ({
   id,
   name,
   placeholder = "Search and select an option",
-  options,
+  options = [],
+  groups = [],
   value,
   onChange,
   className = "",
@@ -58,27 +65,53 @@ export const SearchableDropdown = ({
     return option.name || option.date || option.id; // Fallback to id if neither name nor date
   };
 
+  // Flatten options for easy lookup, handling both groups and flat options
+  const allOptions = useMemo(() => {
+    if (groups.length > 0) {
+      return groups.flatMap((group) => group.options);
+    }
+    return options || [];
+  }, [options, groups]);
+
   // Find the selected option using the `value` (which is an `id`)
   const selectedOption = useMemo(
-    () => options.find((option) => option.id === value),
-    [options, value],
+    () => allOptions.find((option) => option.id === value),
+    [allOptions, value],
   );
 
-  // Filter options based on search term and displayKey
-  const filteredOptions = useMemo(
-    () =>
-      options.filter((option) =>
-        getOptionDisplayName(option)
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()),
-      ),
-    [options, searchTerm, getOptionDisplayName], // getOptionDisplayName should be stable or defined within useMemo
-  );
+  // Filter options/groups based on search term
+  const filteredItems = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+
+    if (groups.length > 0) {
+      const result: (Option | { type: "header"; label: string })[] = [];
+      groups.forEach((group) => {
+        const matchingOptions = group.options.filter((option) =>
+          getOptionDisplayName(option).toLowerCase().includes(term),
+        );
+        if (matchingOptions.length > 0) {
+          result.push({ type: "header", label: group.label });
+          result.push(...matchingOptions);
+        }
+      });
+      return result;
+    } else {
+      return (options || []).filter((option) =>
+        getOptionDisplayName(option).toLowerCase().includes(term),
+      );
+    }
+  }, [options, groups, searchTerm]);
 
   useEffect(() => {
     // Reset highlighted index when filtered options change
-    setHighlightedIndex(filteredOptions.length > 0 ? 0 : -1);
-  }, [filteredOptions]);
+    // Find first selectable option index
+    const firstSelectableIndex = filteredItems.findIndex(
+      (item) => !("type" in item && (item as any).type === "header"),
+    );
+    setHighlightedIndex(
+      firstSelectableIndex !== -1 ? firstSelectableIndex : -1,
+    );
+  }, [filteredItems]);
 
   // Open dropdown when focusing on input
   const handleFocus = () => {
@@ -86,7 +119,7 @@ export const SearchableDropdown = ({
   };
 
   const handleSelect = (optionId: string) => {
-    const option = options.find((opt) => opt.id === optionId);
+    const option = allOptions.find((opt) => opt.id === optionId);
     onChange(optionId);
     // Set search term to the display name of the selected option
     setSearchTerm(option ? getOptionDisplayName(option) : "");
@@ -123,14 +156,16 @@ export const SearchableDropdown = ({
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [selectedOption, searchTerm, value, getOptionDisplayName]); // Add getOptionDisplayName to dependencies
+  }, [selectedOption, searchTerm, value]);
 
   // Set initial search term when selected value changes
   useEffect(() => {
     if (selectedOption && !isOpen) {
       setSearchTerm(getOptionDisplayName(selectedOption));
+    } else if (!selectedOption && !isOpen && !value) {
+      setSearchTerm("");
     }
-  }, [selectedOption, isOpen, getOptionDisplayName]); // Add getOptionDisplayName to dependencies
+  }, [selectedOption, isOpen, value]);
 
   // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -147,19 +182,41 @@ export const SearchableDropdown = ({
         inputRef.current?.blur();
         break;
       case "ArrowDown":
-        setHighlightedIndex((prev) =>
-          prev < filteredOptions.length - 1 ? prev + 1 : prev,
-        );
         e.preventDefault();
+        setHighlightedIndex((prev) => {
+          let next = prev + 1;
+          while (
+            next < filteredItems.length &&
+            "type" in filteredItems[next] &&
+            (filteredItems[next] as any).type === "header"
+          ) {
+            next++;
+          }
+          return next < filteredItems.length ? next : prev;
+        });
         break;
       case "ArrowUp":
-        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : 0));
         e.preventDefault();
+        setHighlightedIndex((prev) => {
+          let next = prev - 1;
+          while (
+            next >= 0 &&
+            "type" in filteredItems[next] &&
+            (filteredItems[next] as any).type === "header"
+          ) {
+            next--;
+          }
+          return next >= 0 ? next : prev;
+        });
         break;
       case "Enter":
-        if (highlightedIndex >= 0 && filteredOptions[highlightedIndex]) {
-          handleSelect(filteredOptions[highlightedIndex].id);
-          e.preventDefault();
+        if (highlightedIndex >= 0 && filteredItems[highlightedIndex]) {
+          const item = filteredItems[highlightedIndex];
+          if (!("type" in item)) {
+            // Ensure it's not a header
+            handleSelect((item as Option).id);
+            e.preventDefault();
+          }
         }
         break;
       default:
@@ -217,26 +274,38 @@ export const SearchableDropdown = ({
           aria-labelledby={`${id}-label`}
           className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-input bg-background py-1 shadow-lg dark:bg-[#333] dark:border-[#555]"
         >
-          {filteredOptions.length === 0 ? (
+          {filteredItems.length === 0 ? (
             <li className="px-4 py-2 text-muted-foreground">
               No matches found
             </li>
           ) : (
-            filteredOptions.map((option, index) => (
-              <li
-                key={option.id}
-                id={`${id}-option-${index}`}
-                role="option"
-                aria-selected={value === option.id}
-                className={`px-4 py-2 cursor-pointer ${
-                  highlightedIndex === index ? "bg-primary/10" : ""
-                } ${value === option.id ? "bg-primary/20" : ""} hover:bg-primary/10`}
-                onClick={() => handleSelect(option.id)}
-                onMouseEnter={() => setHighlightedIndex(index)}
-              >
-                {getOptionDisplayName(option)} {/* Use helper here */}
-              </li>
-            ))
+            filteredItems.map((item, index) => {
+              if ("type" in item && (item as any).type === "header") {
+                return (
+                  <li
+                    key={`header-${index}`}
+                    className="px-3 py-3 text-xl font-bold text-muted-foreground bg-muted/50 dark:bg-muted/20 text-gray-400"
+                  >
+                    {(item as any).label}
+                  </li>
+                );
+              }
+              const option = item as Option;
+              return (
+                <li
+                  key={option.id}
+                  id={`${id}-option-${index}`}
+                  role="option"
+                  aria-selected={value === option.id}
+                  className={`px-4 py-2 cursor-pointer ${highlightedIndex === index ? "bg-primary/10" : ""
+                    } ${value === option.id ? "bg-primary/20" : ""} hover:bg-primary/10 ${groups.length > 0 ? "pl-6" : ""}`}
+                  onClick={() => handleSelect(option.id)}
+                  onMouseEnter={() => setHighlightedIndex(index)}
+                >
+                  {getOptionDisplayName(option)}
+                </li>
+              );
+            })
           )}
         </ul>
       )}
@@ -250,9 +319,9 @@ export const SearchableDropdown = ({
         aria-hidden="true"
       >
         <option value="">{placeholder}</option>
-        {options.map((option) => (
+        {allOptions.map((option) => (
           <option key={option.id} value={option.id}>
-            {getOptionDisplayName(option)} {/* Use helper here */}
+            {getOptionDisplayName(option)}
           </option>
         ))}
       </select>
