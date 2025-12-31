@@ -87,21 +87,21 @@ export default function Onboarding() {
       {onboardingLoading && <p>Loading onboarding data...</p>}
       {onboardingError && <p>Error loading data</p>}
 
-      <div className="mt-4 border w-full border-gray-800 rounded-lg active:shadow-none transition duration-200">
+      <div className="mt-4 border w-full border-gray-800 rounded-lg overflow-hidden active:shadow-none transition duration-200">
         {!isMaxWidth768px ? (
-          <table className="w-full">
-            <thead className="border-b pb-3">
-              <tr className="border-b border-gray-800 pb-3">
-                <th className="text-left pl-8 pr-2 bg-[#1e1e1e] rounded-tl-lg min-w-[150px]">
+          <table className="w-full text-sm text-left">
+            <thead className="text-gray-200 bg-[#1e1e1e]">
+              <tr className="border-b border-gray-800">
+                <th className="pl-8 pr-2 py-4 bg-neutral-700 dark:bg-[#1e1e1e] min-w-[150px]">
                   Name
                 </th>
-                <th className="text-left py-4 px-4 bg-[#1e1e1e]">
+                <th className="py-4 px-4 bg-neutral-700 dark:bg-[#1e1e1e]">
                   Contact Number
                 </th>
-                <th className="text-left py-4 px-4 bg-[#1e1e1e]">
+                <th className="py-4 px-4 bg-neutral-700 dark:bg-[#1e1e1e]">
                   Register Date
                 </th>
-                <th className="text-left py-4 px-4 bg-[#1e1e1e]">
+                <th className="py-4 px-4 bg-neutral-700 dark:bg-[#1e1e1e]">
                   <div className="flex items-center gap-x-3">
                     Status
                     <MemberFilter
@@ -112,7 +112,7 @@ export default function Onboarding() {
                     />
                   </div>
                 </th>
-                <th className="text-left pl-2 pr-8 bg-[#1e1e1e] rounded-tr-lg w-[297px]">
+                <th className="pl-2 pr-8 py-4 bg-neutral-700 dark:bg-[#1e1e1e] w-[297px]">
                   Options
                 </th>
               </tr>
@@ -120,7 +120,10 @@ export default function Onboarding() {
             <tbody>
               {members.length > 0 ? (
                 members.map((member: Member) => (
-                  <tr key={member.id} className="border border-gray-800">
+                  <tr
+                    key={member.id}
+                    className="border-b border-gray-800 last:border-b-0"
+                  >
                     <OnboardingTableRow
                       member={member}
                       mutateOnboarding={mutateOnboarding}

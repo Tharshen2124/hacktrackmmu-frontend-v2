@@ -147,10 +147,10 @@ export function OnboardingMemberModal({
             passHref
             className="border p-[5px] border-blue-600 bg-blue-600 rounded-md"
           >
-            <Edit size="16" />
+            <Edit size="16" className="text-white" />
           </Link>
           <div className="border p-[5px] border-red-600 bg-red-600 rounded-md cursor-pointer">
-            <Trash size="16" />
+            <Trash size="16" className="text-white" />
           </div>
         </div>
       </div>
@@ -181,11 +181,11 @@ export function OnboardingMemberModal({
                 className="bg-blue-600 p-1 rounded-md"
                 onClick={() => updateStatus("up")}
               >
-                <ArrowUp size="16" />
+                <ArrowUp size="16" className="text-white" />
               </button>
             ) : (
               <div className="bg-gray-600 p-1 rounded-md">
-                <ArrowUp size="16" />
+                <ArrowUp size="16" className="text-white" />
               </div>
             )}
             {canDemote ? (
@@ -194,11 +194,11 @@ export function OnboardingMemberModal({
                 className="bg-yellow-500 p-1 rounded-md"
                 onClick={() => updateStatus("down")}
               >
-                <ArrowDown size="16" />
+                <ArrowDown size="16" className="text-white" />
               </button>
             ) : (
               <div className="bg-gray-600 p-1 rounded-md">
-                <ArrowDown size="16" />
+                <ArrowDown size="16" className="text-white" />
               </div>
             )}
           </div>
