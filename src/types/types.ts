@@ -40,6 +40,8 @@ export interface Member {
   comment: string;
   register_date: Date;
   contact_number: string;
+  discord_tag: string;
+  progress_talk_num: number;
 }
 
 export interface Token {
