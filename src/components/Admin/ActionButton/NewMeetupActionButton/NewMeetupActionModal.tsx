@@ -16,9 +16,9 @@ interface NewMeetupActionModalProps {
 }
 
 type Host = {
-  id: string,
-  name: string
-}
+  id: string;
+  name: string;
+};
 
 export function NewMeetupActionModal({
   isModalOpen,
@@ -31,8 +31,8 @@ export function NewMeetupActionModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { token } = useAuthStore();
   const { showToast } = useToast();
-  const [haveHosted, setHaveHosted] = useState<Host[]>()
-  const [yetToHost, setYetToHost] = useState<Host[]>()
+  const [haveHosted, setHaveHosted] = useState<Host[]>();
+  const [yetToHost, setYetToHost] = useState<Host[]>();
 
   const [meetupNumber, setMeetupNumber] = useState<number>(0);
   const [date, setDate] = useState<string>(
@@ -66,10 +66,11 @@ export function NewMeetupActionModal({
           },
         },
       );
-      const transformHosts = (hosts: [string, number][]) => hosts.map(([name, id]) => ({ id: id.toString(), name }));
+      const transformHosts = (hosts: [string, number][]) =>
+        hosts.map(([name, id]) => ({ id: id.toString(), name }));
 
-      setHaveHosted(transformHosts(response.data.hosts["Have Hosted"]))
-      setYetToHost(transformHosts(response.data.hosts["Yet To Host"]))
+      setHaveHosted(transformHosts(response.data.hosts["Have Hosted"]));
+      setYetToHost(transformHosts(response.data.hosts["Yet To Host"]));
 
       setMeetupNumber(response.data.meetup_number.number);
       setIsLoading(false);
@@ -90,16 +91,23 @@ export function NewMeetupActionModal({
       return;
     }
 
+    let payload: any = {
+      date: date,
+      host_id: selectedHostID,
+      category: category,
+    };
+
+    if (category == "hackathon") {
+      payload.hackathon_number = meetup_number;
+    } else {
+      payload.meetup_number = meetup_number;
+    }
+
     try {
       await axios.post(
         `${apiUrl}/api/v1/meetups`,
         {
-          meetup: {
-            date: date,
-            number: meetupNumber,
-            host_id: selectedHostID,
-            category: category,
-          },
+          meetup: payload,
         },
         {
           headers: {
