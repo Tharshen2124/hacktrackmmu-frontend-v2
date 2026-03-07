@@ -33,8 +33,9 @@ export function NewMeetupActionModal({
   const { showToast } = useToast();
   const [haveHosted, setHaveHosted] = useState<Host[]>();
   const [yetToHost, setYetToHost] = useState<Host[]>();
-
-  const [meetupNumber, setMeetupNumber] = useState<number>(0);
+  const [meetupNumberInput, setMeetupNumberInput] = useState<number>(0);
+  const [regularMeetupNumber, setRegularMeetupNumber] = useState<number>(0);
+  const [hackathonNumber, setHackathonNumber] = useState<number>(0);
   const [date, setDate] = useState<string>(
     new Date().toISOString().split("T")[0],
   );
@@ -72,7 +73,9 @@ export function NewMeetupActionModal({
       setHaveHosted(transformHosts(response.data.hosts["Have Hosted"]));
       setYetToHost(transformHosts(response.data.hosts["Yet To Host"]));
 
-      setMeetupNumber(response.data.meetup_number.number);
+      setRegularMeetupNumber(response.data.meetup_number.number);
+      setHackathonNumber(response.data.meetup_number.hackathon_number);
+      setMeetupNumberInput(response.data.meetup_number.number);
       setIsLoading(false);
     } catch (error: any) {
       setIsLoading(false);
@@ -97,10 +100,11 @@ export function NewMeetupActionModal({
       category: category,
     };
 
-    if (category == "hackathon") {
-      payload.hackathon_number = meetup_number;
+    // The Fix:
+    if (category === "hackathon") {
+      payload.hackathon_number = meetupNumberInput;
     } else {
-      payload.meetup_number = meetup_number;
+      payload.number = meetupNumberInput;
     }
 
     try {
@@ -176,9 +180,9 @@ export function NewMeetupActionModal({
           <input
             type="number"
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setMeetupNumber(Number(e.target.value))
+              setMeetupNumberInput(Number(e.target.value))
             }
-            value={meetupNumber}
+            value={meetupNumberInput}
             className="mt-1 flex w-full dark:bg-[#333] dark:border-[#555] rounded-md border border-input bg-background px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus:ring-blue-400 dark:focus:ring-blue-500"
           />
         </div>
@@ -219,7 +223,10 @@ export function NewMeetupActionModal({
                 type="radio"
                 defaultChecked
                 name="category"
-                onChange={() => setCategory("regular_meetup")}
+                onChange={() => {
+                  setCategory("regular_meetup");
+                  setMeetupNumberInput(regularMeetupNumber);
+                }}
                 className="bg-333"
               />
               <label>Regular Meetup</label>
@@ -228,7 +235,10 @@ export function NewMeetupActionModal({
               <input
                 type="radio"
                 name="category"
-                onChange={() => setCategory("hackathon")}
+                onChange={() => {
+                  setCategory("hackathon");
+                  setMeetupNumberInput(hackathonNumber);
+                }}
               />
               <label>Hackathon</label>
             </div>
