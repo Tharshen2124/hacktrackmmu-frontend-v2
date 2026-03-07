@@ -94,7 +94,7 @@ export function NewMeetupActionModal({
       return;
     }
 
-    let payload: any = {
+    const payload: any = {
       date: date,
       host_id: selectedHostID,
       category: category,
