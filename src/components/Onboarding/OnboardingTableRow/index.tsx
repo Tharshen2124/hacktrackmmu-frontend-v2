@@ -7,6 +7,7 @@ import { apiUrl } from "@/utils/env";
 import axios from "axios";
 import useAuthStore from "@/store/useAuthStore";
 import { useToast } from "@/components/Toast/ToastProvider";
+import { NullTextIndicator } from "@/components/atomComponents/NullTextIndicator";
 
 interface OnboardingTableRowProps {
   member: Member;
@@ -67,14 +68,16 @@ export default function OnboardingTableRow({
     }
   };
 
+  console.log("Rendering row for member:", member);
+
   return (
     <>
       <td className="pl-8 pr-2 py-4 min-w-[150px] overflow-auto">
         {member.name}
       </td>
-      <td className="py-4 px-4">{member.contact_number || "N/A"}</td>
+      <td className="py-4 px-4">{member.contact_number || <NullTextIndicator />}</td>
       <td className="py-4 px-4">
-        {dayjs(member.register_date || "N/A").format("MMM D, YYYY")}
+        {member.register_date ? dayjs(member.register_date).format("MMM D, YYYY") : <NullTextIndicator />}
       </td>
 
       <td className="py-4 px-4">

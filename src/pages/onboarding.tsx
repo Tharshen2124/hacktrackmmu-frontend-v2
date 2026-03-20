@@ -51,6 +51,8 @@ export default function Onboarding() {
     ([url, token]) => fetcherWithToken(url, token),
   );
 
+  console.log("Onboarding data:", onboardingData);
+
   const members = useMemo(() => {
     const rawMembers = onboardingData?.data || [];
     return rawMembers.sort((a: Member, b: Member) => {

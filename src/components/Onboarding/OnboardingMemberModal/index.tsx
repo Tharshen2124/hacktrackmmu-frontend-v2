@@ -1,3 +1,4 @@
+import { NullTextIndicator } from "@/components/atomComponents/NullTextIndicator";
 import { ModalLayout } from "@/components/ModalLayout";
 import { useToast } from "@/components/Toast/ToastProvider";
 import useAuthStore from "@/store/useAuthStore";
@@ -12,6 +13,7 @@ import {
   Copy,
   Edit,
   Mail,
+  Phone,
   Trash,
 } from "lucide-react";
 import Image from "next/image";
@@ -233,7 +235,7 @@ export function OnboardingMemberModal({
       <div className="flex items-center justify-between border border-gray-700 py-3 px-4 rounded-md gap-3">
         <p className="min-w-0 truncate">
           <span className="font-bold">Contact Number:</span>{" "}
-          {member.contact_number || "N/A"}
+          {member.contact_number || <NullTextIndicator />}
         </p>
         <div className="flex flex-row gap-x-4">
           <Copy
@@ -243,14 +245,7 @@ export function OnboardingMemberModal({
             className="hover:text-gray-400 hover:cursor-pointer active:text-green-500"
             size="16"
           />
-          <Image
-            src="/whatsapp.svg"
-            alt="WhatsApp"
-            width={16}
-            height={16}
-            className="hover:opacity-70 hover:cursor-pointer active:opacity-50"
-            onClick={() => handleWhatsapp(member.contact_number)}
-          />
+          <Phone size={14} />
         </div>
       </div>
 
@@ -258,14 +253,20 @@ export function OnboardingMemberModal({
       <div className="flex flex-col gap-x-2 border border-gray-700 py-3 px-4 rounded-md max-h-36 lg:max-h-48 overflow-y-auto">
         <p>
           <span className="font-semibold">Register Date:</span>{" "}
-          {dayjs(member.created_at).format("DD/MM/YYYY HH:mm")}
+          {dayjs(member.created_at).format("DD/MM/YYYY")}
+        </p>
+        <p>
+          <span className="font-semibold">Register Time:</span>{" "}
+          {dayjs(member.created_at).format("HH:mm")}
         </p>
         <p>
           <span className="font-semibold">Comment:</span>{" "}
-          {member.comment || "N/A"}
+          {member.comment || (
+            <NullTextIndicator />
+          )}
         </p>
         <p>
-          <span className="font-semibold">Old Status:</span>{" "}
+          <span className="font-semibold">Legacy Status:</span>{" "}
           {typeof member.active === "boolean"
             ? member.active
               ? "Active"
