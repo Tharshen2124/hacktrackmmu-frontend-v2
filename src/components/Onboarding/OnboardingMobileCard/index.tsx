@@ -7,6 +7,8 @@ import axios from "axios";
 import useAuthStore from "@/store/useAuthStore";
 import { useToast } from "@/components/Toast/ToastProvider";
 import Link from "next/link";
+import DeleteModal from "../DeleteModal";
+import { handleConfirmDeleteMember } from "../handleConfirmDeleteMember";
 
 interface OnboardingMobileCardProps {
   member: Member;
@@ -33,9 +35,13 @@ export default function OnboardingMobileCard({
   const { showToast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleViewClick = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
+  const handleDeleteMember = () => setIsDeleteModalOpen(true);
+  const handleCloseDeleteModal = () => setIsDeleteModalOpen(false);
 
   const handleStatusChange = async (newStatus: MemberStatus) => {
     if (newStatus === member.status) return;
@@ -112,7 +118,10 @@ export default function OnboardingMobileCard({
               Edit
             </button>
           </Link>
-          <button className="w-full text-white text-sm font-semibold bg-red-800 py-2 rounded-md transition duration-200 hover:bg-red-700 active:bg-gray-400">
+          <button
+            onClick={handleDeleteMember}
+            className="w-full text-white text-sm font-semibold bg-red-800 py-2 rounded-md transition duration-200 hover:bg-red-700 active:bg-gray-400"
+          >
             Delete
           </button>
         </div>
@@ -122,6 +131,22 @@ export default function OnboardingMobileCard({
         handleCloseModal={handleCloseModal}
         member={member}
         mutateOnboarding={mutateOnboarding}
+      />
+
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={() =>
+          handleConfirmDeleteMember({
+            memberId: member.id,
+            token,
+            mutateOnboarding,
+            showToast,
+            handleCloseDeleteModal,
+            setIsDeleting,
+          })
+        }
+        isDeleting={isDeleting}
       />
     </div>
   );

@@ -8,6 +8,8 @@ import axios from "axios";
 import useAuthStore from "@/store/useAuthStore";
 import { useToast } from "@/components/Toast/ToastProvider";
 import { NullTextIndicator } from "@/components/atomComponents/NullTextIndicator";
+import DeleteModal from "../DeleteModal";
+import { handleConfirmDeleteMember } from "../handleConfirmDeleteMember";
 
 interface OnboardingTableRowProps {
   member: Member;
@@ -47,9 +49,13 @@ export default function OnboardingTableRow({
   const { showToast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleViewClick = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
+  const handleDeleteMember = () => setIsDeleteModalOpen(true);
+  const handleCloseDeleteModal = () => setIsDeleteModalOpen(false);
 
   const handleStatusChange = async (newStatus: MemberStatus) => {
     if (newStatus === member.status) return;
@@ -125,7 +131,10 @@ export default function OnboardingTableRow({
               Edit
             </button>
           </Link>
-          <button className="w-[80px] text-white text-sm font-semibold bg-red-800 py-2 px-3 rounded-full transition duration-200 hover:bg-red-700 active:bg-gray-400">
+          <button 
+            onClick={handleDeleteMember}
+            className="w-[80px] text-white text-sm font-semibold bg-red-800 py-2 px-3 rounded-full transition duration-200 hover:bg-red-700 active:bg-gray-400"
+          >
             Delete
           </button>
         </div>
@@ -136,6 +145,22 @@ export default function OnboardingTableRow({
         handleCloseModal={handleCloseModal}
         member={member}
         mutateOnboarding={mutateOnboarding}
+      />
+
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={() =>
+          handleConfirmDeleteMember({
+            memberId: member.id,
+            token,
+            mutateOnboarding,
+            showToast,
+            handleCloseDeleteModal,
+            setIsDeleting,
+          })
+        }
+        isDeleting={isDeleting}
       />
     </>
   );
