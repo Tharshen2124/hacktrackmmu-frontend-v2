@@ -18,11 +18,11 @@ export default function Selector({
 }: SelectorProps) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
         {label}
       </label>
       <select
-        className="w-full p-2 border border-gray-300 rounded-md text-gray-700"
+        className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-100 bg-white dark:bg-[#1a1a1a]"
         value={value || ""}
         onChange={(e) => onChange(e.target.value)}
       >

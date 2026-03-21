@@ -69,13 +69,13 @@ export default function MemberFilter({
         <div className="buttons flex flex-row gap-2">
           <button
             onClick={handleApplyFilter}
-            className="py-2 w-1/2 border border-gray-300 rounded-md bg-blue-500 hover:bg-blue-400 text-white"
+            className="py-2 w-1/2 border border-gray-300 dark:border-blue-900 rounded-md bg-blue-500 hover:bg-blue-400 dark:bg-blue-600 dark:hover:bg-blue-500 text-white"
           >
             Filter
           </button>
           <button
             onClick={handleClear}
-            className="py-2 w-1/2 border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700"
+            className="py-2 w-1/2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
           >
             Clear
           </button>

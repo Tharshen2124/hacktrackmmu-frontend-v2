@@ -75,7 +75,7 @@ const FilterPopover = forwardRef<FilterPopoverHandle, FilterPopoverProps>(
         {!isOnboarding && (
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center gap-2 px-4 py-2 text-black bg-white border border-gray-300 rounded-3xl hover:bg-gray-200 active:bg-gray-400"
+            className="flex items-center gap-2 px-4 py-2 text-black dark:text-gray-100 bg-white dark:bg-[#111] border border-gray-300 dark:border-gray-700 rounded-3xl hover:bg-gray-200 dark:hover:bg-gray-800 active:bg-gray-400 dark:active:bg-gray-700"
           >
             <ListFilter />
             <p className=" hidden sm:block">Filter</p>
@@ -95,9 +95,9 @@ const FilterPopover = forwardRef<FilterPopoverHandle, FilterPopoverProps>(
           </button>
         )}
         {isOpen && (
-          <div className="absolute top-full right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+          <div className="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
             <div className="p-4">
-              <h3 className="text-lg font-semibold mb-3 text-black">
+              <h3 className="text-lg font-semibold mb-3 text-black dark:text-gray-100">
                 {filterTitle || "Filter Options"}
               </h3>
               <div className="space-y-3">{children}</div>
