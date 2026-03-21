@@ -258,7 +258,7 @@ export function OnboardingMemberModal({
               className="hover:text-gray-400 hover:cursor-pointer active:text-green-500"
               size="16"
             />
-            <Phone size={16} />
+            <Phone onClick={() => handleWhatsapp(member.contact_number)} size={16} />
           </div>
         </div>
         <div className="flex items-center justify-between border border-gray-700 py-3 px-4 rounded-md gap-3">

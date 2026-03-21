@@ -8,6 +8,7 @@ import { MemberStatus, Member } from "@/types/types";
 import { apiUrl } from "@/utils/env";
 import { fetcherWithToken } from "@/utils/fetcher";
 import dayjs from "dayjs";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 
@@ -27,6 +28,7 @@ export default function Onboarding() {
   const { token } = useAuthStore();
   const [isClient, setIsClient] = useState(false);
   const isMaxWidth768px = useMediaQuery("(max-width: 768px)");
+  const [paginationNumber, setPaginationNumber] = useState(1);
   const [statusFilter, setStatusFilter] =
     useState<string[]>(ONBOARDING_STATUSES);
 
@@ -34,8 +36,10 @@ export default function Onboarding() {
     setIsClient(true);
   }, []);
 
-  const createQueryParams = () => {
-    const queryParams = new URLSearchParams();
+  const createQueryParams = (page: number) => {
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+    });
     statusFilter.forEach((status) => {
       queryParams.append("status[]", status);
     });
@@ -50,12 +54,18 @@ export default function Onboarding() {
   } = useSWR(
     token && isClient
       ? [
-          `${apiUrl}/api/v1/members/filtered?${createQueryParams().toString()}`,
+          `${apiUrl}/api/v1/members/filtered?${createQueryParams(paginationNumber).toString()}`,
           token,
         ]
       : null,
     ([url, token]) => fetcherWithToken(url, token),
   );
+
+  const totalPagination = onboardingData?.meta?.total_pages || 1;
+
+  useEffect(() => {
+    setPaginationNumber(1);
+  }, [statusFilter]);
 
   console.log("Onboarding data:", onboardingData);
 
@@ -164,6 +174,30 @@ export default function Onboarding() {
             )}
           </>
         )}
+      </div>
+
+      <div className="fixed flex items-center border-2 border-gray-200 dark:border-gray-700 rounded-full w-fit bottom-4 right-4 z-50 overflow-hidden">
+        <button
+          onClick={() => setPaginationNumber((prev) => Math.max(1, prev - 1))}
+          className="text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 py-2 px-2 transition duration-200 hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={onboardingLoading || paginationNumber === 1}
+        >
+          <ChevronLeft />
+        </button>
+        <div className="text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 w-[75px] py-2 px-2 text-center border-x border-gray-200 dark:border-gray-700">
+          {paginationNumber} - {totalPagination}
+        </div>
+        <button
+          onClick={() =>
+            setPaginationNumber((prev) => Math.min(totalPagination, prev + 1))
+          }
+          className="text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 py-2 px-2 transition duration-200 hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={
+            onboardingLoading || paginationNumber >= totalPagination
+          }
+        >
+          <ChevronRight />
+        </button>
       </div>
     </DashboardLayout>
   );
