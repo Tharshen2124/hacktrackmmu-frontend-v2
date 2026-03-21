@@ -264,12 +264,12 @@ export function OnboardingMemberModal({
         <div className="flex items-center justify-between border border-gray-700 py-3 px-4 rounded-md gap-3">
           <p className="min-w-0 truncate">
             <span className="font-bold">Discord Tag:</span>{" "}
-            {member.contact_number || <NullTextIndicator />}
+            {member.discord_tag || <NullTextIndicator />}
           </p>
           <div className="flex flex-row gap-x-4">
             <Copy
               onClick={() =>
-                copyToClipBoard(member.contact_number, "Contact Number")
+                copyToClipBoard(member.discord_tag, "Discord Tag")
               }
               className="hover:text-gray-400 hover:cursor-pointer active:text-green-500"
               size="16"
