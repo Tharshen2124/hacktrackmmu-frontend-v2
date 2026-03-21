@@ -28,6 +28,7 @@ export default function EditMemberPage() {
     discord_tag: "",
     status: "" as MemberStatus | "",
     comment: "",
+    contact_number: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +41,7 @@ export default function EditMemberPage() {
         discord_tag: member.discord_tag || "",
         status: member.status || "",
         comment: member.comment || "",
+        contact_number: member.contact_number || "",
       });
     }
   }, [member]);
@@ -162,7 +164,6 @@ export default function EditMemberPage() {
                 name="discord_tag"
                 value={formData.discord_tag}
                 onChange={handleChange}
-                required
                 className="w-full px-3 py-2 border-2 dark:border border-neutral-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-[#333]"
               />
             </div>
@@ -188,6 +189,24 @@ export default function EditMemberPage() {
                   </option>
                 ))}
               </select>
+            </div>
+
+            {/*contact number*/}
+            <div>
+              <label
+                htmlFor="contact_number"
+                className="block text-sm font-medium mb-1"
+              >
+                Contact Number
+              </label>
+              <input
+                type="text"
+                id="contact_number"
+                name="contact_number"
+                value={formData.contact_number || ""}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border-2 dark:border border-neutral-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-[#333]"
+              />
             </div>
 
             <div>
