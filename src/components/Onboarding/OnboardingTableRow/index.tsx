@@ -7,6 +7,9 @@ import { apiUrl } from "@/utils/env";
 import axios from "axios";
 import useAuthStore from "@/store/useAuthStore";
 import { useToast } from "@/components/Toast/ToastProvider";
+import { NullTextIndicator } from "@/components/atomComponents/NullTextIndicator";
+import DeleteModal from "../DeleteModal";
+import { handleConfirmDeleteMember } from "../handleConfirmDeleteMember";
 
 interface OnboardingTableRowProps {
   member: Member;
@@ -14,9 +17,15 @@ interface OnboardingTableRowProps {
 }
 
 const statusColour: Partial<Record<MemberStatus, string>> = {
-  [MemberStatus.Registered]: "bg-red-700",
-  [MemberStatus.Contacted]: "bg-blue-700",
-  [MemberStatus.IdeaTalked]: "bg-green-800",
+  [MemberStatus.Registered]: "white",
+  [MemberStatus.Contacted]: "blue-400",
+  [MemberStatus.IdeaTalked]: "green-400",
+  [MemberStatus.NeverActive]: "gray-400",
+  [MemberStatus.Active]: "yellow-400",
+  [MemberStatus.SociallyActive]: "orange-400",
+  [MemberStatus.WasActive]: "purple-400",
+  [MemberStatus.WasSociallyActive]: "indigo-400",
+  [MemberStatus.Terminated]: "red-400",
 };
 
 // Easy to modify: just add/remove statuses here
@@ -24,6 +33,12 @@ const ONBOARDING_STATUSES = [
   MemberStatus.Registered,
   MemberStatus.Contacted,
   MemberStatus.IdeaTalked,
+  MemberStatus.NeverActive,
+  MemberStatus.Active,
+  MemberStatus.SociallyActive,
+  MemberStatus.WasActive,
+  MemberStatus.WasSociallyActive,
+  MemberStatus.Terminated,
 ];
 
 export default function OnboardingTableRow({
@@ -34,9 +49,13 @@ export default function OnboardingTableRow({
   const { showToast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleViewClick = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
+  const handleDeleteMember = () => setIsDeleteModalOpen(true);
+  const handleCloseDeleteModal = () => setIsDeleteModalOpen(false);
 
   const handleStatusChange = async (newStatus: MemberStatus) => {
     if (newStatus === member.status) return;
@@ -67,14 +86,16 @@ export default function OnboardingTableRow({
     }
   };
 
+  console.log("Rendering row for member:", member);
+
   return (
     <>
       <td className="pl-8 pr-2 py-4 min-w-[150px] overflow-auto">
         {member.name}
       </td>
-      <td className="py-4 px-4">{member.contact_number || "N/A"}</td>
+      <td className="py-4 px-4">{member.contact_number || <NullTextIndicator />}</td>
       <td className="py-4 px-4">
-        {dayjs(member.register_date || "N/A").format("MMM D, YYYY")}
+        {member.register_date ? dayjs(member.register_date).format("MMM D, YYYY") : <NullTextIndicator />}
       </td>
 
       <td className="py-4 px-4">
@@ -110,7 +131,10 @@ export default function OnboardingTableRow({
               Edit
             </button>
           </Link>
-          <button className="w-[80px] text-white text-sm font-semibold bg-red-800 py-2 px-3 rounded-full transition duration-200 hover:bg-red-700 active:bg-gray-400">
+          <button 
+            onClick={handleDeleteMember}
+            className="w-[80px] text-white text-sm font-semibold bg-red-800 py-2 px-3 rounded-full transition duration-200 hover:bg-red-700 active:bg-gray-400"
+          >
             Delete
           </button>
         </div>
@@ -121,6 +145,22 @@ export default function OnboardingTableRow({
         handleCloseModal={handleCloseModal}
         member={member}
         mutateOnboarding={mutateOnboarding}
+      />
+
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={() =>
+          handleConfirmDeleteMember({
+            memberId: member.id,
+            token,
+            mutateOnboarding,
+            showToast,
+            handleCloseDeleteModal,
+            setIsDeleting,
+          })
+        }
+        isDeleting={isDeleting}
       />
     </>
   );

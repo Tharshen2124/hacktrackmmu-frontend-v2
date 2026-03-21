@@ -7,22 +7,24 @@ import axios from "axios";
 import useAuthStore from "@/store/useAuthStore";
 import { useToast } from "@/components/Toast/ToastProvider";
 import Link from "next/link";
+import DeleteModal from "../DeleteModal";
+import { handleConfirmDeleteMember } from "../handleConfirmDeleteMember";
 
 interface OnboardingMobileCardProps {
   member: Member;
   mutateOnboarding: () => void;
 }
 
-const statusColour: Partial<Record<MemberStatus, string>> = {
-  [MemberStatus.Registered]: "bg-red-700",
-  [MemberStatus.Contacted]: "bg-blue-700",
-  [MemberStatus.IdeaTalked]: "bg-green-800",
-};
-
 const ONBOARDING_STATUSES = [
   MemberStatus.Registered,
   MemberStatus.Contacted,
   MemberStatus.IdeaTalked,
+  MemberStatus.NeverActive,
+  MemberStatus.Active,
+  MemberStatus.SociallyActive,
+  MemberStatus.WasActive,
+  MemberStatus.WasSociallyActive,
+  MemberStatus.Terminated,
 ];
 
 export default function OnboardingMobileCard({
@@ -33,9 +35,13 @@ export default function OnboardingMobileCard({
   const { showToast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleViewClick = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
+  const handleDeleteMember = () => setIsDeleteModalOpen(true);
+  const handleCloseDeleteModal = () => setIsDeleteModalOpen(false);
 
   const handleStatusChange = async (newStatus: MemberStatus) => {
     if (newStatus === member.status) return;
@@ -81,9 +87,7 @@ export default function OnboardingMobileCard({
             value={member.status}
             onChange={(e) => handleStatusChange(e.target.value as MemberStatus)}
             disabled={isUpdating}
-            className={`truncate px-2 py-1 text-xs font-medium border-gray-200 border ${
-              statusColour[member.status as MemberStatus] || "text-blue-500"
-            } rounded-full bg-transparent cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={`truncate px-2 py-1 text-xs font-medium border-gray-200 border rounded-full bg-transparent cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {ONBOARDING_STATUSES.map((status) => (
               <option
@@ -114,7 +118,10 @@ export default function OnboardingMobileCard({
               Edit
             </button>
           </Link>
-          <button className="w-full text-white text-sm font-semibold bg-red-800 py-2 rounded-md transition duration-200 hover:bg-red-700 active:bg-gray-400">
+          <button
+            onClick={handleDeleteMember}
+            className="w-full text-white text-sm font-semibold bg-red-800 py-2 rounded-md transition duration-200 hover:bg-red-700 active:bg-gray-400"
+          >
             Delete
           </button>
         </div>
@@ -124,6 +131,22 @@ export default function OnboardingMobileCard({
         handleCloseModal={handleCloseModal}
         member={member}
         mutateOnboarding={mutateOnboarding}
+      />
+
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={() =>
+          handleConfirmDeleteMember({
+            memberId: member.id,
+            token,
+            mutateOnboarding,
+            showToast,
+            handleCloseDeleteModal,
+            setIsDeleting,
+          })
+        }
+        isDeleting={isDeleting}
       />
     </div>
   );
