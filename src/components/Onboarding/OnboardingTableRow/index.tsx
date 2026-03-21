@@ -15,9 +15,15 @@ interface OnboardingTableRowProps {
 }
 
 const statusColour: Partial<Record<MemberStatus, string>> = {
-  [MemberStatus.Registered]: "bg-red-700",
-  [MemberStatus.Contacted]: "bg-blue-700",
-  [MemberStatus.IdeaTalked]: "bg-green-800",
+  [MemberStatus.Registered]: "white",
+  [MemberStatus.Contacted]: "blue-400",
+  [MemberStatus.IdeaTalked]: "green-400",
+  [MemberStatus.NeverActive]: "gray-400",
+  [MemberStatus.Active]: "yellow-400",
+  [MemberStatus.SociallyActive]: "orange-400",
+  [MemberStatus.WasActive]: "purple-400",
+  [MemberStatus.WasSociallyActive]: "indigo-400",
+  [MemberStatus.Terminated]: "red-400",
 };
 
 // Easy to modify: just add/remove statuses here
@@ -25,6 +31,12 @@ const ONBOARDING_STATUSES = [
   MemberStatus.Registered,
   MemberStatus.Contacted,
   MemberStatus.IdeaTalked,
+  MemberStatus.NeverActive,
+  MemberStatus.Active,
+  MemberStatus.SociallyActive,
+  MemberStatus.WasActive,
+  MemberStatus.WasSociallyActive,
+  MemberStatus.Terminated,
 ];
 
 export default function OnboardingTableRow({

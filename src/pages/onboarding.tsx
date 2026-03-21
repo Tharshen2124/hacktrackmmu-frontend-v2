@@ -15,6 +15,12 @@ const ONBOARDING_STATUSES = [
   MemberStatus.Registered,
   MemberStatus.Contacted,
   MemberStatus.IdeaTalked,
+  MemberStatus.NeverActive,
+  MemberStatus.Active,
+  MemberStatus.SociallyActive,
+  MemberStatus.WasActive,
+  MemberStatus.WasSociallyActive,
+  MemberStatus.Terminated,
 ];
 
 export default function Onboarding() {
@@ -86,10 +92,9 @@ export default function Onboarding() {
   return (
     <DashboardLayout>
       <h1 className="text-4xl font-bold mt-6">Onboarding</h1>
-      {onboardingLoading && <p>Loading onboarding data...</p>}
       {onboardingError && <p>Error loading data</p>}
 
-      <div className="mt-4 border w-full border-gray-800 rounded-lg overflow-hidden active:shadow-none transition duration-200">
+      <div className="mt-4 border w-full border-gray-800 rounded-lg active:shadow-none transition duration-200">
         {!isMaxWidth768px ? (
           <table className="w-full text-sm text-left">
             <thead className="text-gray-200 bg-[#1e1e1e]">
@@ -111,6 +116,7 @@ export default function Onboarding() {
                       currentStatus={getCurrentSingleStatus()}
                       availableStatuses={ONBOARDING_STATUSES}
                       defaultStatuses={ONBOARDING_STATUSES}
+                      isOnboarding={true}
                     />
                   </div>
                 </th>

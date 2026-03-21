@@ -11,6 +11,7 @@ interface MemberFilterProps {
   currentStatus: string;
   availableStatuses?: MemberStatus[];
   defaultStatuses?: MemberStatus[];
+  isOnboarding?: boolean;
 }
 
 export default function MemberFilter({
@@ -18,10 +19,9 @@ export default function MemberFilter({
   currentStatus,
   availableStatuses = Object.values(MemberStatus), // Default: all statuses
   defaultStatuses = [MemberStatus.Active, MemberStatus.SociallyActive], // Default: active members
+  isOnboarding = false,
 }: MemberFilterProps) {
   const filterPopoverRef = useRef<{ closePopover: () => void }>(null);
-  const isOnboarding =
-    availableStatuses.length < Object.values(MemberStatus).length;
 
   const selectorOptions = [
     { value: ALL_OPTION, label: ALL_LABEL },

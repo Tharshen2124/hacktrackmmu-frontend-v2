@@ -13,16 +13,16 @@ interface OnboardingMobileCardProps {
   mutateOnboarding: () => void;
 }
 
-const statusColour: Partial<Record<MemberStatus, string>> = {
-  [MemberStatus.Registered]: "bg-red-700",
-  [MemberStatus.Contacted]: "bg-blue-700",
-  [MemberStatus.IdeaTalked]: "bg-green-800",
-};
-
 const ONBOARDING_STATUSES = [
   MemberStatus.Registered,
   MemberStatus.Contacted,
   MemberStatus.IdeaTalked,
+  MemberStatus.NeverActive,
+  MemberStatus.Active,
+  MemberStatus.SociallyActive,
+  MemberStatus.WasActive,
+  MemberStatus.WasSociallyActive,
+  MemberStatus.Terminated,
 ];
 
 export default function OnboardingMobileCard({
@@ -81,9 +81,7 @@ export default function OnboardingMobileCard({
             value={member.status}
             onChange={(e) => handleStatusChange(e.target.value as MemberStatus)}
             disabled={isUpdating}
-            className={`truncate px-2 py-1 text-xs font-medium border-gray-200 border ${
-              statusColour[member.status as MemberStatus] || "text-blue-500"
-            } rounded-full bg-transparent cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={`truncate px-2 py-1 text-xs font-medium border-gray-200 border rounded-full bg-transparent cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {ONBOARDING_STATUSES.map((status) => (
               <option
