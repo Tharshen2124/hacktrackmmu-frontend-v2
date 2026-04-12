@@ -9,7 +9,7 @@ import { MemberStatus, Member } from "@/types/types";
 import { apiUrl } from "@/utils/env";
 import { fetcherWithToken } from "@/utils/fetcher";
 import dayjs from "dayjs";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowUp, ArrowDown } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 
@@ -31,6 +31,7 @@ export default function Onboarding() {
   const [searchResults, setSearchResults] = useState<Member[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [dateSortOrder, setDateSortOrder] = useState<"desc" | "asc">("desc");
   const isMaxWidth768px = useMediaQuery("(max-width: 768px)");
   const [paginationNumber, setPaginationNumber] = useState(1);
   const [statusFilter, setStatusFilter] =
@@ -67,6 +68,10 @@ export default function Onboarding() {
 
   const totalPagination = onboardingData?.meta?.total_pages || 1;
 
+  const toggleDateSort = () => {
+    setDateSortOrder((prev) => (prev === "desc" ? "asc" : "desc"));
+  };
+
   useEffect(() => {
     setPaginationNumber(1);
   }, [statusFilter]);
@@ -74,16 +79,25 @@ export default function Onboarding() {
   console.log("Onboarding data:", onboardingData);
 
   const members = useMemo(() => {
-    const rawMembers = isSearching ? searchResults : onboardingData?.data || [];
+    const rawMembers = [
+      ...(isSearching ? searchResults : onboardingData?.data || []),
+    ];
     return rawMembers.sort((a: Member, b: Member) => {
       const dateA = dayjs(a.register_date);
       const dateB = dayjs(b.register_date);
 
-      if (dateB.isAfter(dateA)) return 1;
-      if (dateB.isBefore(dateA)) return -1;
+      if (dateSortOrder === "desc") {
+        if (dateB.isAfter(dateA)) return 1;
+        if (dateB.isBefore(dateA)) return -1;
+        return 0;
+      } else {
+        if (dateA.isAfter(dateB)) return 1;
+        if (dateA.isBefore(dateB)) return -1;
+        return 0;
+      }
       return 0;
     });
-  }, [onboardingData, searchResults, isSearching]);
+  }, [onboardingData, searchResults, isSearching, dateSortOrder]);
 
   const handleStatusChange = (newStatuses: string[]) => {
     setStatusFilter(newStatuses);
@@ -138,7 +152,17 @@ export default function Onboarding() {
                   Contact Number
                 </th>
                 <th className="py-4 px-4 bg-neutral-700 dark:bg-[#1e1e1e]">
-                  Register Date
+                  <button
+                    onClick={toggleDateSort}
+                    className="flex items-center gap-2 hover:text-gray-300 transition-colors font-bold"
+                  >
+                    Register Date
+                    {dateSortOrder === "desc" ? (
+                      <ArrowDown size={16} />
+                    ) : (
+                      <ArrowUp size={16} />
+                    )}
+                  </button>
                 </th>
                 <th className="py-4 px-4 bg-neutral-700 dark:bg-[#1e1e1e]">
                   <div className="flex items-center gap-x-3">
