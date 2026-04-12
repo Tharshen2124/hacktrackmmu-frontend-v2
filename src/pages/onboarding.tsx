@@ -2,6 +2,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import MemberFilter from "@/components/FilterPopover/memberFilter";
 import OnboardingMobileCard from "@/components/Onboarding/OnboardingMobileCard";
 import OnboardingTableRow from "@/components/Onboarding/OnboardingTableRow";
+import SearchComponent from "@/components/Search";
 import { useMediaQuery } from "@/hooks";
 import useAuthStore from "@/store/useAuthStore";
 import { MemberStatus, Member } from "@/types/types";
@@ -27,6 +28,9 @@ const ONBOARDING_STATUSES = [
 export default function Onboarding() {
   const { token } = useAuthStore();
   const [isClient, setIsClient] = useState(false);
+  const [searchResults, setSearchResults] = useState<Member[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isError, setIsError] = useState(false);
   const isMaxWidth768px = useMediaQuery("(max-width: 768px)");
   const [paginationNumber, setPaginationNumber] = useState(1);
   const [statusFilter, setStatusFilter] =
@@ -70,7 +74,7 @@ export default function Onboarding() {
   console.log("Onboarding data:", onboardingData);
 
   const members = useMemo(() => {
-    const rawMembers = onboardingData?.data || [];
+    const rawMembers = isSearching ? searchResults : onboardingData?.data || [];
     return rawMembers.sort((a: Member, b: Member) => {
       const dateA = dayjs(a.register_date);
       const dateB = dayjs(b.register_date);
@@ -79,10 +83,20 @@ export default function Onboarding() {
       if (dateB.isBefore(dateA)) return -1;
       return 0;
     });
-  }, [onboardingData]);
+  }, [onboardingData, searchResults, isSearching]);
 
   const handleStatusChange = (newStatuses: string[]) => {
     setStatusFilter(newStatuses);
+  };
+
+  const handleSearchResults = (results: Member[], searching: boolean) => {
+    setSearchResults(results);
+    setIsSearching(searching);
+  };
+
+  const handleSearchError = (error: unknown) => {
+    console.error("Search failed:", error);
+    setIsError(true);
   };
 
   const getCurrentSingleStatus = () => {
@@ -103,6 +117,14 @@ export default function Onboarding() {
     <DashboardLayout>
       <h1 className="text-4xl font-bold mt-6">Onboarding</h1>
       {onboardingError && <p>Error loading data</p>}
+
+      <div className="filter-section flex flex-row items-center justify-between my-3">
+        <SearchComponent
+          token={token}
+          onSearchResults={handleSearchResults}
+          onSearchError={handleSearchError}
+        />
+      </div>
 
       <div className="mt-4 border w-full border-gray-800 rounded-lg active:shadow-none transition duration-200">
         {!isMaxWidth768px ? (
@@ -192,9 +214,7 @@ export default function Onboarding() {
             setPaginationNumber((prev) => Math.min(totalPagination, prev + 1))
           }
           className="text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 py-2 px-2 transition duration-200 hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={
-            onboardingLoading || paginationNumber >= totalPagination
-          }
+          disabled={onboardingLoading || paginationNumber >= totalPagination}
         >
           <ChevronRight />
         </button>
