@@ -79,10 +79,17 @@ export default function Onboarding() {
   console.log("Onboarding data:", onboardingData);
 
   const members = useMemo(() => {
-    const rawMembers = [
-      ...(isSearching ? searchResults : onboardingData?.data || []),
-    ];
-    return rawMembers.sort((a: Member, b: Member) => {
+    let rawMembers = isSearching ? searchResults : onboardingData?.data || [];
+
+    if (isSearching) {
+      rawMembers = rawMembers.filter((member: Member) =>
+        statusFilter.includes(member.status),
+      );
+    }
+
+    const sortableMembers = [...rawMembers];
+
+    return sortableMembers.sort((a: Member, b: Member) => {
       const dateA = dayjs(a.register_date);
       const dateB = dayjs(b.register_date);
 
@@ -97,7 +104,7 @@ export default function Onboarding() {
       }
       return 0;
     });
-  }, [onboardingData, searchResults, isSearching, dateSortOrder]);
+  }, [onboardingData, searchResults, statusFilter, isSearching, dateSortOrder]);
 
   const handleStatusChange = (newStatuses: string[]) => {
     setStatusFilter(newStatuses);
