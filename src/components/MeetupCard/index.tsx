@@ -97,6 +97,15 @@ export default function MeetupCard({
                       </>
                     )}
                   </p>
+
+                  <p className="text-sm flex">
+                    <strong>
+                      <span className="mr-1">Member:</span>
+                    </strong>
+                    {update.member.length > 40
+                      ? update.member.name.slice(0, 40) + "..."
+                      : update.member.name}
+                  </p>
                   <p className="text-sm mt-1">{update.description}</p>
                 </div>
               </>

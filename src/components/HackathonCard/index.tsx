@@ -76,6 +76,15 @@ export default function HackathonCard({
                     ? update.project.name.slice(0, 30) + "..."
                     : update.project.name}
                 </p>
+
+                <p className="text-sm flex">
+                  <strong>
+                    <span className="mr-1">Member:</span>
+                  </strong>
+                  {update.member.length > 40
+                    ? update.member.name.slice(0, 40) + "..."
+                    : update.member.name}
+                </p>
                 <p className="text-sm">{update.description}</p>
               </div>
               <hr className="border-gray-700 my-3" />
