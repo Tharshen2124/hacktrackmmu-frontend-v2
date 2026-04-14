@@ -11,8 +11,7 @@ import {
 import { useState } from "react";
 import { dateMod } from "@/utils/dateMod";
 import { ModalLayout } from "../ModalLayout";
-import { Update } from "@/types/types";
-import { Project } from "@/types/types";
+import { Update, Project, Meetup } from "@/types/types";
 import { apiUrl } from "@/utils/env";
 import useSWR from "swr";
 import useAuthStore from "@/store/useAuthStore";
@@ -44,6 +43,9 @@ export default function MeetupCard({
   const [selectedProjectId, setSelectedProjectId] = useState<
     string | number | null
   >(null);
+  const [selectedMeetupId, setSelectedMeetupId] = useState<
+    string | number | null
+  >(null);
   const { token } = useAuthStore();
 
   const {
@@ -66,6 +68,17 @@ export default function MeetupCard({
       : null,
     ([url, token]: [string, string]) => fetcherWithToken(url, token),
   );
+
+  const {
+    data: meetupsData,
+    error: meetupsError,
+    isLoading: meetupsLoading,
+  } = useSWR<Meetup[]>(
+    token ? [`${apiUrl}/api/v1/meetups?limit=20`, token] : null,
+    ([url, token]: [string, string]) => fetcherWithToken(url, token),
+  );
+
+  const meetupsList = meetupsData?.data || meetupsData || [];
 
   const projectsList = projectsData?.data || projectsData || [];
 
@@ -91,6 +104,7 @@ export default function MeetupCard({
     if (update) {
       setSelectedMemberId(update.member.id);
       setSelectedProjectId(update.project.id);
+      setSelectedMeetupId(update.meetup_id);
     }
   };
 
@@ -98,6 +112,7 @@ export default function MeetupCard({
     setEditingUpdateId(null);
     setSelectedMemberId(null);
     setSelectedProjectId(null);
+    setSelectedMeetupId(null);
     setModalView("list");
   };
 
@@ -359,15 +374,59 @@ export default function MeetupCard({
                 </div>
 
                 {/* On (Date) */}
-
-                {/* TODO: Loop over meetup dates here */}
                 <div className="grid grid-cols-[100px_1fr] items-center">
                   <label className="font-semibold text-sm">On</label>
-                  <input
-                    type="date"
-                    defaultValue={date.split("T")[0]} // Assumes ISO date format from props
-                    className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full"
-                  />
+
+                  <select
+                    name="edit-meetup-id"
+                    value={selectedMeetupId || ""}
+                    onChange={(e) => setSelectedMeetupId(e.target.value)}
+                    disabled={meetupsLoading || meetupsError}
+                    className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full disabled:opacity-50"
+                    key={`meetup-select-${findEditingUpdate.id}-${meetupsLoading}`}
+                  >
+                    {/* Loading & Error States */}
+                    {meetupsLoading && (
+                      <option value="">Loading dates...</option>
+                    )}
+                    {meetupsError && (
+                      <option value="">Failed to load dates</option>
+                    )}
+
+                    {!meetupsLoading &&
+                      !meetupsError &&
+                      meetupsList.length > 0 && (
+                        <>
+                          {/* Force selection if cleared */}
+                          {selectedMeetupId === "" && (
+                            <option value="" disabled>
+                              Select a date...
+                            </option>
+                          )}
+
+                          {/* Map the SWR list of Meetups */}
+                          {meetupsList.map((meetup: Meetup) => {
+                            // Format the date string safely
+                            const dateString =
+                              typeof meetup.date === "string"
+                                ? meetup.date.split("T")[0]
+                                : new Date(meetup.date)
+                                    .toISOString()
+                                    .split("T")[0];
+
+                            return (
+                              <option
+                                key={meetup.id}
+                                value={meetup.id}
+                                className="bg-black"
+                              >
+                                {dateString}
+                              </option>
+                            );
+                          })}
+                        </>
+                      )}
+                  </select>
                 </div>
 
                 {/* Description */}
