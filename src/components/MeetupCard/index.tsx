@@ -77,7 +77,7 @@ export default function MeetupCard({
     <>
       <div
         onClick={handleCardClick}
-        className="bg-white dark:bg-[#222] rounded-lg p-4 border-2 dark:border border-neutral-300 dark:border-gray-600 hover:border-blue-600 hover:shadow-[0px_0px_8px_1px_rgba(0,_0,_0,_0.1)] hover:shadow-blue-500/50 active:shadow-none transition duration-200"
+        className="bg-white dark:bg-[#222] rounded-lg p-4 border-2 dark:border border-neutral-300 dark:border-gray-600 hover:border-blue-600 hover:shadow-[0px_0px_8px_1px_rgba(0,_0,_0,_0.1)] hover:shadow-blue-500/50 active:shadow-none transition duration-200 cursor-pointer"
       >
         <h1 className="text-lg flex items-center">
           <Calendar size="18" className="mr-2" />
@@ -99,68 +99,194 @@ export default function MeetupCard({
       </div>
 
       <ModalLayout isOpen={isModalOpen} onClose={handleCloseModal}>
-        <h2 className="text-2xl font-bold mb-4">Meetup {number}</h2>
-        <h3 className="text-lg font-semibold mb-1">Details</h3>
-        <div className="border border-gray-700 py-3 px-4 rounded-md mb-3">
-          <p>
-            <strong>Host:</strong> {hostName}
-          </p>
-          <p>
-            <strong>Date:</strong> {dateMod(date)}
-          </p>
-          <p>{numberOfUpdates} updates</p>
-        </div>
+        {modalView === "list" ? (
+          <>
+            <h2 className="text-2xl font-bold mb-4">Meetup {number}</h2>
+            <h3 className="text-lg font-semibold mb-1">Details</h3>
+            <div className="border border-gray-700 py-3 px-4 rounded-md mb-3">
+              <p>
+                <strong>Host:</strong> {hostName}
+              </p>
+              <p>
+                <strong>Date:</strong> {dateMod(date)}
+              </p>
+              <p>{numberOfUpdates} updates</p>
+            </div>
 
-        <h3 className="text-lg font-semibold mb-1">Updates</h3>
-        <div className="overflow-y-auto border flex flex-col gap-y-4 px-4 py-3 mb-8 max-h-56 lg:max-h-96 rounded-md border-gray-700">
-          {updates.length !== 0 ? (
-            updates.map((update, index: number) => (
-              <>
-                <div key={index} className="">
-                  <p className="font-bold">
-                    {update.project.name.length > 40
-                      ? update.project.name.slice(0, 40) + "..."
-                      : update.project.name}
-                  </p>
-                  <p className="text-sm flex items-center">
-                    <strong>Category: </strong>
-                    {update.category === "progress_talk" ? (
-                      <>
-                        <Hammer size="14" className="mx-1" /> Progress Talk
-                      </>
-                    ) : (
-                      <>
-                        <Hammer size="14" className="mx-1" /> Idea Talk
-                      </>
-                    )}
-                  </p>
+            <h3 className="text-lg font-semibold mb-1">Updates</h3>
+            <div className="overflow-y-auto border flex flex-col gap-y-4 px-4 py-3 mb-8 max-h-56 lg:max-h-96 rounded-md border-gray-700">
+              {updates.length !== 0 ? (
+                updates.map((update, index: number) => (
+                  <div
+                    key={update.id || index}
+                    className="border-b border-gray-700 pb-4 last:border-0 last:mb-0 last:pb-0"
+                  >
+                    <div className="flex justify-between items-start">
+                      <p className="font-bold">
+                        {update.project.name.length > 40
+                          ? update.project.name.slice(0, 40) + "..."
+                          : update.project.name}
+                      </p>
 
-                  <p className="text-sm flex">
-                    <strong>
-                      <span className="mr-1">By:</span>
-                    </strong>
-                    {update.member.name.length > 40
-                      ? update.member.name.slice(0, 40) + "..."
-                      : update.member.name}
-                  </p>
-                  <p className="text-sm mt-1">{update.description}</p>
+                      {/* ACTION BUTTONS */}
+                      <div className="flex gap-x-3 shrink-0 ml-4 mt-1">
+                        <button onClick={() => handleEditClick(update.id)}>
+                          <Edit
+                            size="16"
+                            className="text-blue-500 hover:text-blue-400"
+                          />
+                        </button>
+                        <button onClick={handleDeleteClick}>
+                          <Trash
+                            size="16"
+                            className="text-red-500 hover:text-red-400"
+                          />
+                        </button>
+                      </div>
+                    </div>
+
+                    <p className="text-sm flex items-center mt-1">
+                      <strong>Category: </strong>
+                      <Hammer size="14" className="mx-1" />
+                      {update.category === "progress_talk"
+                        ? "Progress Talk"
+                        : "Idea Talk"}
+                    </p>
+
+                    <p className="text-sm flex mt-1">
+                      <strong>
+                        <span className="mr-1">By:</span>
+                      </strong>
+                      {update.member.name.length > 40
+                        ? update.member.name.slice(0, 40) + "..."
+                        : update.member.name}
+                    </p>
+                    <p className="text-sm mt-1">{update.description}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-red-500 dark:text-red-400 flex items-center gap-x-2">
+                  <CircleAlert size="18" />
+                  No updates
+                </p>
+              )}
+            </div>
+
+            <button
+              onClick={handleCloseModal}
+              className="dark:bg-white hover:bg-white-600 dark:text-black bg-[#222] dark:hover:bg-[#e0e0e0] dark:active:bg-[#c7c7c7] text-white hover:bg-[#333] active:bg-[#444] font-bold py-2 px-4 rounded w-full transition duration-200"
+            >
+              Close
+            </button>
+          </>
+        ) : (
+          <>
+            <h2 className="text-2xl font-bold mb-6">Edit Update</h2>
+
+            {findEditingUpdate && (
+              <div className="flex flex-col gap-5 mb-8">
+                {/* Category Radio */}
+                <div className="grid grid-cols-[100px_1fr] items-center">
+                  <label className="font-semibold text-sm">Category</label>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="edit-category"
+                        value="idea_talk"
+                        defaultChecked={
+                          findEditingUpdate.category !== "progress_talk"
+                        }
+                        className="cursor-pointer accent-blue-500"
+                      />
+                      <span className="text-sm">Idea Talk</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="edit-category"
+                        value="progress_talk"
+                        defaultChecked={
+                          findEditingUpdate.category === "progress_talk"
+                        }
+                        className="cursor-pointer accent-blue-500"
+                      />
+                      <span className="text-sm">Progress Talk</span>
+                    </label>
+                  </div>
                 </div>
-              </>
-            ))
-          ) : (
-            <p className="text-red-500 dark:text-red-400 flex items-center gap-x-2">
-              <CircleAlert size="18" />
-              No updates
-            </p>
-          )}
-        </div>
 
-        <button
-          onClick={handleCloseModal}
-          className="dark:bg-white hover:bg-white-600 dark:text-black bg-[#222] dark:hover:bg-[#e0e0e0] dark:active:bg-[#c7c7c7] text-white hover:bg-[#333] active:bg-[#444] font-bold py-2 px-4 rounded w-full transition duration-200"
-        >
-          Close
-        </button>
+                {/* By (Member Dropdown) */}
+                <div className="grid grid-cols-[100px_1fr] items-center">
+                  <label className="font-semibold text-sm">By</label>
+
+                  {/* TODO: Loop over members here */}
+                  <select
+                    defaultValue={findEditingUpdate.member.id}
+                    className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full"
+                  >
+                    <option value={findEditingUpdate.member.id}>
+                      {findEditingUpdate.member.name}
+                    </option>
+                  </select>
+                </div>
+
+                {/* For (Project Dropdown) */}
+                <div className="grid grid-cols-[100px_1fr] items-center">
+                  <label className="font-semibold text-sm">For</label>
+
+                  {/* TODO: Map over projects array here */}
+                  <select
+                    defaultValue={findEditingUpdate.project.id}
+                    className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full"
+                  >
+                    <option value={findEditingUpdate.project.id}>
+                      {findEditingUpdate.project.name}
+                    </option>
+                  </select>
+                </div>
+
+                {/* On (Date) */}
+
+                {/* TODO: Loop over meetup dates here */}
+                <div className="grid grid-cols-[100px_1fr] items-center">
+                  <label className="font-semibold text-sm">On</label>
+                  <input
+                    type="date"
+                    defaultValue={date.split("T")[0]} // Assumes ISO date format from props
+                    className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full"
+                  />
+                </div>
+
+                {/* Description */}
+                <div className="grid grid-cols-[100px_1fr] items-start">
+                  <label className="font-semibold text-sm pt-2">
+                    Description
+                  </label>
+                  <textarea
+                    defaultValue={findEditingUpdate.description}
+                    className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full h-32 resize-y"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-3 mt-auto">
+              <button
+                onClick={handleCancelEditClick}
+                className="flex-1 border border-gray-400 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#333] font-bold py-2 px-4 rounded transition duration-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveClick}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200"
+              >
+                Save
+              </button>
+            </div>
+          </>
+        )}
       </ModalLayout>
     </>
   );
