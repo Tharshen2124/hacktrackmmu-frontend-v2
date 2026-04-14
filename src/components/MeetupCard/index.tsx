@@ -5,6 +5,8 @@ import {
   RefreshCcw,
   Timer,
   User,
+  Trash,
+  Edit,
 } from "lucide-react";
 import { useState } from "react";
 import { dateMod } from "@/utils/dateMod";
@@ -27,6 +29,10 @@ export default function MeetupCard({
   updates,
 }: MeetupCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalView, setModalView] = useState<"list" | "edit">("list");
+  const [editingUpdateId, setEditingUpdateId] = useState<
+    string | number | null
+  >(null);
 
   const handleCardClick = () => {
     setIsModalOpen(true);
@@ -34,7 +40,38 @@ export default function MeetupCard({
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+
+    setTimeout(() => {
+      setModalView("list");
+      setEditingUpdateId(null);
+    }, 3000);
   };
+
+  const handleEditClick = (updateId: string | number) => {
+    setEditingUpdateId(updateId);
+    setModalView("edit");
+  };
+
+  const handleCancelEditClick = () => {
+    setEditingUpdateId(null);
+    setModalView("list");
+  };
+
+  const handleSaveClick = () => {
+    // TODO: call edit endpoint
+    console.log("Saving edits...");
+  };
+
+  const handleDeleteClick = () => {
+    if (confirm("Are you sure you want to delete this update?")) {
+      // TODO: call delete endpoint
+      console.log("Deleting update...");
+    }
+  };
+
+  const findEditingUpdate = updates.find(
+    (update) => update.id === editingUpdateId,
+  );
 
   return (
     <>
