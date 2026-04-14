@@ -12,6 +12,7 @@ import { useState } from "react";
 import { dateMod } from "@/utils/dateMod";
 import { ModalLayout } from "../ModalLayout";
 import { Update } from "@/types/types";
+import { Project } from "@/types/types";
 import { apiUrl } from "@/utils/env";
 import useSWR from "swr";
 import useAuthStore from "@/store/useAuthStore";
@@ -37,6 +38,12 @@ export default function MeetupCard({
   const [editingUpdateId, setEditingUpdateId] = useState<
     string | number | null
   >(null);
+  const [selectedMemberId, setSelectedMemberId] = useState<
+    string | number | null
+  >(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<
+    string | number | null
+  >(null);
   const { token } = useAuthStore();
 
   const {
@@ -48,6 +55,19 @@ export default function MeetupCard({
     ([url, token]: [string, string]) => fetcherWithToken(url, token),
   );
   const membersList = membersData?.data || membersData || [];
+
+  const {
+    data: projectsData,
+    error: projectsError,
+    isLoading: projectsLoading,
+  } = useSWR(
+    token && selectedMemberId
+      ? [`${apiUrl}/api/v1/projects?member_id=${selectedMemberId}`, token]
+      : null,
+    ([url, token]: [string, string]) => fetcherWithToken(url, token),
+  );
+
+  const projectsList = projectsData?.data || projectsData || [];
 
   const handleCardClick = () => {
     setIsModalOpen(true);
@@ -63,12 +83,21 @@ export default function MeetupCard({
   };
 
   const handleEditClick = (updateId: string | number) => {
+    const update = updates.find((u) => u.id === updateId);
+
     setEditingUpdateId(updateId);
     setModalView("edit");
+
+    if (update) {
+      setSelectedMemberId(update.member.id);
+      setSelectedProjectId(update.project.id);
+    }
   };
 
   const handleCancelEditClick = () => {
     setEditingUpdateId(null);
+    setSelectedMemberId(null);
+    setSelectedProjectId(null);
     setModalView("list");
   };
 
@@ -238,29 +267,38 @@ export default function MeetupCard({
                   <select
                     name="edit-member-id"
                     defaultValue={findEditingUpdate.member.id}
+                    value={selectedMemberId || ""}
+                    onChange={(e) => {
+                      setSelectedMemberId(e.target.value);
+                      setSelectedProjectId("");
+                    }}
                     disabled={membersLoading || membersError}
                     className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full disabled:opacity-50"
                     key={`member-select-${findEditingUpdate.id}-${membersLoading}`}
                   >
-                    {/* 1. Loading State */}
+                    {/* Loading State */}
                     {membersLoading && (
                       <option value={findEditingUpdate.member.id}>
                         Loading members...
                       </option>
                     )}
 
-                    {/* 2. Error State */}
+                    {/* Error State */}
                     {membersError && (
                       <option value={findEditingUpdate.member.id}>
                         Failed to load members
                       </option>
                     )}
 
-                    {/* 3. Success State: Loop over the data */}
+                    {/* Success State: Loop over the data */}
                     {!membersLoading &&
                       !membersError &&
                       membersList.map((member: Member) => (
-                        <option key={member.id} value={member.id}>
+                        <option
+                          key={member.id}
+                          value={member.id}
+                          className="bg-black"
+                        >
                           {member.name}
                         </option>
                       ))}
@@ -271,14 +309,52 @@ export default function MeetupCard({
                 <div className="grid grid-cols-[100px_1fr] items-center">
                   <label className="font-semibold text-sm">For</label>
 
-                  {/* TODO: Map over projects array here */}
                   <select
+                    name="edit-project-id"
                     defaultValue={findEditingUpdate.project.id}
-                    className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full"
+                    onChange={(e) => setSelectedProjectId(e.target.value)}
+                    disabled={
+                      projectsLoading || projectsError || !selectedMemberId
+                    }
+                    className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full disabled:opacity-50"
+                    key={`project-select-${findEditingUpdate.id}-${projectsLoading}-${selectedMemberId}`}
                   >
-                    <option value={findEditingUpdate.project.id}>
-                      {findEditingUpdate.project.name}
-                    </option>
+                    {projectsLoading && <option>Loading projects...</option>}
+                    {projectsError && <option>Failed to load projects</option>}
+
+                    {!projectsLoading &&
+                      !projectsError &&
+                      projectsList.length === 0 && (
+                        <option disabled>
+                          No projects found for this member
+                        </option>
+                      )}
+
+                    {!projectsLoading &&
+                      !projectsError &&
+                      projectsList.length > 0 && (
+                        <>
+                          {selectedMemberId === findEditingUpdate.member.id &&
+                            !projectsList.some(
+                              (p: Project) =>
+                                p.id === findEditingUpdate.project.id,
+                            ) && (
+                              <option value={findEditingUpdate.project.id}>
+                                {findEditingUpdate.project.name}
+                              </option>
+                            )}
+
+                          {projectsList.map((project: any) => (
+                            <option
+                              key={project.id}
+                              value={project.id}
+                              className="bg-black"
+                            >
+                              {project.name}
+                            </option>
+                          ))}
+                        </>
+                      )}
                   </select>
                 </div>
 
