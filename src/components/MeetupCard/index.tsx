@@ -74,7 +74,9 @@ export default function MeetupCard({
     error: meetupsError,
     isLoading: meetupsLoading,
   } = useSWR<Meetup[]>(
-    token ? [`${apiUrl}/api/v1/meetups?limit=20`, token] : null,
+    token
+      ? [`${apiUrl}/api/v1/meetups?category=regular_meetup&limit=20`, token]
+      : null,
     ([url, token]: [string, string]) => fetcherWithToken(url, token),
   );
 
