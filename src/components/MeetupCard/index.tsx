@@ -12,6 +12,10 @@ import { useState } from "react";
 import { dateMod } from "@/utils/dateMod";
 import { ModalLayout } from "../ModalLayout";
 import { Update } from "@/types/types";
+import { apiUrl } from "@/utils/env";
+import useSWR from "swr";
+import useAuthStore from "@/store/useAuthStore";
+import { fetcherWithToken } from "@/utils/fetcher";
 
 interface MeetupCardProps {
   number: number;
@@ -33,6 +37,17 @@ export default function MeetupCard({
   const [editingUpdateId, setEditingUpdateId] = useState<
     string | number | null
   >(null);
+  const { token } = useAuthStore();
+
+  const {
+    data: membersData,
+    error: membersError,
+    isLoading: membersLoading,
+  } = useSWR<Member>(
+    token ? [`${apiUrl}/api/v1/members?unpaginated=true`, token] : null,
+    ([url, token]: [string, string]) => fetcherWithToken(url, token),
+  );
+  const membersList = membersData?.data || membersData || [];
 
   const handleCardClick = () => {
     setIsModalOpen(true);
@@ -153,7 +168,7 @@ export default function MeetupCard({
                         : "Idea Talk"}
                     </p>
 
-                    <p className="text-sm flex mt-1">
+                    <p className="text-sm flex mt-0.25">
                       <strong>
                         <span className="mr-1">By:</span>
                       </strong>
@@ -220,14 +235,35 @@ export default function MeetupCard({
                 <div className="grid grid-cols-[100px_1fr] items-center">
                   <label className="font-semibold text-sm">By</label>
 
-                  {/* TODO: Loop over members here */}
                   <select
+                    name="edit-member-id"
                     defaultValue={findEditingUpdate.member.id}
-                    className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full"
+                    disabled={membersLoading || membersError}
+                    className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full disabled:opacity-50"
+                    key={`member-select-${findEditingUpdate.id}-${membersLoading}`}
                   >
-                    <option value={findEditingUpdate.member.id}>
-                      {findEditingUpdate.member.name}
-                    </option>
+                    {/* 1. Loading State */}
+                    {membersLoading && (
+                      <option value={findEditingUpdate.member.id}>
+                        Loading members...
+                      </option>
+                    )}
+
+                    {/* 2. Error State */}
+                    {membersError && (
+                      <option value={findEditingUpdate.member.id}>
+                        Failed to load members
+                      </option>
+                    )}
+
+                    {/* 3. Success State: Loop over the data */}
+                    {!membersLoading &&
+                      !membersError &&
+                      membersList.map((member: Member) => (
+                        <option key={member.id} value={member.id}>
+                          {member.name}
+                        </option>
+                      ))}
                   </select>
                 </div>
 
