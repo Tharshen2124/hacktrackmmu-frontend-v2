@@ -157,6 +157,7 @@ export default function MeetupCard({
       if (mutateMeetups) {
         mutateMeetups();
       }
+      showToast("Update edited successfully!", "success");
       setEditingUpdateId(null);
       setSelectedMemberId(null);
       setSelectedProjectId(null);
