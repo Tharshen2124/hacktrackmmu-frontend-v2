@@ -17,6 +17,7 @@ import useSWR from "swr";
 import axios from "axios";
 import useAuthStore from "@/store/useAuthStore";
 import { fetcherWithToken } from "@/utils/fetcher";
+import { useToast } from "@/components/Toast/ToastProvider";
 
 interface MeetupCardProps {
   number: number;
@@ -52,6 +53,7 @@ export default function MeetupCard({
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedDescription, setSelectedDescription] = useState<string>("");
   const { token } = useAuthStore();
+  const { showToast } = useToast();
 
   const {
     data: membersData,
@@ -161,8 +163,7 @@ export default function MeetupCard({
       setSelectedMeetupId(null);
       setModalView("list");
     } catch (error) {
-      console.error("Failed to save update:", error);
-      alert("Failed to save update. Please check your inputs.");
+      showToast("Unable to edit update. Please try again.", "error");
     }
   };
 
@@ -265,7 +266,9 @@ export default function MeetupCard({
                         ? update.member.name.slice(0, 40) + "..."
                         : update.member.name}
                     </p>
-                    <p className="text-sm mt-1">{update.description}</p>
+                    <p className="text-sm mt-1 whitespace-pre-line">
+                      {update.description}
+                    </p>
                   </div>
                 ))
               ) : (
