@@ -361,15 +361,25 @@ export default function MeetupCard({
                               </option>
                             )}
 
-                          {projectsList.map((project: any) => (
-                            <option
-                              key={project.id}
-                              value={project.id}
-                              className="bg-black"
-                            >
-                              {project.name}
-                            </option>
-                          ))}
+                          <optgroup
+                            label={
+                              membersList.find(
+                                (m: Member) =>
+                                  String(m.id) === String(selectedMemberId),
+                              )?.name || findEditingUpdate.member.name
+                            }
+                            className="font-bold bg-black"
+                          >
+                            {projectsList.map((project: any) => (
+                              <option
+                                key={project.id}
+                                value={project.id}
+                                className="bg-black"
+                              >
+                                {project.name}
+                              </option>
+                            ))}
+                          </optgroup>
                         </>
                       )}
                   </select>
