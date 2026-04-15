@@ -14,6 +14,7 @@ import { ModalLayout } from "../ModalLayout";
 import { Update, Project, Meetup } from "@/types/types";
 import { apiUrl } from "@/utils/env";
 import useSWR from "swr";
+import axios from "axios";
 import useAuthStore from "@/store/useAuthStore";
 import { fetcherWithToken } from "@/utils/fetcher";
 
@@ -23,6 +24,7 @@ interface MeetupCardProps {
   date: string;
   hostName: string;
   updates: Update[];
+  mutateMeetups?: () => void;
 }
 
 export default function MeetupCard({
@@ -31,6 +33,7 @@ export default function MeetupCard({
   date,
   hostName,
   updates,
+  mutateMeetups,
 }: MeetupCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalView, setModalView] = useState<"list" | "edit">("list");
@@ -46,6 +49,8 @@ export default function MeetupCard({
   const [selectedMeetupId, setSelectedMeetupId] = useState<
     string | number | null
   >(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedDescription, setSelectedDescription] = useState<string>("");
   const { token } = useAuthStore();
 
   const {
@@ -107,6 +112,8 @@ export default function MeetupCard({
       setSelectedMemberId(update.member.id);
       setSelectedProjectId(update.project.id);
       setSelectedMeetupId(update.meetup_id);
+      setSelectedCategory(update.category);
+      setSelectedDescription(update.description);
     }
   };
 
@@ -115,12 +122,48 @@ export default function MeetupCard({
     setSelectedMemberId(null);
     setSelectedProjectId(null);
     setSelectedMeetupId(null);
+    setSelectedCategory("");
+    setSelectedDescription("");
     setModalView("list");
   };
 
-  const handleSaveClick = () => {
-    // TODO: call edit endpoint
-    console.log("Saving edits...");
+  const handleSaveClick = async () => {
+    if (!findEditingUpdate) return;
+
+    const payload = {
+      update: {
+        meetup_id: selectedMeetupId,
+        project_id: selectedProjectId,
+        member_id: selectedMemberId,
+        category: selectedCategory,
+        description: selectedDescription,
+      },
+    };
+
+    try {
+      await axios.patch(
+        `${apiUrl}/api/v1/updates/${findEditingUpdate.id}`,
+        payload,
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (mutateMeetups) {
+        mutateMeetups();
+      }
+      setEditingUpdateId(null);
+      setSelectedMemberId(null);
+      setSelectedProjectId(null);
+      setSelectedMeetupId(null);
+      setModalView("list");
+    } catch (error) {
+      console.error("Failed to save update:", error);
+      alert("Failed to save update. Please check your inputs.");
+    }
   };
 
   const handleDeleteClick = () => {
@@ -255,9 +298,8 @@ export default function MeetupCard({
                         type="radio"
                         name="edit-category"
                         value="idea_talk"
-                        defaultChecked={
-                          findEditingUpdate.category !== "progress_talk"
-                        }
+                        checked={selectedCategory === "idea_talk"}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
                         className="cursor-pointer accent-blue-500"
                       />
                       <span className="text-sm">Idea Talk</span>
@@ -267,9 +309,8 @@ export default function MeetupCard({
                         type="radio"
                         name="edit-category"
                         value="progress_talk"
-                        defaultChecked={
-                          findEditingUpdate.category === "progress_talk"
-                        }
+                        checked={selectedCategory === "progress_talk"}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
                         className="cursor-pointer accent-blue-500"
                       />
                       <span className="text-sm">Progress Talk</span>
@@ -416,9 +457,7 @@ export default function MeetupCard({
                             </option>
                           )}
 
-                          {/* Map the SWR list of Meetups */}
                           {meetupsList.map((meetup: Meetup) => {
-                            // Format the date string safely
                             const dateString =
                               typeof meetup.date === "string"
                                 ? meetup.date.split("T")[0]
@@ -447,7 +486,8 @@ export default function MeetupCard({
                     Description
                   </label>
                   <textarea
-                    defaultValue={findEditingUpdate.description}
+                    value={selectedDescription}
+                    onChange={(e) => setSelectedDescription(e.target.value)}
                     className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full h-32 resize-y"
                   />
                 </div>

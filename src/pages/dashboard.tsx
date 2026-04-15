@@ -173,6 +173,7 @@ export default function Home() {
                 numberOfUpdates={meetup.updates.length}
                 hostName={meetup.host?.name || "unknown host"}
                 updates={meetup.updates}
+                mutateMeetups={mutateMeetups}
               />
             ))}
         </div>
