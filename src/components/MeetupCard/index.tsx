@@ -155,7 +155,7 @@ export default function MeetupCard({
       );
 
       if (mutateMeetups) {
-        mutateMeetups();
+        await mutateMeetups();
       }
       showToast("Update edited successfully!", "success");
       setEditingUpdateId(null);
@@ -168,10 +168,27 @@ export default function MeetupCard({
     }
   };
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = async (updateId: string | number) => {
     if (confirm("Are you sure you want to delete this update?")) {
-      // TODO: call delete endpoint
-      console.log("Deleting update...");
+      try {
+        await axios.delete(`${apiUrl}/api/v1/updates/${updateId}`, {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (mutateMeetups) {
+          await mutateMeetups();
+        }
+        setEditingUpdateId(null);
+        setSelectedMemberId(null);
+        setSelectedProjectId(null);
+        setSelectedMeetupId(null);
+        setModalView("list");
+        showToast("Update deleted successfully", "success");
+      } catch (error) {
+        showToast("Unable to delete update. Please try agian.", "error");
+      }
     }
   };
 
@@ -242,7 +259,7 @@ export default function MeetupCard({
                             className="text-blue-500 hover:text-blue-400"
                           />
                         </button>
-                        <button onClick={handleDeleteClick}>
+                        <button onClick={() => handleDeleteClick(update.id)}>
                           <Trash
                             size="16"
                             className="text-red-500 hover:text-red-400"
