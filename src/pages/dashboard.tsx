@@ -201,6 +201,7 @@ export default function Home() {
                 numberOfUpdates={hackathon.updates.length}
                 hostName={hackathon.host?.name || "unknown host"}
                 updates={hackathon.updates}
+                mutateHackathons={mutateHackathons}
               />
             ))}
         </div>
