@@ -243,6 +243,7 @@ export default function MemberCard({
         },
       );
 
+      await sleep(500);
       if (mutateMembers) await mutateMembers();
       showToast("Update edited successfully!", "success");
       handleCancelEditUpdate();
@@ -264,6 +265,7 @@ export default function MemberCard({
           },
         });
 
+        await sleep(500);
         if (mutateMembers) await mutateMembers();
         showToast("Update deleted successfully", "success");
       } catch (error) {
