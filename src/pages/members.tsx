@@ -7,9 +7,10 @@ import SkeletonMemberCard from "@/components/skeletonComponents/SkeletonMemberCa
 import useAuthStore from "@/store/useAuthStore";
 import { apiUrl } from "@/utils/env";
 import { Member, MemberStatus, getStatusLabel } from "@/types/types";
-import axios from "axios";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
+import useSWR from "swr";
+import { fetcherWithToken } from "@/utils/fetcher";
 
 const DEFAULT_STATUSES = [MemberStatus.Active, MemberStatus.SociallyActive];
 
@@ -22,55 +23,45 @@ const MemberStatusComponent = ({ status }: { status: string }) => {
 };
 
 export default function Members() {
-  const { token } = useAuthStore();
+  const { token, isAdmin } = useAuthStore();
   const [paginationNumber, setPaginationNumber] = useState(1);
-  const [totalPagination, setTotalPagination] = useState(1);
-  const [members, setMembers] = useState<Member[]>([]);
+  const [statusFilter, setStatusFilter] = useState<string[]>(DEFAULT_STATUSES);
+
   const [searchResults, setSearchResults] = useState<Member[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<string[]>(DEFAULT_STATUSES);
+  const [isSearchError, setIsSearchError] = useState(false);
+
+  const getSWRKey = () => {
+    if (!token || isSearching) return null;
+
+    const queryParams = new URLSearchParams({
+      page: paginationNumber.toString(),
+    });
+    statusFilter.forEach((status) => {
+      queryParams.append("status[]", status);
+    });
+
+    return [
+      `${apiUrl}/api/v1/members/filtered?${queryParams.toString()}`,
+      token,
+    ];
+  };
+
+  const {
+    data: swrData,
+    error: swrError,
+    isLoading: swrLoading,
+    mutate: mutateMembers,
+  } = useSWR(getSWRKey(), ([url, token]) => fetcherWithToken(url, token));
+
+  const members = swrData?.data || [];
+  const totalPagination = swrData?.meta?.total_pages || 1;
+  const isError = swrError || isSearchError;
+  const isLoading = swrLoading && !isSearching;
 
   const displayMembers = isSearching ? searchResults : members;
 
-  useEffect(() => {
-    async function getData() {
-      setIsLoading(true);
-      try {
-        const queryParams = new URLSearchParams({
-          page: paginationNumber.toString(),
-        });
-
-        statusFilter.forEach((status) => {
-          queryParams.append("status[]", status);
-        });
-
-        const response = await axios.get(
-          `${apiUrl}/api/v1/members/filtered?${queryParams.toString()}`,
-          {
-            headers: {
-              Accept: "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-
-        setMembers(response.data.data);
-        setTotalPagination(response.data.meta.total_pages);
-        setIsLoading(false);
-      } catch (error) {
-        setIsLoading(false);
-        setIsError(true);
-        console.log("Error occurred:", error);
-      }
-    }
-
-    if (!isSearching) {
-      getData();
-    }
-  }, [paginationNumber, token, statusFilter, isSearching]);
-
+  // Reset pagination when filters change
   useEffect(() => {
     setPaginationNumber(1);
   }, [statusFilter]);
@@ -90,7 +81,7 @@ export default function Members() {
 
   const handleSearchError = (error: unknown) => {
     console.error("Search failed:", error);
-    setIsError(true);
+    setIsSearchError(true);
   };
 
   const getCurrentSingleStatus = () => {
@@ -131,35 +122,47 @@ export default function Members() {
 
       <div className="mt-10 mb-[70px]">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-          {isLoading && !isSearching
+          {isLoading
             ? [...Array(8)].map((_, index) => (
                 <SkeletonMemberCard key={index} />
               ))
             : displayMembers?.map((member: Member) => (
-                <MemberCard key={member.id} {...member} />
+                <MemberCard
+                  key={member.id}
+                  {...member}
+                  mutateMembers={mutateMembers}
+                />
               ))}
         </div>
-        <div className="fixed flex items-center border-2 border-gray-200 rounded-full w-fit bottom-4 right-4 z-50">
-          <button
-            onClick={() => setPaginationNumber((prev) => Math.max(1, prev - 1))}
-            className="text-black bg-white py-2 px-2 rounded-l-full transition duration-200 hover:bg-gray-200 active:bg-gray-400"
-            disabled={isLoading}
-          >
-            <ChevronLeft />
-          </button>
-          <div className="text-black bg-white w-[75px] py-2 px-2 text-center">
-            {paginationNumber} - {totalPagination}
+
+        {/* Hide pagination if searching */}
+        {!isSearching && (
+          <div className="fixed flex items-center border-2 border-gray-200 rounded-full w-fit bottom-4 right-4 z-50">
+            <button
+              onClick={() =>
+                setPaginationNumber((prev) => Math.max(1, prev - 1))
+              }
+              className="text-black bg-white py-2 px-2 rounded-l-full transition duration-200 hover:bg-gray-200 active:bg-gray-400"
+              disabled={isLoading || paginationNumber === 1}
+            >
+              <ChevronLeft />
+            </button>
+            <div className="text-black bg-white w-[75px] py-2 px-2 text-center">
+              {paginationNumber} - {totalPagination}
+            </div>
+            <button
+              onClick={() =>
+                setPaginationNumber((prev) =>
+                  Math.min(totalPagination, prev + 1),
+                )
+              }
+              className="text-black bg-white py-2 px-2 rounded-r-full transition duration-200 hover:bg-gray-200 active:bg-gray-400"
+              disabled={isLoading || paginationNumber === totalPagination}
+            >
+              <ChevronRight />
+            </button>
           </div>
-          <button
-            onClick={() =>
-              setPaginationNumber((prev) => Math.min(totalPagination, prev + 1))
-            }
-            className="text-black bg-white py-2 px-2 rounded-r-full transition duration-200 hover:bg-gray-200 active:bg-gray-400"
-            disabled={isLoading}
-          >
-            <ChevronRight />
-          </button>
-        </div>
+        )}
       </div>
     </DashboardLayout>
   );
