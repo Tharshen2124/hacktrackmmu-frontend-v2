@@ -27,6 +27,8 @@ interface HackathonCardProps {
   mutateHackathons?: () => void;
 }
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export default function HackathonCard({
   number,
   numberOfUpdates,
@@ -151,6 +153,7 @@ export default function HackathonCard({
         },
       );
 
+      await sleep(500);
       if (mutateHackathons) {
         await mutateHackathons();
       }
@@ -176,6 +179,7 @@ export default function HackathonCard({
           },
         });
 
+        await sleep(500);
         if (mutateHackathons) {
           await mutateHackathons();
         }

@@ -28,6 +28,8 @@ interface MeetupCardProps {
   mutateMeetups?: () => void;
 }
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export default function MeetupCard({
   number,
   numberOfUpdates,
@@ -154,6 +156,7 @@ export default function MeetupCard({
         },
       );
 
+      await sleep(500);
       if (mutateMeetups) {
         await mutateMeetups();
       }
@@ -177,6 +180,8 @@ export default function MeetupCard({
             Authorization: `Bearer ${token}`,
           },
         });
+
+        await sleep(500);
         if (mutateMeetups) {
           await mutateMeetups();
         }
