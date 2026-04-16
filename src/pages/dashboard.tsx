@@ -24,7 +24,6 @@ export default function Home() {
     setIsClient(true);
   }, []);
 
-  // Move all hooks before any conditional returns
   const {
     data: members,
     error: membersError,
@@ -55,7 +54,6 @@ export default function Home() {
     ([url, token]) => fetcherWithToken(url, token),
   );
 
-  // Now you can safely do conditional returns
   if (!isClient) return null;
 
   const isLoading = membersLoading || meetupsLoading || hackathonsLoading;
