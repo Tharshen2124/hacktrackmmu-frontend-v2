@@ -166,7 +166,7 @@ export default function Meetups() {
             hackathons.map((meetup: any) => (
               <HackathonCard
                 key={meetup.id}
-                number={meetup.number}
+                number={meetup.hackathon_number}
                 date={meetup.date}
                 numberOfUpdates={meetup.updates.length}
                 hostName={

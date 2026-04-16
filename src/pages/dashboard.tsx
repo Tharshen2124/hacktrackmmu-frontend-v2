@@ -196,7 +196,7 @@ export default function Home() {
             hackathons.map((hackathon: any) => (
               <HackathonCard
                 key={hackathon.id}
-                number={hackathon.number}
+                number={hackathon.hackathon_number}
                 date={hackathon.date}
                 numberOfUpdates={hackathon.updates.length}
                 hostName={hackathon.host?.name || "unknown host"}
