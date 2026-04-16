@@ -52,7 +52,7 @@ export default function MeetupCard({
   >(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedDescription, setSelectedDescription] = useState<string>("");
-  const { token } = useAuthStore();
+  const { token, isAdmin } = useAuthStore();
   const { showToast } = useToast();
 
   const {
@@ -252,20 +252,22 @@ export default function MeetupCard({
                       </p>
 
                       {/* ACTION BUTTONS */}
-                      <div className="flex gap-x-3 shrink-0 ml-4 mt-1">
-                        <button onClick={() => handleEditClick(update.id)}>
-                          <Edit
-                            size="16"
-                            className="text-blue-500 hover:text-blue-400"
-                          />
-                        </button>
-                        <button onClick={() => handleDeleteClick(update.id)}>
-                          <Trash
-                            size="16"
-                            className="text-red-500 hover:text-red-400"
-                          />
-                        </button>
-                      </div>
+                      {isAdmin && (
+                        <div className="flex gap-x-3 shrink-0 ml-4 mt-1">
+                          <button onClick={() => handleEditClick(update.id)}>
+                            <Edit
+                              size="16"
+                              className="text-blue-500 hover:text-blue-400"
+                            />
+                          </button>
+                          <button onClick={() => handleDeleteClick(update.id)}>
+                            <Trash
+                              size="16"
+                              className="text-red-500 hover:text-red-400"
+                            />
+                          </button>
+                        </div>
+                      )}
                     </div>
 
                     <p className="text-sm flex items-center mt-1">

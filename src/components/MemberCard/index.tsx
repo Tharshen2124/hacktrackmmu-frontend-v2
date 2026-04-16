@@ -16,7 +16,17 @@ import Link from "next/link";
 import dayjs from "dayjs";
 import { Member, Project, Update } from "@/types/types";
 
-export default function MemberCard({ id, name, projects, status }: Member) {
+interface MemberCardProps extends Member {
+  mutateMembers?: () => void;
+}
+
+export default function MemberCard({
+  id,
+  name,
+  projects,
+  status,
+  mutateMembers,
+}: MemberCardProps) {
   const { isAdmin } = useAuthStore();
 
   const numberOfCompletedProjects = projects.filter(
