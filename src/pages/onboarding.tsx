@@ -135,7 +135,7 @@ export default function Onboarding() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout pageTitle="HackTrack - Onboarding">
       <h1 className="text-4xl font-bold mt-6">Onboarding</h1>
       {onboardingError && <p>Error loading data</p>}
 

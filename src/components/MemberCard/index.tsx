@@ -19,6 +19,7 @@ import dayjs from "dayjs";
 import { Member, Project, Update } from "@/types/types";
 import { apiUrl } from "@/utils/env";
 import axios from "axios";
+import Head from "next/head";
 import { useToast } from "@/components/Toast/ToastProvider";
 import { EditProjectForm, EditProjectData } from "../Forms/EditProjectForm";
 import { EditUpdateForm, EditUpdateData } from "../Forms/EditUpdateForm";
@@ -214,6 +215,17 @@ export default function MemberCard({
 
   return (
     <>
+      {isModalOpen && (
+        <Head>
+          <title key="title">
+            {modalView === "edit-project"
+              ? "HackTrack - Edit Project"
+              : modalView === "edit-update"
+                ? "HackTrack - Edit Update"
+                : `HackTrack - ${name}'s profile`}
+          </title>
+        </Head>
+      )}
       <div
         onClick={handleCardClick}
         className="bg-white dark:bg-[#222] rounded-lg p-4 border-2 dark:border border-neutral-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-200 hover:shadow-gray-600/50 hover:shadow-[0px_0px_8px_1px_rgba(0,_0,_0,_0.1)] dark:hover:shadow-gray-200/50 active:shadow-none transition duration-200 cursor-pointer"

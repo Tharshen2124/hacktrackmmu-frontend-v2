@@ -61,7 +61,7 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <DashboardLayout>
+      <DashboardLayout pageTitle="HackTrack - Home">
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
         <div className="mt-10">
           <div className="flex justify-between items-center">
@@ -139,7 +139,7 @@ export default function Home() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout pageTitle="HackTrack - Home">
       <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
       {isAdmin && (
         <ControlPanel

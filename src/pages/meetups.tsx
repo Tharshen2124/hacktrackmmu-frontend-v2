@@ -57,7 +57,7 @@ export default function Meetups() {
 
   if (isLoading) {
     return (
-      <DashboardLayout>
+      <DashboardLayout pageTitle="HackTrack - Meetups">
         <div className="flex justify-between items-center">
           <h1 className="text-4xl font-bold">Meetups</h1>
           <div className="flex items-center border-2 border-gray-200 rounded-full w-fit">
@@ -116,7 +116,7 @@ export default function Meetups() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout pageTitle="HackTrack - Meetups">
       <div className="flex justify-between items-center">
         <h1 className="text-4xl font-bold">Meetups</h1>
         <div className="flex items-center border-2 border-gray-200 rounded-full w-fit">

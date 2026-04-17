@@ -99,7 +99,7 @@ export default function Members() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout pageTitle="HackTrack - Members">
       <div className="flex justify-between items-center mb-5">
         <div className="flex flex-row gap-4">
           <h1 className="text-4xl font-bold">Members</h1>
