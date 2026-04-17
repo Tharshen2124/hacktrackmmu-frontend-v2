@@ -16,12 +16,12 @@ import { ModalLayout } from "../ModalLayout";
 import useAuthStore from "@/store/useAuthStore";
 import Link from "next/link";
 import dayjs from "dayjs";
-import { Member, Project, Update, Meetup } from "@/types/types";
+import { Member, Project, Update } from "@/types/types";
 import { apiUrl } from "@/utils/env";
 import axios from "axios";
-import useSWR from "swr";
-import { fetcherWithToken } from "@/utils/fetcher";
 import { useToast } from "@/components/Toast/ToastProvider";
+import { EditProjectForm, EditProjectData } from "../Forms/EditProjectForm";
+import { EditUpdateForm, EditUpdateData } from "../Forms/EditUpdateForm";
 
 interface MemberCardProps extends Member {
   mutateMembers?: () => void;
@@ -51,71 +51,15 @@ export default function MemberCard({
   const [modalView, setModalView] = useState<
     "list" | "edit-project" | "edit-update"
   >("list");
-
   const [isSaving, setIsSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | number | null>(null);
 
   const [editingProjectId, setEditingProjectId] = useState<
     string | number | null
   >(null);
-  const [editProjectName, setEditProjectName] = useState("");
-  const [editProjectCompleted, setEditProjectCompleted] = useState(false);
-  const [editProjectCategory, setEditProjectCategory] =
-    useState<string>("project");
-  const [editProjectMemberId, setEditProjectMemberId] = useState<
-    string | number
-  >("");
-
   const [editingUpdateId, setEditingUpdateId] = useState<
     string | number | null
   >(null);
-  const [selectedMemberId, setSelectedMemberId] = useState<
-    string | number | null
-  >(null);
-  const [selectedProjectId, setSelectedProjectId] = useState<
-    string | number | null
-  >(null);
-  const [selectedMeetupId, setSelectedMeetupId] = useState<
-    string | number | null
-  >(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>("idea_talk");
-  const [selectedDescription, setSelectedDescription] = useState<string>("");
-
-  const {
-    data: membersData,
-    error: membersError,
-    isLoading: membersLoading,
-  } = useSWR(
-    token && (modalView === "edit-update" || modalView === "edit-project")
-      ? [`${apiUrl}/api/v1/members?unpaginated=true`, token]
-      : null,
-    ([url, token]: [string, string]) => fetcherWithToken(url, token),
-  );
-  const membersList = membersData?.data || membersData || [];
-
-  const {
-    data: projectsData,
-    error: projectsError,
-    isLoading: projectsLoading,
-  } = useSWR(
-    token && modalView === "edit-update" && selectedMemberId
-      ? [`${apiUrl}/api/v1/projects?member_id=${selectedMemberId}`, token]
-      : null,
-    ([url, token]: [string, string]) => fetcherWithToken(url, token),
-  );
-  const projectsList = projectsData?.data || projectsData || [];
-
-  const {
-    data: meetupsData,
-    error: meetupsError,
-    isLoading: meetupsLoading,
-  } = useSWR<Meetup[]>(
-    token && modalView === "edit-update"
-      ? [`${apiUrl}/api/v1/meetups?category=regular_meetup&limit=20`, token]
-      : null,
-    ([url, token]: [string, string]) => fetcherWithToken(url, token),
-  );
-  const meetupsList = meetupsData?.data || meetupsData || [];
 
   const handleCardClick = () => setIsModalOpen(true);
 
@@ -136,77 +80,9 @@ export default function MemberCard({
       .join(" ");
   };
 
-  // PROJECT HANDLERS
   const handleEditProjectClick = (project: Project) => {
     setEditingProjectId(project.id);
-    setEditProjectName(project.name);
-    setEditProjectCompleted(project.completed);
-
-    const rawCategory = String(project.category);
-    let finalCategory = "project";
-
-    if (rawCategory === "0" || rawCategory === "project") {
-      finalCategory = "project";
-    } else if (rawCategory === "1" || rawCategory === "mini_project") {
-      finalCategory = "mini_project";
-    } else if (rawCategory === "2" || rawCategory === "group_project") {
-      finalCategory = "group_project";
-    }
-
-    setEditProjectCategory(finalCategory);
-
-    if (project.members && project.members.length > 0) {
-      setEditProjectMemberId(project.members[0].id);
-    } else {
-      setEditProjectMemberId(id);
-    }
     setModalView("edit-project");
-  };
-
-  const handleCancelEditProject = () => {
-    setEditingProjectId(null);
-    setEditProjectName("");
-    setEditProjectCompleted(false);
-    setEditProjectCategory("project");
-    setEditProjectMemberId("");
-    setModalView("list");
-  };
-
-  const handleSaveProject = async () => {
-    if (!editingProjectId) return;
-    setIsSaving(true);
-
-    const payload = {
-      project: {
-        name: editProjectName,
-        completed: editProjectCompleted,
-        category: editProjectCategory,
-        member_ids: [editProjectMemberId],
-      },
-    };
-
-    try {
-      await axios.patch(
-        `${apiUrl}/api/v1/projects/${editingProjectId}`,
-        payload,
-        {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      await sleep(500);
-      if (mutateMembers) await mutateMembers(); // Uses parent's exact key for background revalidation
-
-      showToast("Project edited successfully!", "success");
-      handleCancelEditProject();
-    } catch (error) {
-      showToast("Unable to edit project. Please try again.", "error");
-    } finally {
-      setIsSaving(false);
-    }
   };
 
   const handleDeleteProject = async (projectId: string | number) => {
@@ -223,10 +99,8 @@ export default function MemberCard({
             Authorization: `Bearer ${token}`,
           },
         });
-
         await sleep(500);
         if (mutateMembers) await mutateMembers();
-
         showToast("Project deleted successfully", "success");
       } catch (error) {
         showToast("Unable to delete project.", "error");
@@ -236,50 +110,20 @@ export default function MemberCard({
     }
   };
 
-  // UPDATE HANDLERS
-  const handleEditUpdateClick = (update: Update) => {
-    setEditingUpdateId(update.id);
-    setSelectedMemberId(update.member?.id || update.member_id);
-    setSelectedProjectId(update.project?.id || update.project_id);
-    setSelectedMeetupId(update.meetup_id);
-    setSelectedDescription(update.description);
-
-    const rawCategory = String(update.category);
-    let finalCategory = "idea_talk";
-
-    if (rawCategory === "0" || rawCategory === "idea_talk") {
-      finalCategory = "idea_talk";
-    } else if (rawCategory === "1" || rawCategory === "progress_talk") {
-      finalCategory = "progress_talk";
-    }
-
-    setSelectedCategory(finalCategory);
-    setModalView("edit-update");
-  };
-
-  const handleCancelEditUpdate = () => {
-    setEditingUpdateId(null);
-    setModalView("list");
-  };
-
-  const handleSaveUpdate = async () => {
-    if (!editingUpdateId) return;
+  const handleSaveProject = async (data: EditProjectData) => {
+    if (!editingProjectId) return;
     setIsSaving(true);
-
-    const payload = {
-      update: {
-        meetup_id: selectedMeetupId,
-        project_id: selectedProjectId,
-        member_id: selectedMemberId,
-        category: selectedCategory,
-        description: selectedDescription,
-      },
-    };
-
     try {
       await axios.patch(
-        `${apiUrl}/api/v1/updates/${editingUpdateId}`,
-        payload,
+        `${apiUrl}/api/v1/projects/${editingProjectId}`,
+        {
+          project: {
+            name: data.name,
+            completed: data.completed,
+            category: data.category,
+            member_ids: [data.memberId],
+          },
+        },
         {
           headers: {
             Accept: "application/json",
@@ -287,17 +131,21 @@ export default function MemberCard({
           },
         },
       );
-
       await sleep(500);
       if (mutateMembers) await mutateMembers();
-
-      showToast("Update edited successfully!", "success");
-      handleCancelEditUpdate();
+      showToast("Project edited successfully!", "success");
+      setModalView("list");
+      setEditingProjectId(null);
     } catch (error) {
-      showToast("Unable to edit update.", "error");
+      showToast("Unable to edit project. Please try again.", "error");
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleEditUpdateClick = (update: Update) => {
+    setEditingUpdateId(update.id);
+    setModalView("edit-update");
   };
 
   const handleDeleteUpdate = async (updateId: string | number) => {
@@ -310,10 +158,8 @@ export default function MemberCard({
             Authorization: `Bearer ${token}`,
           },
         });
-
         await sleep(500);
         if (mutateMembers) await mutateMembers();
-
         showToast("Update deleted successfully", "success");
       } catch (error) {
         showToast("Unable to delete update.", "error");
@@ -323,6 +169,41 @@ export default function MemberCard({
     }
   };
 
+  const handleSaveUpdate = async (data: EditUpdateData) => {
+    if (!editingUpdateId) return;
+    setIsSaving(true);
+    try {
+      await axios.patch(
+        `${apiUrl}/api/v1/updates/${editingUpdateId}`,
+        {
+          update: {
+            meetup_id: data.meetupId,
+            project_id: data.projectId,
+            member_id: data.memberId,
+            category: data.category,
+            description: data.description,
+          },
+        },
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      await sleep(500);
+      if (mutateMembers) await mutateMembers();
+      showToast("Update edited successfully!", "success");
+      setModalView("list");
+      setEditingUpdateId(null);
+    } catch (error) {
+      showToast("Unable to edit update.", "error");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const findEditingProject = projects.find((p) => p.id === editingProjectId);
   let findEditingUpdate: Update | undefined;
   if (modalView === "edit-update") {
     projects.forEach((p) => {
@@ -364,7 +245,6 @@ export default function MemberCard({
       </div>
 
       <ModalLayout isOpen={isModalOpen} onClose={handleCloseModal}>
-        {/* VIEW 1: THE LIST VIEW (SHOWS PROJECTS & UPDATES) */}
         {modalView === "list" && (
           <>
             <div className="flex flex-row gap-2 items-center mb-4 justify-between">
@@ -379,19 +259,17 @@ export default function MemberCard({
               )}
             </div>
 
-            {/* PROJECTS SECTION */}
             <h3 className="text-lg font-semibold mb-1">Projects</h3>
-            <div className="border border-gray-700 py-3 px-4 rounded-md mb-3 max-h-48 lg:max-h-64 overflow-y-auto flex flex-col gap-1 opacity-100">
-              {projects && projects.length != 0 ? (
+            <div className="border border-gray-700 py-3 px-4 rounded-md mb-3 max-h-48 lg:max-h-64 overflow-y-auto flex flex-col gap-1">
+              {projects && projects.length !== 0 ? (
                 projects.map((project: Project) => (
                   <div
                     key={project.id}
-                    className={
-                      "flex items-start justify-between group py-1.5 border-b border-gray-700 last:border-0 transition-opacity duration-200 " +
-                      (deletingId === project.id
+                    className={`flex items-start justify-between group py-1.5 border-b border-gray-700 last:border-0 transition-opacity duration-200 ${
+                      deletingId === project.id
                         ? "opacity-30 pointer-events-none"
-                        : "opacity-100")
-                    }
+                        : "opacity-100"
+                    }`}
                   >
                     <div className="flex items-center gap-x-2 mr-2">
                       {project.completed ? (
@@ -405,7 +283,7 @@ export default function MemberCard({
                     </div>
 
                     {isAdmin && (
-                      <div className="flex gap-x-3 shrink-0 ml-auto opacity-100  mt-0.5">
+                      <div className="flex gap-x-3 shrink-0 ml-auto opacity-100 mt-0.5">
                         <button onClick={() => handleEditProjectClick(project)}>
                           <Edit
                             size="16"
@@ -429,7 +307,6 @@ export default function MemberCard({
               )}
             </div>
 
-            {/* UPDATES SECTION */}
             <h3 className="text-lg font-semibold mb-1">Talks</h3>
             <div className="overflow-y-auto border flex flex-col gap-y-3 px-4 py-3 mb-8 max-h-56 lg:max-h-80 rounded-md border-gray-700">
               {projects && projects.length !== 0 && numberOfUpdates > 0 ? (
@@ -463,7 +340,6 @@ export default function MemberCard({
                               )}
                             </div>
 
-                            {/* UPDATE ACTION BUTTONS */}
                             {isAdmin && (
                               <div className="flex gap-x-3 shrink-0 ml-4 opacity-100 mt-1">
                                 <button
@@ -514,354 +390,24 @@ export default function MemberCard({
           </>
         )}
 
-        {/* VIEW 2: THE EDIT PROJECT FORM */}
-        {modalView === "edit-project" && (
-          <>
-            <h2 className="text-2xl font-bold mb-6">Edit Project</h2>
-            <div className="flex flex-col gap-5 mb-8">
-              {/* Project Name */}
-              <div className="grid grid-cols-[100px_1fr] items-center">
-                <label className="font-semibold text-sm">Name</label>
-                <input
-                  type="text"
-                  value={editProjectName}
-                  onChange={(e) => setEditProjectName(e.target.value)}
-                  className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full"
-                  placeholder="Enter project name..."
-                />
-              </div>
-
-              {/* Project Type Radio Buttons */}
-              <div className="grid grid-cols-[100px_1fr] items-center">
-                <label className="font-semibold text-sm">Type</label>
-                <div className="flex gap-4">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name={`project-category-${editingProjectId}`}
-                      value="project"
-                      checked={editProjectCategory === "project"}
-                      onChange={(e) => setEditProjectCategory(e.target.value)}
-                      className="cursor-pointer accent-blue-500"
-                    />
-                    <span className="text-sm">Solo</span>{" "}
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name={`project-category-${editingProjectId}`}
-                      value="mini_project"
-                      checked={editProjectCategory === "mini_project"}
-                      onChange={(e) => setEditProjectCategory(e.target.value)}
-                      className="cursor-pointer accent-blue-500"
-                    />
-                    <span className="text-sm">Mini</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name={`project-category-${editingProjectId}`}
-                      value="group_project"
-                      checked={editProjectCategory === "group_project"}
-                      onChange={(e) => setEditProjectCategory(e.target.value)}
-                      className="cursor-pointer accent-blue-500"
-                    />
-                    <span className="text-sm">Group</span>{" "}
-                  </label>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-[100px_1fr] items-center">
-                <label className="font-semibold text-sm">Owner</label>
-                <select
-                  value={editProjectMemberId}
-                  onChange={(e) => setEditProjectMemberId(e.target.value)}
-                  disabled={membersLoading || membersError}
-                  className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full disabled:opacity-50"
-                >
-                  {membersLoading && (
-                    <option value="">Loading members...</option>
-                  )}
-                  {membersError && (
-                    <option value="">Failed to load members</option>
-                  )}
-                  {!membersLoading &&
-                    !membersError &&
-                    membersList.map((m: Member) => (
-                      <option key={m.id} value={m.id} className="bg-black">
-                        {m.name}
-                      </option>
-                    ))}
-                </select>
-              </div>
-
-              {/* Project Status */}
-              <div className="grid grid-cols-[100px_1fr] items-center mt-2">
-                <label className="font-semibold text-sm">Status</label>
-                <label className="flex items-center gap-2 cursor-pointer w-max">
-                  <input
-                    type="checkbox"
-                    checked={editProjectCompleted}
-                    onChange={(e) => setEditProjectCompleted(e.target.checked)}
-                    className="cursor-pointer w-4 h-4 accent-blue-500"
-                  />
-                  <span className="text-sm select-none">Mark as Completed</span>
-                </label>
-              </div>
-            </div>
-
-            <div className="flex gap-3 mt-auto">
-              <button
-                onClick={handleCancelEditProject}
-                disabled={isSaving}
-                className="flex-1 border border-gray-400 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#333] font-bold py-2 px-4 rounded transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveProject}
-                disabled={isSaving || editProjectName.trim() === ""}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200 disabled:bg-blue-400 disabled:cursor-not-allowed"
-              >
-                {isSaving ? "Saving..." : "Save"}
-              </button>
-            </div>
-          </>
+        {modalView === "edit-project" && findEditingProject && (
+          <EditProjectForm
+            project={findEditingProject}
+            defaultMemberId={id}
+            isSaving={isSaving}
+            onCancel={() => setModalView("list")}
+            onSave={handleSaveProject}
+          />
         )}
 
-        {/* VIEW 3: THE EDIT UPDATE FORM */}
-        {modalView === "edit-update" && (
-          <>
-            {findEditingUpdate ? (
-              <>
-                <h2 className="text-2xl font-bold mb-6">Edit Update</h2>
-                <div className="flex flex-col gap-5 mb-8">
-                  {/* Category Radio */}
-                  <div className="grid grid-cols-[100px_1fr] items-center">
-                    <label className="font-semibold text-sm">Category</label>
-                    <div className="flex gap-4">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name={`update-category-${editingUpdateId}`}
-                          value="idea_talk"
-                          checked={selectedCategory === "idea_talk"}
-                          onChange={(e) => setSelectedCategory(e.target.value)}
-                          className="cursor-pointer accent-blue-500"
-                        />
-                        <span className="text-sm">Idea Talk</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name={`update-category-${editingUpdateId}`}
-                          value="progress_talk"
-                          checked={selectedCategory === "progress_talk"}
-                          onChange={(e) => setSelectedCategory(e.target.value)}
-                          className="cursor-pointer accent-blue-500"
-                        />
-                        <span className="text-sm">Progress Talk</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* By (Member Dropdown) */}
-                  <div className="grid grid-cols-[100px_1fr] items-center">
-                    <label className="font-semibold text-sm">By</label>
-                    <select
-                      value={selectedMemberId || ""}
-                      onChange={(e) => {
-                        setSelectedMemberId(e.target.value);
-                        setSelectedProjectId("");
-                      }}
-                      disabled={membersLoading || membersError}
-                      className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full disabled:opacity-50"
-                    >
-                      {membersLoading && (
-                        <option
-                          value={
-                            findEditingUpdate?.member?.id ||
-                            findEditingUpdate?.member_id
-                          }
-                        >
-                          Loading members...
-                        </option>
-                      )}
-                      {membersError && (
-                        <option
-                          value={
-                            findEditingUpdate?.member?.id ||
-                            findEditingUpdate?.member_id
-                          }
-                        >
-                          Failed to load members
-                        </option>
-                      )}
-                      {!membersLoading &&
-                        !membersError &&
-                        membersList.map((m: Member) => (
-                          <option key={m.id} value={m.id} className="bg-black">
-                            {m.name}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
-
-                  {/* For (Project Dropdown) */}
-                  <div className="grid grid-cols-[100px_1fr] items-center">
-                    <label className="font-semibold text-sm">For</label>
-                    <select
-                      value={selectedProjectId || ""}
-                      onChange={(e) => setSelectedProjectId(e.target.value)}
-                      disabled={
-                        projectsLoading || projectsError || !selectedMemberId
-                      }
-                      className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full disabled:opacity-50"
-                    >
-                      {projectsLoading && <option>Loading projects...</option>}
-                      {projectsError && (
-                        <option>Failed to load projects</option>
-                      )}
-                      {!projectsLoading &&
-                        !projectsError &&
-                        projectsList.length === 0 && (
-                          <option disabled>
-                            No projects found for this member
-                          </option>
-                        )}
-                      {!projectsLoading &&
-                        !projectsError &&
-                        projectsList.length > 0 && (
-                          <>
-                            {selectedMemberId ===
-                              String(
-                                findEditingUpdate?.member?.id ||
-                                  findEditingUpdate?.member_id,
-                              ) &&
-                              !projectsList.some(
-                                (p: Project) =>
-                                  String(p.id) ===
-                                  String(
-                                    findEditingUpdate?.project?.id ||
-                                      findEditingUpdate?.project_id,
-                                  ),
-                              ) && (
-                                <option
-                                  value={
-                                    findEditingUpdate?.project?.id ||
-                                    findEditingUpdate?.project_id
-                                  }
-                                >
-                                  {findEditingUpdate?.project?.name ||
-                                    "Unknown Project"}
-                                </option>
-                              )}
-                            <optgroup
-                              label={
-                                membersList.find(
-                                  (m: Member) =>
-                                    String(m.id) === String(selectedMemberId),
-                                )?.name ||
-                                findEditingUpdate?.member?.name ||
-                                "Member"
-                              }
-                              className="font-bold bg-black"
-                            >
-                              {projectsList.map((project: Project) => (
-                                <option
-                                  key={project.id}
-                                  value={project.id}
-                                  className="bg-black font-normal"
-                                >
-                                  {project.name}
-                                </option>
-                              ))}
-                            </optgroup>
-                          </>
-                        )}
-                    </select>
-                  </div>
-
-                  {/* On (Date) */}
-                  <div className="grid grid-cols-[100px_1fr] items-center">
-                    <label className="font-semibold text-sm">On</label>
-                    <select
-                      value={selectedMeetupId || ""}
-                      onChange={(e) => setSelectedMeetupId(e.target.value)}
-                      disabled={meetupsLoading || meetupsError}
-                      className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full disabled:opacity-50"
-                    >
-                      {meetupsLoading && (
-                        <option value="">Loading dates...</option>
-                      )}
-                      {meetupsError && (
-                        <option value="">Failed to load dates</option>
-                      )}
-                      {!meetupsLoading &&
-                        !meetupsError &&
-                        meetupsList.length > 0 && (
-                          <>
-                            {selectedMeetupId === "" && (
-                              <option value="" disabled>
-                                Select a date...
-                              </option>
-                            )}
-                            {meetupsList.map((meetup: Meetup) => {
-                              const dateString =
-                                typeof meetup.date === "string"
-                                  ? meetup.date.split("T")[0]
-                                  : new Date(meetup.date)
-                                      .toISOString()
-                                      .split("T")[0];
-                              return (
-                                <option
-                                  key={meetup.id}
-                                  value={meetup.id}
-                                  className="bg-black"
-                                >
-                                  {dateString}
-                                </option>
-                              );
-                            })}
-                          </>
-                        )}
-                    </select>
-                  </div>
-
-                  {/* Description */}
-                  <div className="grid grid-cols-[100px_1fr] items-start">
-                    <label className="font-semibold text-sm pt-2">
-                      Description
-                    </label>
-                    <textarea
-                      value={selectedDescription}
-                      onChange={(e) => setSelectedDescription(e.target.value)}
-                      className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full h-32 resize-y"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex gap-3 mt-auto">
-                  <button
-                    onClick={handleCancelEditUpdate}
-                    disabled={isSaving}
-                    className="flex-1 border border-gray-400 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-[#333] font-bold py-2 px-4 rounded transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSaveUpdate}
-                    disabled={isSaving}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200 disabled:bg-blue-400 disabled:cursor-not-allowed"
-                  >
-                    {isSaving ? "Saving..." : "Save"}
-                  </button>
-                </div>
-              </>
-            ) : (
-              <p>Loading update data...</p>
-            )}
-          </>
+        {modalView === "edit-update" && findEditingUpdate && (
+          <EditUpdateForm
+            update={findEditingUpdate}
+            isSaving={isSaving}
+            meetupFetchUrl={`${apiUrl}/api/v1/meetups?category=regular_meetup&limit=20`}
+            onCancel={() => setModalView("list")}
+            onSave={handleSaveUpdate}
+          />
         )}
       </ModalLayout>
     </>
