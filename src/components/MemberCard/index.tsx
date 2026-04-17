@@ -60,6 +60,11 @@ export default function MemberCard({
   >(null);
   const [editProjectName, setEditProjectName] = useState("");
   const [editProjectCompleted, setEditProjectCompleted] = useState(false);
+  const [editProjectCategory, setEditProjectCategory] =
+    useState<string>("project");
+  const [editProjectMemberId, setEditProjectMemberId] = useState<
+    string | number
+  >("");
 
   const [editingUpdateId, setEditingUpdateId] = useState<
     string | number | null
@@ -73,16 +78,15 @@ export default function MemberCard({
   const [selectedMeetupId, setSelectedMeetupId] = useState<
     string | number | null
   >(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("idea_talk");
   const [selectedDescription, setSelectedDescription] = useState<string>("");
 
-  // --- SWR Fetches for the Update Edit Form ---
   const {
     data: membersData,
     error: membersError,
     isLoading: membersLoading,
   } = useSWR(
-    token && modalView === "edit-update"
+    token && (modalView === "edit-update" || modalView === "edit-project")
       ? [`${apiUrl}/api/v1/members?unpaginated=true`, token]
       : null,
     ([url, token]: [string, string]) => fetcherWithToken(url, token),
@@ -113,7 +117,6 @@ export default function MemberCard({
   );
   const meetupsList = meetupsData?.data || meetupsData || [];
 
-  // --- Helper Functions ---
   const handleCardClick = () => setIsModalOpen(true);
 
   const handleCloseModal = () => {
@@ -138,11 +141,34 @@ export default function MemberCard({
     setEditingProjectId(project.id);
     setEditProjectName(project.name);
     setEditProjectCompleted(project.completed);
+
+    const rawCategory = String(project.category);
+    let finalCategory = "project";
+
+    if (rawCategory === "0" || rawCategory === "project") {
+      finalCategory = "project";
+    } else if (rawCategory === "1" || rawCategory === "mini_project") {
+      finalCategory = "mini_project";
+    } else if (rawCategory === "2" || rawCategory === "group_project") {
+      finalCategory = "group_project";
+    }
+
+    setEditProjectCategory(finalCategory);
+
+    if (project.members && project.members.length > 0) {
+      setEditProjectMemberId(project.members[0].id);
+    } else {
+      setEditProjectMemberId(id);
+    }
     setModalView("edit-project");
   };
 
   const handleCancelEditProject = () => {
     setEditingProjectId(null);
+    setEditProjectName("");
+    setEditProjectCompleted(false);
+    setEditProjectCategory("project");
+    setEditProjectMemberId("");
     setModalView("list");
   };
 
@@ -150,12 +176,19 @@ export default function MemberCard({
     if (!editingProjectId) return;
     setIsSaving(true);
 
+    const payload = {
+      project: {
+        name: editProjectName,
+        completed: editProjectCompleted,
+        category: editProjectCategory,
+        member_ids: [editProjectMemberId],
+      },
+    };
+
     try {
       await axios.patch(
         `${apiUrl}/api/v1/projects/${editingProjectId}`,
-        {
-          project: { name: editProjectName, completed: editProjectCompleted },
-        },
+        payload,
         {
           headers: {
             Accept: "application/json",
@@ -165,7 +198,8 @@ export default function MemberCard({
       );
 
       await sleep(500);
-      if (mutateMembers) await mutateMembers();
+      if (mutateMembers) await mutateMembers(); // Uses parent's exact key for background revalidation
+
       showToast("Project edited successfully!", "success");
       handleCancelEditProject();
     } catch (error) {
@@ -192,6 +226,7 @@ export default function MemberCard({
 
         await sleep(500);
         if (mutateMembers) await mutateMembers();
+
         showToast("Project deleted successfully", "success");
       } catch (error) {
         showToast("Unable to delete project.", "error");
@@ -207,8 +242,18 @@ export default function MemberCard({
     setSelectedMemberId(update.member?.id || update.member_id);
     setSelectedProjectId(update.project?.id || update.project_id);
     setSelectedMeetupId(update.meetup_id);
-    setSelectedCategory(update.category);
     setSelectedDescription(update.description);
+
+    const rawCategory = String(update.category);
+    let finalCategory = "idea_talk";
+
+    if (rawCategory === "0" || rawCategory === "idea_talk") {
+      finalCategory = "idea_talk";
+    } else if (rawCategory === "1" || rawCategory === "progress_talk") {
+      finalCategory = "progress_talk";
+    }
+
+    setSelectedCategory(finalCategory);
     setModalView("edit-update");
   };
 
@@ -245,6 +290,7 @@ export default function MemberCard({
 
       await sleep(500);
       if (mutateMembers) await mutateMembers();
+
       showToast("Update edited successfully!", "success");
       handleCancelEditUpdate();
     } catch (error) {
@@ -267,6 +313,7 @@ export default function MemberCard({
 
         await sleep(500);
         if (mutateMembers) await mutateMembers();
+
         showToast("Update deleted successfully", "success");
       } catch (error) {
         showToast("Unable to delete update.", "error");
@@ -276,7 +323,6 @@ export default function MemberCard({
     }
   };
 
-  // --- Safely find current update data for the form ---
   let findEditingUpdate: Update | undefined;
   if (modalView === "edit-update") {
     projects.forEach((p) => {
@@ -341,7 +387,10 @@ export default function MemberCard({
                   <div
                     key={project.id}
                     className={
-                      "flex items-start justify-between group py-1.5 border-b border-gray-700 last:border-0"
+                      "flex items-start justify-between group py-1.5 border-b border-gray-700 last:border-0 transition-opacity duration-200 " +
+                      (deletingId === project.id
+                        ? "opacity-30 pointer-events-none"
+                        : "opacity-100")
                     }
                   >
                     <div className="flex items-center gap-x-2 mr-2">
@@ -400,7 +449,8 @@ export default function MemberCard({
                               <p className="font-semibold truncate">
                                 {project.name}
                               </p>
-                              {update.category === "idea_talk" ? (
+                              {String(update.category) === "idea_talk" ||
+                              String(update.category) === "0" ? (
                                 <Lightbulb
                                   size="14"
                                   className="ml-2 shrink-0"
@@ -469,6 +519,7 @@ export default function MemberCard({
           <>
             <h2 className="text-2xl font-bold mb-6">Edit Project</h2>
             <div className="flex flex-col gap-5 mb-8">
+              {/* Project Name */}
               <div className="grid grid-cols-[100px_1fr] items-center">
                 <label className="font-semibold text-sm">Name</label>
                 <input
@@ -480,6 +531,71 @@ export default function MemberCard({
                 />
               </div>
 
+              {/* Project Type Radio Buttons */}
+              <div className="grid grid-cols-[100px_1fr] items-center">
+                <label className="font-semibold text-sm">Type</label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name={`project-category-${editingProjectId}`}
+                      value="project"
+                      checked={editProjectCategory === "project"}
+                      onChange={(e) => setEditProjectCategory(e.target.value)}
+                      className="cursor-pointer accent-blue-500"
+                    />
+                    <span className="text-sm">Solo</span>{" "}
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name={`project-category-${editingProjectId}`}
+                      value="mini_project"
+                      checked={editProjectCategory === "mini_project"}
+                      onChange={(e) => setEditProjectCategory(e.target.value)}
+                      className="cursor-pointer accent-blue-500"
+                    />
+                    <span className="text-sm">Mini</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name={`project-category-${editingProjectId}`}
+                      value="group_project"
+                      checked={editProjectCategory === "group_project"}
+                      onChange={(e) => setEditProjectCategory(e.target.value)}
+                      className="cursor-pointer accent-blue-500"
+                    />
+                    <span className="text-sm">Group</span>{" "}
+                  </label>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-[100px_1fr] items-center">
+                <label className="font-semibold text-sm">Owner</label>
+                <select
+                  value={editProjectMemberId}
+                  onChange={(e) => setEditProjectMemberId(e.target.value)}
+                  disabled={membersLoading || membersError}
+                  className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full disabled:opacity-50"
+                >
+                  {membersLoading && (
+                    <option value="">Loading members...</option>
+                  )}
+                  {membersError && (
+                    <option value="">Failed to load members</option>
+                  )}
+                  {!membersLoading &&
+                    !membersError &&
+                    membersList.map((m: Member) => (
+                      <option key={m.id} value={m.id} className="bg-black">
+                        {m.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
+
+              {/* Project Status */}
               <div className="grid grid-cols-[100px_1fr] items-center mt-2">
                 <label className="font-semibold text-sm">Status</label>
                 <label className="flex items-center gap-2 cursor-pointer w-max">
@@ -527,7 +643,7 @@ export default function MemberCard({
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="radio"
-                          name="edit-category"
+                          name={`update-category-${editingUpdateId}`}
                           value="idea_talk"
                           checked={selectedCategory === "idea_talk"}
                           onChange={(e) => setSelectedCategory(e.target.value)}
@@ -538,7 +654,7 @@ export default function MemberCard({
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="radio"
-                          name="edit-category"
+                          name={`update-category-${editingUpdateId}`}
                           value="progress_talk"
                           checked={selectedCategory === "progress_talk"}
                           onChange={(e) => setSelectedCategory(e.target.value)}
@@ -618,13 +734,17 @@ export default function MemberCard({
                         projectsList.length > 0 && (
                           <>
                             {selectedMemberId ===
-                              (findEditingUpdate?.member?.id ||
-                                findEditingUpdate?.member_id) &&
+                              String(
+                                findEditingUpdate?.member?.id ||
+                                  findEditingUpdate?.member_id,
+                              ) &&
                               !projectsList.some(
                                 (p: Project) =>
-                                  p.id ===
-                                  (findEditingUpdate?.project?.id ||
-                                    findEditingUpdate?.project_id),
+                                  String(p.id) ===
+                                  String(
+                                    findEditingUpdate?.project?.id ||
+                                      findEditingUpdate?.project_id,
+                                  ),
                               ) && (
                                 <option
                                   value={

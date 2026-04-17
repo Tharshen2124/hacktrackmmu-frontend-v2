@@ -31,12 +31,14 @@ export default function Members() {
   const [isSearching, setIsSearching] = useState(false);
   const [isSearchError, setIsSearchError] = useState(false);
 
+  // SWR automatically watches this. If pagination or filters change, it re-fetches
   const getSWRKey = () => {
     if (!token || isSearching) return null;
 
     const queryParams = new URLSearchParams({
       page: paginationNumber.toString(),
     });
+
     statusFilter.forEach((status) => {
       queryParams.append("status[]", status);
     });
@@ -47,6 +49,7 @@ export default function Members() {
     ];
   };
 
+  // SWR as the single source of truth
   const {
     data: swrData,
     error: swrError,
@@ -54,6 +57,7 @@ export default function Members() {
     mutate: mutateMembers,
   } = useSWR(getSWRKey(), ([url, token]) => fetcherWithToken(url, token));
 
+  // 3. Extract the data cleanly
   const members = swrData?.data || [];
   const totalPagination = swrData?.meta?.total_pages || 1;
   const isError = swrError || isSearchError;
@@ -137,17 +141,17 @@ export default function Members() {
 
         {/* Hide pagination if searching */}
         {!isSearching && (
-          <div className="fixed flex items-center border-2 border-gray-200 rounded-full w-fit bottom-4 right-4 z-50">
+          <div className="fixed flex items-center border-2 border-gray-200 rounded-full w-fit bottom-4 right-4 z-50 bg-white dark:bg-[#222]">
             <button
               onClick={() =>
                 setPaginationNumber((prev) => Math.max(1, prev - 1))
               }
-              className="text-black bg-white py-2 px-2 rounded-l-full transition duration-200 hover:bg-gray-200 active:bg-gray-400"
+              className="text-black dark:text-white bg-transparent py-2 px-2 rounded-l-full transition duration-200 hover:bg-gray-200 dark:hover:bg-[#333] active:bg-gray-400"
               disabled={isLoading || paginationNumber === 1}
             >
               <ChevronLeft />
             </button>
-            <div className="text-black bg-white w-[75px] py-2 px-2 text-center">
+            <div className="text-black dark:text-white bg-transparent w-[75px] py-2 px-2 text-center font-medium">
               {paginationNumber} - {totalPagination}
             </div>
             <button
@@ -156,7 +160,7 @@ export default function Members() {
                   Math.min(totalPagination, prev + 1),
                 )
               }
-              className="text-black bg-white py-2 px-2 rounded-r-full transition duration-200 hover:bg-gray-200 active:bg-gray-400"
+              className="text-black dark:text-white bg-transparent py-2 px-2 rounded-r-full transition duration-200 hover:bg-gray-200 dark:hover:bg-[#333] active:bg-gray-400"
               disabled={isLoading || paginationNumber === totalPagination}
             >
               <ChevronRight />
