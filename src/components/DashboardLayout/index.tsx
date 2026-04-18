@@ -36,7 +36,7 @@ export default function DashboardLayout({
 
   useSWR(
     isHydrated && token && token !== "0"
-      ? [`${apiUrl}/api/v1/meetups?category=regular_meetup`, token]
+      ? [`${apiUrl}/api/v1/meetups?category=regular_meetup&limit=1000`, token]
       : null,
     ([url, token]) => fetcherWithToken(url, token),
     {
@@ -47,7 +47,7 @@ export default function DashboardLayout({
 
   useSWR(
     isHydrated && token && token !== "0"
-      ? [`${apiUrl}/api/v1/meetups?category=hackathon`, token]
+      ? [`${apiUrl}/api/v1/meetups?category=hackathon&limit=1000`, token]
       : null,
     ([url, token]) => fetcherWithToken(url, token),
     {
