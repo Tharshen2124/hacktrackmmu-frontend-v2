@@ -146,7 +146,8 @@ export default function MeetupCard({
         <hr className="border-gray-600 mb-2 mt-1" />
         <p className="flex items-center">
           <User size="16" className="mr-2" />
-          Host: {hostName}
+          Host:
+          <span className="truncate ml-1"> {hostName}</span>
         </p>
         <p className="flex items-center">
           <Timer size="16" className="mr-2" />

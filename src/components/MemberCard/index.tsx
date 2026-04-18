@@ -233,9 +233,7 @@ export default function MemberCard({
         <h1 className="text-lg flex justify-between">
           <div className="flex items-center">
             <User size="18" className="mr-2" />
-            <span className="font-bold">
-              {name.length > 20 ? name.slice(0, 30) + "..." : name}
-            </span>
+            <span className="font-bold line-clamp-1">{name}</span>
           </div>
           <span className="text-gray-500 ml-2 text-[12px]">
             {formatStatus(status)}

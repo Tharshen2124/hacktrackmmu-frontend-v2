@@ -1,5 +1,7 @@
 import NavigationBar from "../NavigationBar";
 import Head from "next/head";
+import useAuthStore from "@/store/useAuthStore";
+import { useState, useEffect } from "react";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -12,6 +14,17 @@ export default function DashboardLayout({
 }: {
   DashboardLayoutProps;
 }) {
+  const { hydrateAuth, token } = useAuthStore();
+  const [isHydrated, setIsHydrated] = useState(false);
+  useEffect(() => {
+    hydrateAuth();
+    setIsHydrated(true);
+  }, [hydrateAuth]);
+
+  if (!isHydrated) {
+    return null;
+  }
+
   return (
     <>
       <Head>

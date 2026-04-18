@@ -19,6 +19,7 @@ const images = [
 export default function LoginPage() {
   const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [waitMessage, setWaitMessage] = useState<boolean>(false);
@@ -50,6 +51,7 @@ export default function LoginPage() {
         {
           session: {
             password: password,
+            remember_me: rememberMe,
           },
         },
         {
@@ -65,7 +67,7 @@ export default function LoginPage() {
           "success",
         );
         setIsSubmitting(false);
-        setToken(response.data.token);
+        setToken(response.data.token, rememberMe);
         setAdmin(response.data.isAdmin);
         setValidUntil(response.data.valid_until);
         router.push("/dashboard");
@@ -153,6 +155,21 @@ export default function LoginPage() {
               </button>
             </div>
 
+            <div className="flex items-center space-x-2 mt-4 mb-4 ml-1">
+              <input
+                type="checkbox"
+                id="rememberMe"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 dark:border-gray-600 dark:bg-[#333]"
+              />
+              <label
+                htmlFor="rememberMe"
+                className="text-sm text-gray-700 dark:text-gray-300 select-none cursor-pointer"
+              >
+                Remember me
+              </label>
+            </div>
             <SubmitButton isSubmitting={isSubmitting} isLogin={true} />
             <div className="text-center h-[24px]">
               <p
