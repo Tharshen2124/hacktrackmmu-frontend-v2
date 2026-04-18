@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import useSWR from "swr";
 import useAuthStore from "@/store/useAuthStore";
 import { fetcherWithToken } from "@/utils/fetcher";
 import { apiUrl } from "@/utils/env";
 import { Project, Member } from "@/types/types";
+import { SearchableDropdown } from "../atomComponents/Dropdown/SelectDropdown";
 
 export interface EditProjectData {
   name: string;
@@ -61,6 +62,11 @@ export function EditProjectForm({
     onSave({ name, completed, category, memberId });
   };
 
+  const memberOptions = membersList.map((m: Member) => ({
+    id: String(m.id),
+    name: m.name,
+  }));
+
   return (
     <>
       <h2 className="text-2xl font-bold mb-6">Edit Project</h2>
@@ -117,22 +123,23 @@ export function EditProjectForm({
 
         <div className="grid grid-cols-[100px_1fr] items-center">
           <label className="font-semibold text-sm">Owner</label>
-          <select
-            value={memberId}
-            onChange={(e) => setMemberId(e.target.value)}
-            disabled={membersLoading || membersError}
-            className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full disabled:opacity-50"
-          >
-            {membersLoading && <option value="">Loading members...</option>}
-            {membersError && <option value="">Failed to load members</option>}
-            {!membersLoading &&
-              !membersError &&
-              membersList.map((m: Member) => (
-                <option key={m.id} value={m.id} className="bg-black">
-                  {m.name}
-                </option>
-              ))}
-          </select>
+          <div className="w-full">
+            <SearchableDropdown
+              id={`project-owner-${project.id}`}
+              name="owner"
+              label=""
+              placeholder={
+                membersLoading
+                  ? "Loading members..."
+                  : membersError
+                    ? "Failed to load members"
+                    : "Search and select..."
+              }
+              options={memberOptions}
+              value={String(memberId)}
+              onChange={(val) => setMemberId(val)}
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-[100px_1fr] items-center mt-2">

@@ -82,12 +82,18 @@ export const SearchableDropdown = ({
   // Filter options/groups based on search term
   const filteredItems = useMemo(() => {
     const term = searchTerm.toLowerCase();
+    const selectedDisplayName = selectedOption
+      ? getOptionDisplayName(selectedOption).toLowerCase()
+      : "";
+    const showAll = term === "" || term === selectedDisplayName;
 
     if (groups.length > 0) {
       const result: (Option | { type: "header"; label: string })[] = [];
       groups.forEach((group) => {
-        const matchingOptions = group.options.filter((option) =>
-          getOptionDisplayName(option).toLowerCase().includes(term),
+        const matchingOptions = group.options.filter(
+          (option) =>
+            showAll ||
+            getOptionDisplayName(option).toLowerCase().includes(term),
         );
         if (matchingOptions.length > 0) {
           result.push({ type: "header", label: group.label });
@@ -96,15 +102,14 @@ export const SearchableDropdown = ({
       });
       return result;
     } else {
-      return (options || []).filter((option) =>
-        getOptionDisplayName(option).toLowerCase().includes(term),
+      return (options || []).filter(
+        (option) =>
+          showAll || getOptionDisplayName(option).toLowerCase().includes(term),
       );
     }
-  }, [options, groups, searchTerm]);
+  }, [options, groups, searchTerm, selectedOption]);
 
   useEffect(() => {
-    // Reset highlighted index when filtered options change
-    // Find first selectable option index
     const firstSelectableIndex = filteredItems.findIndex(
       (item) => !("type" in item && (item as any).type === "header"),
     );
@@ -297,8 +302,9 @@ export const SearchableDropdown = ({
                   id={`${id}-option-${index}`}
                   role="option"
                   aria-selected={value === option.id}
-                  className={`px-4 py-2 cursor-pointer ${highlightedIndex === index ? "bg-primary/10" : ""
-                    } ${value === option.id ? "bg-primary/20" : ""} hover:bg-primary/10 ${groups.length > 0 ? "pl-6" : ""}`}
+                  className={`px-4 py-2 cursor-pointer ${
+                    highlightedIndex === index ? "bg-primary/10" : ""
+                  } ${value === option.id ? "bg-primary/20" : ""} hover:bg-primary/10 ${groups.length > 0 ? "pl-6" : ""}`}
                   onClick={() => handleSelect(option.id)}
                   onMouseEnter={() => setHighlightedIndex(index)}
                 >

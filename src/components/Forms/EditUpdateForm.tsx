@@ -4,6 +4,7 @@ import useAuthStore from "@/store/useAuthStore";
 import { fetcherWithToken } from "@/utils/fetcher";
 import { apiUrl } from "@/utils/env";
 import { Update, Member, Project, Meetup } from "@/types/types";
+import { SearchableDropdown } from "../atomComponents/Dropdown/SelectDropdown";
 
 export interface EditUpdateData {
   memberId: string | number;
@@ -86,6 +87,71 @@ export function EditUpdateForm({
     onSave({ memberId, projectId, meetupId, category, description });
   };
 
+  // 1. Convert Members to options
+  const memberOptions = membersList.map((m: Member) => ({
+    id: String(m.id),
+    name: m.name,
+  }));
+
+  // 2. Convert Projects to options (handles optgroup fallback logic)
+  const currentProjectInList = projectsList.some(
+    (p: Project) =>
+      String(p.id) === String(update.project?.id || update.project_id),
+  );
+  const injectFallbackProject =
+    String(memberId) === String(update.member?.id || update.member_id) &&
+    !currentProjectInList;
+
+  const projectOptions = projectsList.map((p: Project) => ({
+    id: String(p.id),
+    name: p.name,
+  }));
+
+  if (injectFallbackProject) {
+    projectOptions.unshift({
+      id: String(update.project?.id || update.project_id),
+      name: update.project?.name || "Unknown Project",
+    });
+  }
+
+  const groupLabel =
+    membersList.find((m: Member) => String(m.id) === String(memberId))?.name ||
+    update.member?.name ||
+    "Member";
+
+  const projectGroups =
+    projectOptions.length > 0
+      ? [
+          {
+            label: groupLabel,
+            options: projectOptions,
+          },
+        ]
+      : [];
+
+  // 3. Convert Meetups to options
+  const meetupOptions = meetupsList.map((meetup: Meetup) => {
+    const dateString =
+      typeof meetup.date === "string"
+        ? meetup.date.split("T")[0]
+        : new Date(meetup.date).toISOString().split("T")[0];
+    return {
+      id: String(meetup.id),
+      name: dateString, // Using 'name' ensures standard formatting
+    };
+  });
+
+  const currentMeetupInList = meetupsList.some(
+    (m: Meetup) => String(m.id) === String(meetupId),
+  );
+
+  if (meetupId && !currentMeetupInList) {
+    meetupOptions.unshift({
+      id: String(meetupId),
+      name: "Original Date (Hidden from recent)",
+    });
+  }
+
   return (
     <>
       <h2 className="text-2xl font-bold mb-6">Edit Update</h2>
@@ -122,129 +188,71 @@ export function EditUpdateForm({
 
         <div className="grid grid-cols-[100px_1fr] items-center">
           <label className="font-semibold text-sm">By</label>
-          <select
-            value={memberId || ""}
-            onChange={(e) => {
-              setMemberId(e.target.value);
-              setProjectId(""); // Reset project when member changes
-            }}
-            disabled={membersLoading || membersError}
-            className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full disabled:opacity-50"
-          >
-            {membersLoading && (
-              <option value={memberId}>Loading members...</option>
-            )}
-            {membersError && (
-              <option value={memberId}>Failed to load members</option>
-            )}
-            {!membersLoading &&
-              !membersError &&
-              membersList.map((m: Member) => (
-                <option key={m.id} value={m.id} className="bg-black">
-                  {m.name}
-                </option>
-              ))}
-          </select>
+          <div className="w-full">
+            <SearchableDropdown
+              id={`update-member-${update.id}`}
+              name="member"
+              label=""
+              placeholder={
+                membersLoading
+                  ? "Loading members..."
+                  : membersError
+                    ? "Failed to load members"
+                    : "Search and select..."
+              }
+              options={memberOptions}
+              value={String(memberId || "")}
+              onChange={(val) => {
+                setMemberId(val);
+                setProjectId(""); // Reset project when member changes
+              }}
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-[100px_1fr] items-center">
           <label className="font-semibold text-sm">For</label>
-          <select
-            value={projectId || ""}
-            onChange={(e) => setProjectId(e.target.value)}
-            disabled={projectsLoading || projectsError || !memberId}
-            className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full disabled:opacity-50"
-          >
-            {projectsLoading && <option>Loading projects...</option>}
-            {projectsError && <option>Failed to load projects</option>}
-            {!projectsLoading &&
-              !projectsError &&
-              projectsList.length === 0 && (
-                <option disabled>No projects found for this member</option>
-              )}
-            {!projectsLoading && !projectsError && projectsList.length > 0 && (
-              <>
-                {/* Fallback injection if current project isn't fetched */}
-                {String(memberId) ===
-                  String(update.member?.id || update.member_id) &&
-                  !projectsList.some(
-                    (p: Project) =>
-                      String(p.id) ===
-                      String(update.project?.id || update.project_id),
-                  ) && (
-                    <option value={update.project?.id || update.project_id}>
-                      {update.project?.name || "Unknown Project"}
-                    </option>
-                  )}
-                <optgroup
-                  label={
-                    membersList.find(
-                      (m: Member) => String(m.id) === String(memberId),
-                    )?.name ||
-                    update.member?.name ||
-                    "Member"
-                  }
-                  className="font-bold bg-black"
-                >
-                  {projectsList.map((project: Project) => (
-                    <option
-                      key={project.id}
-                      value={project.id}
-                      className="bg-black font-normal"
-                    >
-                      {project.name}
-                    </option>
-                  ))}
-                </optgroup>
-              </>
-            )}
-          </select>
+          <div className="w-full">
+            <SearchableDropdown
+              id={`update-project-${update.id}`}
+              name="project"
+              label=""
+              placeholder={
+                projectsLoading
+                  ? "Loading projects..."
+                  : projectsError
+                    ? "Failed to load projects"
+                    : projectGroups.length === 0
+                      ? "No projects found for this member"
+                      : "Search and select..."
+              }
+              groups={projectGroups}
+              options={projectOptions}
+              value={String(projectId || "")}
+              onChange={(val) => setProjectId(val)}
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-[100px_1fr] items-center">
           <label className="font-semibold text-sm">On</label>
-          <select
-            value={meetupId || ""}
-            onChange={(e) => setMeetupId(e.target.value)}
-            disabled={meetupsLoading || meetupsError}
-            className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-sm w-full disabled:opacity-50"
-          >
-            {meetupsLoading && <option value="">Loading dates...</option>}
-            {meetupsError && <option value="">Failed to load dates</option>}
-            {!meetupsLoading && !meetupsError && meetupsList.length > 0 && (
-              <>
-                {meetupId === "" && (
-                  <option value="" disabled>
-                    Select a date...
-                  </option>
-                )}
-                {/* Fallback injection if current meetup isn't fetched */}
-                {meetupId &&
-                  !meetupsList.some(
-                    (m: Meetup) => String(m.id) === String(meetupId),
-                  ) && (
-                    <option value={meetupId}>
-                      Original Date (Hidden from recent)
-                    </option>
-                  )}
-                {meetupsList.map((meetup: Meetup) => {
-                  const dateString =
-                    typeof meetup.date === "string"
-                      ? meetup.date.split("T")[0]
-                      : new Date(meetup.date).toISOString().split("T")[0];
-                  return (
-                    <option
-                      key={meetup.id}
-                      value={meetup.id}
-                      className="bg-black"
-                    >
-                      {dateString}
-                    </option>
-                  );
-                })}
-              </>
-            )}
-          </select>
+          <div className="w-full">
+            <SearchableDropdown
+              id={`update-meetup-${update.id}`}
+              name="meetup"
+              label=""
+              placeholder={
+                meetupsLoading
+                  ? "Loading dates..."
+                  : meetupsError
+                    ? "Failed to load dates"
+                    : "Search and select..."
+              }
+              options={meetupOptions}
+              value={String(meetupId || "")}
+              onChange={(val) => setMeetupId(val)}
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-[100px_1fr] items-start">
