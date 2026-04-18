@@ -7,6 +7,7 @@ import {
   User,
   Trash,
   Edit,
+  PenLine,
 } from "lucide-react";
 import Head from "next/head";
 import { useState } from "react";
@@ -209,9 +210,9 @@ export default function MeetupCard({
               <h2 className="text-2xl font-bold">Meetup {number}</h2>
               {isAdmin && (
                 <button onClick={handleEditMeetupClick}>
-                  <Edit
-                    size="18"
-                    className="text-blue-500 hover:text-blue-400"
+                  <PenLine
+                    size={16}
+                    className="hover:cursor-pointer hover:text-blue-500 transition duration-200"
                   />
                 </button>
               )}

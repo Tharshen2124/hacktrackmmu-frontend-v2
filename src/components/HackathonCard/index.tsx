@@ -6,6 +6,7 @@ import {
   User,
   Trash,
   Edit,
+  PenLine,
 } from "lucide-react";
 import { useState } from "react";
 import { dateMod } from "@/utils/dateMod";
@@ -78,8 +79,8 @@ export default function HackathonCard({
         `${apiUrl}/api/v1/meetups/${id}`,
         {
           meetup: {
-            number: data.number,
-            host: data.host, // make sure backend permits :host or adjust to :host_name
+            number: meetup.id,
+            host_id: data.hostId,
             date: data.date,
           },
         },
@@ -208,9 +209,9 @@ export default function HackathonCard({
               <h2 className="text-2xl font-bold">Hackathon {number}</h2>
               {isAdmin && (
                 <button onClick={handleEditMeetupClick}>
-                  <Edit
-                    size="18"
-                    className="text-blue-500 hover:text-blue-400"
+                  <PenLine
+                    size={16}
+                    className="hover:cursor-pointer hover:text-blue-500 transition duration-200"
                   />
                 </button>
               )}
