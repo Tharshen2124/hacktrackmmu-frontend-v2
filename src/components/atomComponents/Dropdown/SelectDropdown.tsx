@@ -254,7 +254,7 @@ export const SearchableDropdown = ({
           onFocus={handleFocus}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className={`w-full rounded-md border border-input bg-background px-4 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-[#333] dark:border-[#555] focus:ring-blue-400 dark:focus:ring-blue-500 ${className}`}
+          className={`w-full rounded-md border border-input border-gray-300 bg-background px-4 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-[#333] dark:border-[#555] focus:ring-blue-400 dark:focus:ring-blue-500 ${className}`}
         />
         <button
           type="button"
@@ -264,7 +264,7 @@ export const SearchableDropdown = ({
             setIsOpen(!isOpen);
             if (!isOpen) inputRef.current?.focus();
           }}
-          className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"
+          className="absolute inset-y-0 right-0 flex items-center px-3 ml-2 text-gray-500"
         >
           <ChevronDown
             className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`}

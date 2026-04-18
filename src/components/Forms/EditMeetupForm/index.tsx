@@ -103,7 +103,7 @@ export function EditMeetupForm({
             type="number"
             value={number}
             onChange={(e) => setNumber(Number(e.target.value))}
-            className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-[#333] text-sm w-full"
+            className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent dark:bg-[#333] text-sm w-full"
             placeholder={`${type} number...`}
           />
         </div>
@@ -135,7 +135,7 @@ export function EditMeetupForm({
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-[#333] text-sm w-full"
+            className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent dark:bg-[#333] text-sm w-full"
           />
         </div>
       </div>
