@@ -316,7 +316,7 @@ export default function MeetupCard({
           <EditUpdateForm
             update={findEditingUpdate}
             isSaving={isSaving}
-            meetupFetchUrl={`${apiUrl}/api/v1/meetups?category=regular_meetup&limit=20`}
+            meetupFetchUrl={`${apiUrl}/api/v1/meetups?category=regular_meetup`}
             onCancel={() => setModalView("list")}
             onSave={handleSaveUpdate}
           />

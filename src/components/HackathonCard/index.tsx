@@ -308,7 +308,7 @@ export default function HackathonCard({
             update={findEditingUpdate}
             isSaving={isSaving}
             showCategory={false}
-            meetupFetchUrl={`${apiUrl}/api/v1/meetups?category=hackathon&limit=20`}
+            meetupFetchUrl={`${apiUrl}/api/v1/meetups?category=hackathon`}
             onCancel={() => setModalView("list")}
             onSave={handleSaveUpdate}
           />

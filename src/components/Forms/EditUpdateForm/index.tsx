@@ -81,7 +81,22 @@ export function EditUpdateForm({
   } = useSWR(token ? [meetupFetchUrl, token] : null, ([url, token]) =>
     fetcherWithToken(url, token),
   );
-  const meetupsList = meetupsData?.data || meetupsData || [];
+  let meetupsList = [];
+  if (meetupsData?.data) {
+    if (Array.isArray(meetupsData.data)) {
+      meetupsList = meetupsData.data;
+    } else if (
+      meetupsData.data.regular_meetups ||
+      meetupsData.data.hackathons
+    ) {
+      meetupsList = [
+        ...(meetupsData.data.regular_meetups || []),
+        ...(meetupsData.data.hackathons || []),
+      ];
+    }
+  } else if (Array.isArray(meetupsData)) {
+    meetupsList = meetupsData;
+  }
 
   const handleSave = () => {
     onSave({ memberId, projectId, meetupId, category, description });
