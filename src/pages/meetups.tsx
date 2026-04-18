@@ -152,6 +152,7 @@ export default function Meetups() {
             meetups.map((meetup: any, index: number) => (
               <MeetupCard
                 key={index}
+                id={meetup.id}
                 number={meetup.number}
                 date={meetup.date}
                 numberOfUpdates={meetup.updates.length}
@@ -176,6 +177,7 @@ export default function Meetups() {
             hackathons.map((meetup: any) => (
               <HackathonCard
                 key={meetup.id}
+                id={meetup.id}
                 number={meetup.hackathon_number}
                 date={meetup.date}
                 numberOfUpdates={meetup.updates.length}

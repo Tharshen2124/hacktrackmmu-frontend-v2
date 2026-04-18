@@ -18,8 +18,10 @@ import axios from "axios";
 import useAuthStore from "@/store/useAuthStore";
 import { useToast } from "@/components/Toast/ToastProvider";
 import { EditUpdateForm, EditUpdateData } from "../Forms/EditUpdateForm";
+import { EditMeetupForm, EditMeetupData } from "../Forms/EditMeetupForm";
 
 interface MeetupCardProps {
+  id: string | number;
   number: number;
   numberOfUpdates: number;
   date: string;
@@ -31,6 +33,7 @@ interface MeetupCardProps {
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function MeetupCard({
+  id,
   number,
   numberOfUpdates,
   date,
@@ -39,7 +42,9 @@ export default function MeetupCard({
   mutateMeetups,
 }: MeetupCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalView, setModalView] = useState<"list" | "edit">("list");
+  const [modalView, setModalView] = useState<
+    "list" | "edit-update" | "edit-meetup"
+  >("list");
   const [editingUpdateId, setEditingUpdateId] = useState<
     string | number | null
   >(null);
@@ -58,9 +63,45 @@ export default function MeetupCard({
     }, 300);
   };
 
-  const handleEditClick = (updateId: string | number) => {
+  const handleEditUpdateClick = (updateId: string | number) => {
     setEditingUpdateId(updateId);
-    setModalView("edit");
+    setModalView("edit-update");
+  };
+
+  const handleEditMeetupClick = () => {
+    setModalView("edit-meetup");
+  };
+
+  const handleSaveMeetup = async (data: EditMeetupData) => {
+    setIsSaving(true);
+    try {
+      await axios.patch(
+        `${apiUrl}/api/v1/meetups/${id}`,
+        {
+          meetup: {
+            number: data.number,
+            host_id: data.hostId,
+            date: data.date,
+          },
+        },
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      await sleep(500);
+      if (mutateMeetups) await mutateMeetups();
+
+      showToast("Meetup edited successfully!", "success");
+      setModalView("list");
+    } catch (error) {
+      showToast("Unable to edit meetup. Please try again.", "error");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleSaveUpdate = async (data: EditUpdateData) => {
@@ -129,9 +170,11 @@ export default function MeetupCard({
       {isModalOpen && (
         <Head>
           <title key="title">
-            {modalView === "edit"
+            {modalView === "edit-update"
               ? "HackTrack - Edit Update"
-              : `HackTrack - Meetup ${number}`}
+              : modalView === "edit-meetup"
+                ? "HackTrack - Edit Meetup"
+                : `HackTrack - Meetup ${number}`}
           </title>
         </Head>
       )}
@@ -162,7 +205,18 @@ export default function MeetupCard({
       <ModalLayout isOpen={isModalOpen} onClose={handleCloseModal}>
         {modalView === "list" && (
           <>
-            <h2 className="text-2xl font-bold mb-4">Meetup {number}</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold">Meetup {number}</h2>
+              {isAdmin && (
+                <button onClick={handleEditMeetupClick}>
+                  <Edit
+                    size="18"
+                    className="text-blue-500 hover:text-blue-400"
+                  />
+                </button>
+              )}
+            </div>
+
             <h3 className="text-lg font-semibold mb-1">Details</h3>
             <div className="border border-gray-700 py-3 px-4 rounded-md mb-3">
               <p>
@@ -191,7 +245,9 @@ export default function MeetupCard({
 
                       {isAdmin && (
                         <div className="flex gap-x-3 shrink-0 ml-4 mt-1">
-                          <button onClick={() => handleEditClick(update.id)}>
+                          <button
+                            onClick={() => handleEditUpdateClick(update.id)}
+                          >
                             <Edit
                               size="16"
                               className="text-blue-500 hover:text-blue-400"
@@ -243,7 +299,19 @@ export default function MeetupCard({
           </>
         )}
 
-        {modalView === "edit" && findEditingUpdate && (
+        {modalView === "edit-meetup" && (
+          <EditMeetupForm
+            type="Meetup"
+            initialNumber={number}
+            initialDate={date}
+            initialHost={hostName}
+            isSaving={isSaving}
+            onCancel={() => setModalView("list")}
+            onSave={handleSaveMeetup}
+          />
+        )}
+
+        {modalView === "edit-update" && findEditingUpdate && (
           <EditUpdateForm
             update={findEditingUpdate}
             isSaving={isSaving}

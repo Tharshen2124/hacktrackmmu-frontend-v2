@@ -17,8 +17,10 @@ import useAuthStore from "@/store/useAuthStore";
 import { useToast } from "@/components/Toast/ToastProvider";
 import Head from "next/head";
 import { EditUpdateForm, EditUpdateData } from "../Forms/EditUpdateForm";
+import { EditMeetupForm, EditMeetupData } from "../Forms/EditMeetupForm";
 
 interface HackathonCardProps {
+  id: string | number;
   number: number;
   numberOfUpdates: number;
   date: string;
@@ -30,6 +32,7 @@ interface HackathonCardProps {
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function HackathonCard({
+  id,
   number,
   numberOfUpdates,
   date,
@@ -38,7 +41,9 @@ export default function HackathonCard({
   mutateHackathons,
 }: HackathonCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalView, setModalView] = useState<"list" | "edit">("list");
+  const [modalView, setModalView] = useState<
+    "list" | "edit-update" | "edit-meetup"
+  >("list");
   const [editingUpdateId, setEditingUpdateId] = useState<
     string | number | null
   >(null);
@@ -57,9 +62,45 @@ export default function HackathonCard({
     }, 300);
   };
 
-  const handleEditClick = (updateId: string | number) => {
+  const handleEditUpdateClick = (updateId: string | number) => {
     setEditingUpdateId(updateId);
-    setModalView("edit");
+    setModalView("edit-update");
+  };
+
+  const handleEditMeetupClick = () => {
+    setModalView("edit-meetup");
+  };
+
+  const handleSaveMeetup = async (data: EditMeetupData) => {
+    setIsSaving(true);
+    try {
+      await axios.patch(
+        `${apiUrl}/api/v1/meetups/${id}`,
+        {
+          meetup: {
+            number: data.number,
+            host: data.host, // make sure backend permits :host or adjust to :host_name
+            date: data.date,
+          },
+        },
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      await sleep(500);
+      if (mutateHackathons) await mutateHackathons();
+
+      showToast("Hackathon edited successfully!", "success");
+      setModalView("list");
+    } catch (error) {
+      showToast("Unable to edit hackathon. Please try again.", "error");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleSaveUpdate = async (data: EditUpdateData) => {
@@ -128,9 +169,11 @@ export default function HackathonCard({
       {isModalOpen && (
         <Head>
           <title key="title">
-            {modalView === "edit"
+            {modalView === "edit-update"
               ? "HackTrack - Edit Update"
-              : `HackTrack - Hackathon ${number}`}
+              : modalView === "edit-meetup"
+                ? "HackTrack - Edit Hackathon"
+                : `HackTrack - Hackathon ${number}`}
           </title>
         </Head>
       )}
@@ -161,7 +204,18 @@ export default function HackathonCard({
       <ModalLayout isOpen={isModalOpen} onClose={handleCloseModal}>
         {modalView === "list" && (
           <>
-            <h2 className="text-2xl font-bold mb-4">Hackathon {number}</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold">Hackathon {number}</h2>
+              {isAdmin && (
+                <button onClick={handleEditMeetupClick}>
+                  <Edit
+                    size="18"
+                    className="text-blue-500 hover:text-blue-400"
+                  />
+                </button>
+              )}
+            </div>
+
             <h3 className="text-lg font-semibold mb-1">Details</h3>
             <div className="border border-gray-700 py-3 px-4 rounded-md mb-3">
               <p>
@@ -190,7 +244,9 @@ export default function HackathonCard({
 
                       {isAdmin && (
                         <div className="flex gap-x-3 shrink-0 ml-4 mt-1">
-                          <button onClick={() => handleEditClick(update.id)}>
+                          <button
+                            onClick={() => handleEditUpdateClick(update.id)}
+                          >
                             <Edit
                               size="16"
                               className="text-blue-500 hover:text-blue-400"
@@ -234,7 +290,19 @@ export default function HackathonCard({
           </>
         )}
 
-        {modalView === "edit" && findEditingUpdate && (
+        {modalView === "edit-meetup" && (
+          <EditMeetupForm
+            type="Hackathon"
+            initialNumber={number}
+            initialDate={date}
+            initialHost={hostName}
+            isSaving={isSaving}
+            onCancel={() => setModalView("list")}
+            onSave={handleSaveMeetup}
+          />
+        )}
+
+        {modalView === "edit-update" && findEditingUpdate && (
           <EditUpdateForm
             update={findEditingUpdate}
             isSaving={isSaving}
