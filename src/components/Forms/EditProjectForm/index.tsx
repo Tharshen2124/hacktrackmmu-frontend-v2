@@ -42,11 +42,7 @@ export function EditProjectForm({
         : "project";
 
   const [category, setCategory] = useState<string>(initialCategory);
-  const [memberId, setMemberId] = useState<string | number>(
-    project.members && project.members.length > 0
-      ? project.members[0].id
-      : defaultMemberId,
-  );
+  const [memberId, setMemberId] = useState<string | number>(defaultMemberId);
 
   const {
     data: membersData,

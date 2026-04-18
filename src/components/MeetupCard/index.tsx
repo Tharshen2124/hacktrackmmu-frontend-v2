@@ -98,7 +98,7 @@ export default function MeetupCard({
 
       showToast("Meetup edited successfully!", "success");
       setModalView("list");
-    } catch (error) {
+    } catch {
       showToast("Unable to edit meetup. Please try again.", "error");
     } finally {
       setIsSaving(false);
@@ -135,7 +135,7 @@ export default function MeetupCard({
       showToast("Update edited successfully!", "success");
       setModalView("list");
       setEditingUpdateId(null);
-    } catch (error) {
+    } catch {
       showToast("Unable to edit update. Please try again.", "error");
     } finally {
       setIsSaving(false);
@@ -156,7 +156,7 @@ export default function MeetupCard({
         if (mutateMeetups) await mutateMeetups();
 
         showToast("Update deleted successfully", "success");
-      } catch (error) {
+      } catch {
         showToast("Unable to delete update. Please try again.", "error");
       }
     }

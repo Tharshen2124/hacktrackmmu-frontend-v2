@@ -81,7 +81,7 @@ export function EditUpdateForm({
   } = useSWR(token ? [meetupFetchUrl, token] : null, ([url, token]) =>
     fetcherWithToken(url, token),
   );
-  let meetupsList = [];
+  let meetupsList: Meetup[] = [];
   if (meetupsData?.data) {
     if (Array.isArray(meetupsData.data)) {
       meetupsList = meetupsData.data;
@@ -148,11 +148,11 @@ export function EditUpdateForm({
   const meetupOptions = meetupsList.map((meetup: Meetup) => {
     const dateString =
       typeof meetup.date === "string"
-        ? meetup.date.split("T")[0]
+        ? (meetup.date as string).split("T")[0]
         : new Date(meetup.date).toISOString().split("T")[0];
     return {
       id: String(meetup.id),
-      name: dateString, // Using 'name' ensures standard formatting
+      name: dateString,
     };
   });
 

@@ -103,7 +103,7 @@ export default function MemberCard({
         await sleep(500);
         if (mutateMembers) await mutateMembers();
         showToast("Project deleted successfully", "success");
-      } catch (error) {
+      } catch {
         showToast("Unable to delete project.", "error");
       } finally {
         setDeletingId(null);
@@ -137,7 +137,7 @@ export default function MemberCard({
       showToast("Project edited successfully!", "success");
       setModalView("list");
       setEditingProjectId(null);
-    } catch (error) {
+    } catch {
       showToast("Unable to edit project. Please try again.", "error");
     } finally {
       setIsSaving(false);
@@ -162,7 +162,7 @@ export default function MemberCard({
         await sleep(500);
         if (mutateMembers) await mutateMembers();
         showToast("Update deleted successfully", "success");
-      } catch (error) {
+      } catch {
         showToast("Unable to delete update.", "error");
       } finally {
         setDeletingId(null);
@@ -197,7 +197,7 @@ export default function MemberCard({
       showToast("Update edited successfully!", "success");
       setModalView("list");
       setEditingUpdateId(null);
-    } catch (error) {
+    } catch {
       showToast("Unable to edit update.", "error");
     } finally {
       setIsSaving(false);

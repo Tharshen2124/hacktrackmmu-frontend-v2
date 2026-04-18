@@ -30,7 +30,6 @@ export default function Onboarding() {
   const [isClient, setIsClient] = useState(false);
   const [searchResults, setSearchResults] = useState<Member[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [isError, setIsError] = useState(false);
   const [dateSortOrder, setDateSortOrder] = useState<"desc" | "asc">("desc");
   const isMaxWidth768px = useMediaQuery("(max-width: 768px)");
   const [paginationNumber, setPaginationNumber] = useState(1);
@@ -117,7 +116,6 @@ export default function Onboarding() {
 
   const handleSearchError = (error: unknown) => {
     console.error("Search failed:", error);
-    setIsError(true);
   };
 
   const getCurrentSingleStatus = () => {

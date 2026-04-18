@@ -79,7 +79,7 @@ export default function HackathonCard({
         `${apiUrl}/api/v1/meetups/${id}`,
         {
           meetup: {
-            number: meetup.id,
+            number: id,
             host_id: data.hostId,
             date: data.date,
           },
@@ -97,7 +97,7 @@ export default function HackathonCard({
 
       showToast("Hackathon edited successfully!", "success");
       setModalView("list");
-    } catch (error) {
+    } catch {
       showToast("Unable to edit hackathon. Please try again.", "error");
     } finally {
       setIsSaving(false);
@@ -134,7 +134,7 @@ export default function HackathonCard({
       showToast("Update edited successfully!", "success");
       setModalView("list");
       setEditingUpdateId(null);
-    } catch (error) {
+    } catch {
       showToast("Unable to edit update. Please try again.", "error");
     } finally {
       setIsSaving(false);
@@ -155,7 +155,7 @@ export default function HackathonCard({
         if (mutateHackathons) await mutateHackathons();
 
         showToast("Update deleted successfully", "success");
-      } catch (error) {
+      } catch {
         showToast("Unable to delete update. Please try again.", "error");
       }
     }

@@ -23,7 +23,7 @@ const MemberStatusComponent = ({ status }: { status: string }) => {
 };
 
 export default function Members() {
-  const { token, isAdmin } = useAuthStore();
+  const { token } = useAuthStore();
   const [paginationNumber, setPaginationNumber] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string[]>(DEFAULT_STATUSES);
 
