@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import useAuthStore from "@/store/useAuthStore";
+import Cookies from "js-cookie";
 import { apiUrl } from "@/utils/env";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
@@ -22,6 +23,7 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState<boolean>(false);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isChecking, setIsChecking] = useState<boolean>(true);
   const [waitMessage, setWaitMessage] = useState<boolean>(false);
   const { setToken, setAdmin, setValidUntil } = useAuthStore();
   const { isDarkMode } = useDarkMode();
@@ -34,6 +36,15 @@ export default function LoginPage() {
     }, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    const activeToken = Cookies.get("token");
+    if (activeToken && activeToken !== "0") {
+      router.push("/dashboard");
+    } else {
+      setIsChecking(false);
+    }
+  }, [router]);
 
   async function LoginUser(e: React.FormEvent) {
     e.preventDefault();
@@ -83,6 +94,9 @@ export default function LoginPage() {
         showToast("Invalid password. Try again.", "error");
       }
     }
+  }
+  if (isChecking) {
+    return <div className="min-h-screen bg-white dark:bg-[#111]" />;
   }
 
   return (
