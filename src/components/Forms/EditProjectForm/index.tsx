@@ -4,7 +4,7 @@ import useAuthStore from "@/store/useAuthStore";
 import { fetcherWithToken } from "@/utils/fetcher";
 import { apiUrl } from "@/utils/env";
 import { Project, Member } from "@/types/types";
-import { SearchableDropdown } from "../atomComponents/Dropdown/SelectDropdown";
+import { SearchableDropdown } from "@/components/atomComponents/Dropdown/SelectDropdown";
 
 export interface EditProjectData {
   name: string;
