@@ -11,7 +11,6 @@ import { SubmitButton } from "@/components/atomComponents/SubmitButton";
 
 const images = [
   "/presentation.jpg",
-  "/mamakSession.jpg",
   "/hackerspaceSession.jpg",
   "/weijie.jpg",
   "/willie.jpg",
