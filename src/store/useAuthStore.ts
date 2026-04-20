@@ -10,7 +10,7 @@ interface useAuthStoreProps {
   isValidToken: boolean;
   isCheckingToken: boolean;
 
-  setToken: (token: string) => void;
+  setToken: (token: string, rememberMe: boolean) => void;
   setAdmin: (isAdmin: boolean) => void; // Changed parameter type to boolean
   setValidUntil: (validUntil: string) => void;
 
@@ -21,6 +21,8 @@ interface useAuthStoreProps {
   setIsValidToken: (isValid: boolean) => void;
   checkToken: () => Promise<void>;
   setIsCheckingToken: (checking: boolean) => void;
+
+  hydrateAuth: () => void;
 }
 
 const useAuthStore = create<useAuthStoreProps>((set, get) => {
@@ -36,9 +38,13 @@ const useAuthStore = create<useAuthStoreProps>((set, get) => {
     isValidToken: true,
     isCheckingToken: false,
 
-    setToken: (token: string) => {
+    setToken: (token: string, rememberMe: boolean) => {
       set({ token });
-      Cookies.set("token", token, { expires: 7 });
+      if (rememberMe) {
+        Cookies.set("token", token, { expires: 30 });
+      } else {
+        Cookies.set("token", token);
+      }
     },
 
     setAdmin: (isAdmin: boolean) => {
@@ -86,6 +92,18 @@ const useAuthStore = create<useAuthStoreProps>((set, get) => {
       } finally {
         set({ isCheckingToken: false });
       }
+    },
+
+    hydrateAuth: () => {
+      const storedToken = Cookies.get("token") || "0";
+      const storedIsAdmin = Cookies.get("isAdmin") === "true";
+      const storedValidUntil = Cookies.get("validUntil") || "0";
+
+      set({
+        token: storedToken,
+        isAdmin: storedIsAdmin,
+        validUntil: storedValidUntil,
+      });
     },
   };
 });

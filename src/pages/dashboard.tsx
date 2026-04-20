@@ -24,7 +24,6 @@ export default function Home() {
     setIsClient(true);
   }, []);
 
-  // Move all hooks before any conditional returns
   const {
     data: members,
     error: membersError,
@@ -55,7 +54,6 @@ export default function Home() {
     ([url, token]) => fetcherWithToken(url, token),
   );
 
-  // Now you can safely do conditional returns
   if (!isClient) return null;
 
   const isLoading = membersLoading || meetupsLoading || hackathonsLoading;
@@ -63,7 +61,7 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <DashboardLayout>
+      <DashboardLayout pageTitle="HackTrack - Home">
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
         <div className="mt-10">
           <div className="flex justify-between items-center">
@@ -141,7 +139,7 @@ export default function Home() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout pageTitle="HackTrack - Home">
       <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
       {isAdmin && (
         <ControlPanel
@@ -168,11 +166,13 @@ export default function Home() {
             meetups.map((meetup: any, index: number) => (
               <MeetupCard
                 key={index}
+                id={meetup.id}
                 number={meetup.number}
                 date={meetup.date}
                 numberOfUpdates={meetup.updates.length}
                 hostName={meetup.host?.name || "unknown host"}
                 updates={meetup.updates}
+                mutateMeetups={mutateMeetups}
               />
             ))}
         </div>
@@ -195,11 +195,13 @@ export default function Home() {
             hackathons.map((hackathon: any) => (
               <HackathonCard
                 key={hackathon.id}
-                number={hackathon.number}
+                id={hackathon.id}
+                number={hackathon.hackathon_number}
                 date={hackathon.date}
                 numberOfUpdates={hackathon.updates.length}
                 hostName={hackathon.host?.name || "unknown host"}
                 updates={hackathon.updates}
+                mutateHackathons={mutateHackathons}
               />
             ))}
         </div>
@@ -220,7 +222,11 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
           {Array.isArray(members) &&
             members.map((member: any) => (
-              <MemberCard key={member.id} {...member} />
+              <MemberCard
+                key={member.id}
+                {...member}
+                mutateMembers={mutateMembers}
+              />
             ))}
         </div>
       </div>

@@ -1,20 +1,20 @@
-export function extractToken() {
-  const cookies = document.cookie;
+export function extractToken(cookieString?: string) {
+  const cookies =
+    cookieString || (typeof document !== "undefined" ? document.cookie : "");
 
-  const [isAdmin, tokenValue, date] = cookies.split(";");
-
-  const [, isAdminValue] = isAdmin.split("=");
+  const parsedCookies = Object.fromEntries(
+    cookies
+      .split("; ")
+      .filter(Boolean)
+      .map((c) => c.split("=")),
+  );
 
   let admin = false;
+  if (parsedCookies.isAdmin === "true") admin = true;
 
-  if (isAdminValue === "true") {
-    admin = true;
-  } else if (isAdminValue === "false") {
-    admin = false;
-  }
-
-  const [, token] = tokenValue.split("=");
-  const [, dateValue] = date.split("=");
-
-  return { token, dateValue, admin };
+  return {
+    token: parsedCookies.token || "0",
+    dateValue: parsedCookies.validUntil || "0",
+    admin: admin,
+  };
 }

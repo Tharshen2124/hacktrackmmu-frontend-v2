@@ -8,7 +8,7 @@ import useAuthStore from "@/store/useAuthStore";
 import { apiUrl } from "@/utils/env";
 import axios from "axios";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 export default function Meetups() {
   const { token } = useAuthStore();
@@ -19,9 +19,10 @@ export default function Meetups() {
   const [isError, setIsError] = useState<any>();
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    async function getData() {
-      setIsLoading(true);
+  // Extract getData and wrap in useCallback so we can use it as a mutation trigger
+  const getData = useCallback(
+    async (showLoadingState = true) => {
+      if (showLoadingState) setIsLoading(true);
       try {
         const response = await axios.get(
           `${apiUrl}/api/v1/meetups/?page=${paginationNumber}`,
@@ -35,20 +36,28 @@ export default function Meetups() {
         setMeetups(response.data.data.regular_meetups);
         setHackathons(response.data.data.hackathons);
         setTotalPagination(response.data.meta.regular_meetups.total_pages);
-        setIsLoading(false);
+        if (showLoadingState) setIsLoading(false);
       } catch (error: any) {
-        setIsLoading(false);
+        if (showLoadingState) setIsLoading(false);
         setIsError(true);
         console.log("Error occured and caught", error);
       }
-    }
+    },
+    [paginationNumber, token],
+  );
 
+  useEffect(() => {
     getData();
-  }, [paginationNumber, token]);
+  }, [getData]);
+
+  // Create a silent re-fetch function to avoid screen flickering when saving
+  const handleMutate = async () => {
+    await getData(false);
+  };
 
   if (isLoading) {
     return (
-      <DashboardLayout>
+      <DashboardLayout pageTitle="HackTrack - Meetups">
         <div className="flex justify-between items-center">
           <h1 className="text-4xl font-bold">Meetups</h1>
           <div className="flex items-center border-2 border-gray-200 rounded-full w-fit">
@@ -107,7 +116,7 @@ export default function Meetups() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout pageTitle="HackTrack - Meetups">
       <div className="flex justify-between items-center">
         <h1 className="text-4xl font-bold">Meetups</h1>
         <div className="flex items-center border-2 border-gray-200 rounded-full w-fit">
@@ -143,6 +152,7 @@ export default function Meetups() {
             meetups.map((meetup: any, index: number) => (
               <MeetupCard
                 key={index}
+                id={meetup.id}
                 number={meetup.number}
                 date={meetup.date}
                 numberOfUpdates={meetup.updates.length}
@@ -150,6 +160,7 @@ export default function Meetups() {
                   (meetup.host && meetup.host.name && meetup.host.name) || "N/A"
                 }
                 updates={meetup.updates}
+                mutateMeetups={handleMutate}
               />
             ))}
         </div>
@@ -166,13 +177,15 @@ export default function Meetups() {
             hackathons.map((meetup: any) => (
               <HackathonCard
                 key={meetup.id}
-                number={meetup.number}
+                id={meetup.id}
+                number={meetup.hackathon_number}
                 date={meetup.date}
                 numberOfUpdates={meetup.updates.length}
                 hostName={
                   (meetup.host && meetup.host.name && meetup.host.name) || "N/A"
                 }
                 updates={meetup.updates}
+                mutateHackathons={handleMutate}
               />
             ))}
         </div>

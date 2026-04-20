@@ -82,12 +82,18 @@ export const SearchableDropdown = ({
   // Filter options/groups based on search term
   const filteredItems = useMemo(() => {
     const term = searchTerm.toLowerCase();
+    const selectedDisplayName = selectedOption
+      ? getOptionDisplayName(selectedOption).toLowerCase()
+      : "";
+    const showAll = term === "" || term === selectedDisplayName;
 
     if (groups.length > 0) {
       const result: (Option | { type: "header"; label: string })[] = [];
       groups.forEach((group) => {
-        const matchingOptions = group.options.filter((option) =>
-          getOptionDisplayName(option).toLowerCase().includes(term),
+        const matchingOptions = group.options.filter(
+          (option) =>
+            showAll ||
+            getOptionDisplayName(option).toLowerCase().includes(term),
         );
         if (matchingOptions.length > 0) {
           result.push({ type: "header", label: group.label });
@@ -96,15 +102,14 @@ export const SearchableDropdown = ({
       });
       return result;
     } else {
-      return (options || []).filter((option) =>
-        getOptionDisplayName(option).toLowerCase().includes(term),
+      return (options || []).filter(
+        (option) =>
+          showAll || getOptionDisplayName(option).toLowerCase().includes(term),
       );
     }
-  }, [options, groups, searchTerm]);
+  }, [options, groups, searchTerm, selectedOption]);
 
   useEffect(() => {
-    // Reset highlighted index when filtered options change
-    // Find first selectable option index
     const firstSelectableIndex = filteredItems.findIndex(
       (item) => !("type" in item && (item as any).type === "header"),
     );
@@ -249,7 +254,7 @@ export const SearchableDropdown = ({
           onFocus={handleFocus}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className={`w-full rounded-md border border-input bg-background px-4 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-[#333] dark:border-[#555] focus:ring-blue-400 dark:focus:ring-blue-500 ${className}`}
+          className={`w-full rounded-md border border-input border-gray-300 bg-background px-4 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-[#333] dark:border-[#555] focus:ring-blue-400 dark:focus:ring-blue-500 ${className}`}
         />
         <button
           type="button"
@@ -259,7 +264,7 @@ export const SearchableDropdown = ({
             setIsOpen(!isOpen);
             if (!isOpen) inputRef.current?.focus();
           }}
-          className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"
+          className="absolute inset-y-0 right-0 flex items-center px-3 ml-2 text-gray-500"
         >
           <ChevronDown
             className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
@@ -297,8 +302,9 @@ export const SearchableDropdown = ({
                   id={`${id}-option-${index}`}
                   role="option"
                   aria-selected={value === option.id}
-                  className={`px-4 py-2 cursor-pointer ${highlightedIndex === index ? "bg-primary/10" : ""
-                    } ${value === option.id ? "bg-primary/20" : ""} hover:bg-primary/10 ${groups.length > 0 ? "pl-6" : ""}`}
+                  className={`px-4 py-2 cursor-pointer ${
+                    highlightedIndex === index ? "bg-primary/10" : ""
+                  } ${value === option.id ? "bg-primary/20" : ""} hover:bg-primary/10 ${groups.length > 0 ? "pl-6" : ""}`}
                   onClick={() => handleSelect(option.id)}
                   onMouseEnter={() => setHighlightedIndex(index)}
                 >
