@@ -332,7 +332,7 @@ export default function MemberCard({
                           }`}
                         >
                           <div className="flex justify-between items-start group">
-                            <div className="font-bold flex items-center mt-1">
+                            <div className="font-bold flex items-center flex-1 min-w-0 mt-1">
                               <p className="font-semibold truncate">
                                 {project.name}
                               </p>
@@ -372,7 +372,7 @@ export default function MemberCard({
                             )}
                           </div>
 
-                          <p className="text-sm mt-1 whitespace-pre-line">
+                          <p className="text-sm mt-1 break-all whitespace-pre-line">
                             {update.description}
                           </p>
                           <p className="text-[#777] mt-1 text-sm font-semibold">
