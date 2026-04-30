@@ -228,8 +228,11 @@ export function NewMeetupActionModal({
                   setMeetupNumberInput(regularMeetupNumber);
                 }}
                 className="bg-333"
+                id="regular-meetup"
               />
-              <label>Regular Meetup</label>
+              <label className="cursor-pointer" htmlFor="regular-meetup">
+                Regular Meetup
+              </label>
             </div>
             <div className="flex items-center gap-x-1">
               <input
@@ -239,8 +242,11 @@ export function NewMeetupActionModal({
                   setCategory("hackathon");
                   setMeetupNumberInput(hackathonNumber);
                 }}
+                id="hackathon"
               />
-              <label>Hackathon</label>
+              <label className="cursor-pointer" htmlFor="hackathon">
+                Hackathon
+              </label>
             </div>
           </div>
         </div>

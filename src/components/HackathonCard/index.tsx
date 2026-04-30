@@ -49,6 +49,7 @@ export default function HackathonCard({
     string | number | null
   >(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | number | null>(null);
 
   const { token, isAdmin } = useAuthStore();
   const { showToast } = useToast();
@@ -70,6 +71,35 @@ export default function HackathonCard({
 
   const handleEditMeetupClick = () => {
     setModalView("edit-meetup");
+  };
+
+  // --- NEW: Delete Hackathon Handler ---
+  const handleDeleteMeetup = async () => {
+    if (
+      confirm(
+        "Are you sure you want to delete this hackathon? All associated updates will also be deleted.",
+      )
+    ) {
+      setIsSaving(true);
+      try {
+        await axios.delete(`${apiUrl}/api/v1/meetups/${id}`, {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        await sleep(500);
+        if (mutateHackathons) await mutateHackathons();
+
+        showToast("Hackathon deleted successfully", "success");
+        setIsModalOpen(false); // Close modal since the item is deleted
+      } catch {
+        showToast("Unable to delete hackathon. Please try again.", "error");
+      } finally {
+        setIsSaving(false);
+      }
+    }
   };
 
   const handleSaveMeetup = async (data: EditMeetupData) => {
@@ -109,7 +139,6 @@ export default function HackathonCard({
     setIsSaving(true);
 
     try {
-      // Category is omitted from the payload for Hackathons
       await axios.patch(
         `${apiUrl}/api/v1/updates/${editingUpdateId}`,
         {
@@ -143,6 +172,7 @@ export default function HackathonCard({
 
   const handleDeleteClick = async (updateId: string | number) => {
     if (confirm("Are you sure you want to delete this update?")) {
+      setDeletingId(updateId);
       try {
         await axios.delete(`${apiUrl}/api/v1/updates/${updateId}`, {
           headers: {
@@ -155,8 +185,12 @@ export default function HackathonCard({
         if (mutateHackathons) await mutateHackathons();
 
         showToast("Update deleted successfully", "success");
+        setEditingUpdateId(null);
+        setModalView("list");
       } catch {
         showToast("Unable to delete update. Please try again.", "error");
+      } finally {
+        setDeletingId(null);
       }
     }
   };
@@ -208,12 +242,28 @@ export default function HackathonCard({
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold">Hackathon {number}</h2>
               {isAdmin && (
-                <button onClick={handleEditMeetupClick}>
-                  <PenLine
-                    size={16}
-                    className="hover:cursor-pointer hover:text-blue-500 transition duration-200"
-                  />
-                </button>
+                <div className="flex items-center gap-x-4">
+                  <button
+                    onClick={handleEditMeetupClick}
+                    title="Edit Hackathon"
+                    disabled={isSaving}
+                  >
+                    <PenLine
+                      size={18}
+                      className="text-gray-400 hover:text-blue-500 transition duration-200"
+                    />
+                  </button>
+                  <button
+                    onClick={handleDeleteMeetup}
+                    title="Delete Hackathon"
+                    disabled={isSaving}
+                  >
+                    <Trash
+                      size={18}
+                      className="text-red-500 hover:text-red-400 transition duration-200"
+                    />
+                  </button>
+                </div>
               )}
             </div>
 
@@ -234,7 +284,7 @@ export default function HackathonCard({
                 updates.map((update, index: number) => (
                   <div
                     key={update.id || index}
-                    className="border-b border-gray-700 pb-4 last:border-0 last:mb-0 last:pb-0"
+                    className={`border-b border-gray-700 pb-4 last:border-0 last:mb-0 last:pb-0 transition-opacity duration-200 ${deletingId === update.id ? "opacity-30 pointer-events-none" : "opacity-100"}`}
                   >
                     <div className="flex justify-between items-start">
                       <p className="font-bold">
@@ -243,6 +293,7 @@ export default function HackathonCard({
                           : update.project.name}
                       </p>
 
+                      {/* UPDATE ACTION BUTTONS */}
                       {isAdmin && (
                         <div className="flex gap-x-3 shrink-0 ml-4 mt-1">
                           <button

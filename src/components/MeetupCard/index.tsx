@@ -73,6 +73,34 @@ export default function MeetupCard({
     setModalView("edit-meetup");
   };
 
+  const handleDeleteMeetup = async () => {
+    if (
+      confirm(
+        "Are you sure you want to delete this meetup? All associated updates will also be deleted.",
+      )
+    ) {
+      setIsSaving(true);
+      try {
+        await axios.delete(`${apiUrl}/api/v1/meetups/${id}`, {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        await sleep(500);
+        if (mutateMeetups) await mutateMeetups();
+
+        showToast("Meetup deleted successfully", "success");
+        setIsModalOpen(false); // Close the modal entirely since the meetup is gone
+      } catch {
+        showToast("Unable to delete meetup. Please try again.", "error");
+      } finally {
+        setIsSaving(false);
+      }
+    }
+  };
+
   const handleSaveMeetup = async (data: EditMeetupData) => {
     setIsSaving(true);
     try {
@@ -209,12 +237,28 @@ export default function MeetupCard({
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold">Meetup {number}</h2>
               {isAdmin && (
-                <button onClick={handleEditMeetupClick}>
-                  <PenLine
-                    size={16}
-                    className="hover:cursor-pointer hover:text-blue-500 transition duration-200"
-                  />
-                </button>
+                <div className="flex items-center gap-x-4">
+                  <button
+                    onClick={handleEditMeetupClick}
+                    title="Edit Meetup"
+                    disabled={isSaving}
+                  >
+                    <PenLine
+                      size={18}
+                      className="hover:cursor-pointer text-gray-400 hover:text-blue-500 transition duration-200"
+                    />
+                  </button>
+                  <button
+                    onClick={handleDeleteMeetup}
+                    title="Delete Meetup"
+                    disabled={isSaving}
+                  >
+                    <Trash
+                      size={18}
+                      className="hover:cursor-pointer text-red-500 hover:text-red-400 transition duration-200"
+                    />
+                  </button>
+                </div>
               )}
             </div>
 
@@ -244,6 +288,7 @@ export default function MeetupCard({
                           : update.project.name}
                       </p>
 
+                      {/* UPDATE ACTION BUTTONS */}
                       {isAdmin && (
                         <div className="flex gap-x-3 shrink-0 ml-4 mt-1">
                           <button
@@ -271,6 +316,7 @@ export default function MeetupCard({
                         ? "Progress Talk"
                         : "Idea Talk"}
                     </p>
+
                     <p className="text-sm flex mt-0.25">
                       <strong>
                         <span className="mr-1">By:</span>
@@ -286,7 +332,8 @@ export default function MeetupCard({
                 ))
               ) : (
                 <p className="text-red-500 dark:text-red-400 flex items-center gap-x-2">
-                  <CircleAlert size="18" /> No updates
+                  <CircleAlert size="18" />
+                  No updates
                 </p>
               )}
             </div>

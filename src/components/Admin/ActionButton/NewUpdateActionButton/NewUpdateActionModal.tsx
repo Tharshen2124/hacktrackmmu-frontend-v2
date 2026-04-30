@@ -5,7 +5,7 @@ import { ModalLayout } from "@/components/ModalLayout";
 import { useToast } from "@/components/Toast/ToastProvider";
 import useAuthStore from "@/store/useAuthStore";
 import { apiUrl } from "@/utils/env";
-import { fetcherWithToken } from "@/utils/fetcher"; // Assuming you have this utility
+import { fetcherWithToken } from "@/utils/fetcher";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
@@ -169,16 +169,22 @@ export function NewUpdateActionModal({
               className="bg-333"
               defaultChecked
               onChange={() => setCategory("idea_talk")}
+              id="ideatalk"
             />
-            <label>Idea Talk</label>
+            <label htmlFor="ideatalk" className="cursor-pointer">
+              Idea Talk
+            </label>
           </div>
           <div className="flex items-center gap-x-1">
             <input
               type="radio"
               name="group_project"
               onChange={() => setCategory("progress_talk")}
+              id="progresstalk"
             />
-            <label>Progress Talk</label>
+            <label htmlFor="progresstalk" className="cursor-pointer">
+              Progress Talk
+            </label>
           </div>
         </div>
         <div>

@@ -169,16 +169,22 @@ export function NewProjectActionModal({
               name="project_category"
               defaultChecked
               className="bg-333"
+              id="project"
             />
-            <label>Project</label>
+            <label htmlFor="project" className="cursor-pointer">
+              Project
+            </label>
           </div>
           <div className="flex items-center gap-x-1">
             <input
               type="radio"
               onChange={() => setProjectCategory("group_project")}
               name="project_category"
+              id="group-project"
             />
-            <label>Group Project</label>
+            <label htmlFor="group-project" className="cursor-pointer">
+              Group Project
+            </label>
           </div>
         </div>
         <div className="flex items-center mb-4">
@@ -187,8 +193,12 @@ export function NewProjectActionModal({
             checked={isCompleted}
             onChange={(e) => setIsCompleted(e.target.checked)}
             className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            id="is-completed"
           />
-          <label className="ms-2 font-medium text-gray-900 dark:text-gray-300">
+          <label
+            htmlFor="is-completed"
+            className="ms-2 cursor-pointer font-medium text-gray-900 dark:text-gray-300"
+          >
             Is Project Completed?
           </label>
         </div>
