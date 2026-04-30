@@ -123,7 +123,6 @@ export default function HackathonCard({
       );
 
       await sleep(500);
-      await forceGlobalRefresh();
       if (mutateHackathons) await mutateHackathons();
 
       showToast("Hackathon edited successfully!", "success");
@@ -159,7 +158,6 @@ export default function HackathonCard({
       );
 
       await sleep(500);
-      await forceGlobalRefresh();
       if (mutateHackathons) await mutateHackathons();
 
       showToast("Update edited successfully!", "success");
@@ -184,7 +182,6 @@ export default function HackathonCard({
         });
 
         await sleep(500);
-        await forceGlobalRefresh();
         if (mutateHackathons) await mutateHackathons();
 
         showToast("Update deleted successfully", "success");
