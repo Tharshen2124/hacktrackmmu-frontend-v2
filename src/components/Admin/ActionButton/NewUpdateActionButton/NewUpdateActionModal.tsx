@@ -5,7 +5,7 @@ import { ModalLayout } from "@/components/ModalLayout";
 import { useToast } from "@/components/Toast/ToastProvider";
 import useAuthStore from "@/store/useAuthStore";
 import { apiUrl } from "@/utils/env";
-import { fetcherWithToken } from "@/utils/fetcher"; // Assuming you have this utility
+import { fetcherWithToken } from "@/utils/fetcher";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
