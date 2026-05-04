@@ -6,9 +6,16 @@ import { MemberStatus, MemberStatusLabels } from "@/types/types";
 const ALL_OPTION = "all";
 const ALL_LABEL = "All";
 
+const SORT_OPTIONS = [
+  { value: "", label: "Default" },
+  { value: "talks_desc", label: "Most Talks" },
+];
+
 interface MemberFilterProps {
   onStatusChange: (status: string[]) => void;
+  onSortChange: (sortBy: string) => void;
   currentStatus: string;
+  currentSortBy: string;
   availableStatuses?: MemberStatus[];
   defaultStatuses?: MemberStatus[];
   isOnboarding?: boolean;
@@ -16,7 +23,9 @@ interface MemberFilterProps {
 
 export default function MemberFilter({
   onStatusChange,
+  onSortChange,
   currentStatus,
+  currentSortBy,
   availableStatuses = Object.values(MemberStatus), // Default: all statuses
   defaultStatuses = [MemberStatus.Active, MemberStatus.SociallyActive], // Default: active members
   isOnboarding = false,
@@ -34,6 +43,7 @@ export default function MemberFilter({
   const [selectedStatus, setSelectedStatus] = useState<string>(
     currentStatus === "all" ? ALL_OPTION : currentStatus,
   );
+  const [selectedSort, setSelectedSort] = useState<string>(currentSortBy);
 
   const handleStatusSelect = (value: string) => {
     setSelectedStatus(value);
@@ -44,12 +54,15 @@ export default function MemberFilter({
       selectedStatus === ALL_OPTION ? availableStatuses : [selectedStatus];
 
     onStatusChange(statusesToSend);
+    onSortChange(selectedSort);
     filterPopoverRef.current?.closePopover();
   };
 
   const handleClear = () => {
     setSelectedStatus(ALL_OPTION);
+    setSelectedSort("");
     onStatusChange(defaultStatuses);
+    onSortChange("");
     filterPopoverRef.current?.closePopover();
   };
 
@@ -65,6 +78,12 @@ export default function MemberFilter({
           options={selectorOptions}
           value={selectedStatus}
           onChange={handleStatusSelect}
+        />
+        <Selector
+          label="Sort By"
+          options={SORT_OPTIONS}
+          value={selectedSort}
+          onChange={setSelectedSort}
         />
         <div className="buttons flex flex-row gap-2">
           <button

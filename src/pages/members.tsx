@@ -26,6 +26,7 @@ export default function Members() {
   const { token } = useAuthStore();
   const [paginationNumber, setPaginationNumber] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string[]>(DEFAULT_STATUSES);
+  const [sortBy, setSortBy] = useState<string>("");
 
   const [searchResults, setSearchResults] = useState<Member[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -42,6 +43,10 @@ export default function Members() {
     statusFilter.forEach((status) => {
       queryParams.append("status[]", status);
     });
+
+    if (sortBy) {
+      queryParams.append("sort_by", sortBy);
+    }
 
     return [
       `${apiUrl}/api/v1/members/filtered?${queryParams.toString()}`,
@@ -68,7 +73,7 @@ export default function Members() {
   // Reset pagination when filters change
   useEffect(() => {
     setPaginationNumber(1);
-  }, [statusFilter]);
+  }, [statusFilter, sortBy]);
 
   const currentStatusLabels = statusFilter.map((status) =>
     getStatusLabel(status),
@@ -76,6 +81,10 @@ export default function Members() {
 
   const handleStatusChange = (statuses: string[]) => {
     setStatusFilter(statuses);
+  };
+
+  const handleSortChange = (newSortBy: string) => {
+    setSortBy(newSortBy);
   };
 
   const handleSearchResults = (results: Member[], searching: boolean) => {
@@ -111,7 +120,9 @@ export default function Members() {
         </div>
         <MemberFilter
           onStatusChange={handleStatusChange}
+          onSortChange={handleSortChange}
           currentStatus={getCurrentSingleStatus()}
+          currentSortBy={sortBy}
           defaultStatuses={DEFAULT_STATUSES}
         />
       </div>
