@@ -174,7 +174,9 @@ export default function Onboarding() {
                     Status
                     <MemberFilter
                       onStatusChange={handleStatusChange}
+                      onSortChange={() => {}}
                       currentStatus={getCurrentSingleStatus()}
+                      currentSortBy=""
                       availableStatuses={ONBOARDING_STATUSES}
                       defaultStatuses={ONBOARDING_STATUSES}
                       isOnboarding={true}

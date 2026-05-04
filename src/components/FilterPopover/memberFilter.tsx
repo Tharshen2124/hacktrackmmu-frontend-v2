@@ -79,12 +79,14 @@ export default function MemberFilter({
           value={selectedStatus}
           onChange={handleStatusSelect}
         />
-        <Selector
-          label="Sort By"
-          options={SORT_OPTIONS}
-          value={selectedSort}
-          onChange={setSelectedSort}
-        />
+        {!isOnboarding && (
+          <Selector
+            label="Sort By"
+            options={SORT_OPTIONS}
+            value={selectedSort}
+            onChange={setSelectedSort}
+          />
+        )}
         <div className="buttons flex flex-row gap-2">
           <button
             onClick={handleApplyFilter}
