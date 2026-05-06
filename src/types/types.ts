@@ -42,6 +42,9 @@ export interface Member {
   contact_number: string;
   discord_tag: string;
   progress_talk_num: number;
+  duration_active: string;
+  avg_time_between_talks: string;
+  meetups_since_last_talk: number;
 }
 
 export interface Token {
