@@ -5,6 +5,7 @@ interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   isAdmin: boolean;
+  handleLogout: () => Promise<void>;
 }
 
 export function Sidebar({
