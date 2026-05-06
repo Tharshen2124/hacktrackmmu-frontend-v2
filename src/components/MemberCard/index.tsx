@@ -10,6 +10,9 @@ import {
   User,
   Edit,
   Trash,
+  Clock,
+  CalendarRange,
+  History,
 } from "lucide-react";
 import { useState } from "react";
 import { ModalLayout } from "../ModalLayout";
@@ -35,6 +38,9 @@ export default function MemberCard({
   name,
   projects,
   status,
+  duration_active,
+  avg_time_between_talks,
+  meetups_since_last_talk,
   mutateMembers,
 }: MemberCardProps) {
   const { token, isAdmin } = useAuthStore();
@@ -251,6 +257,22 @@ export default function MemberCard({
         <p className="flex items-center">
           <Speech size="16" className="mr-2" />
           {numberOfUpdates} Talks
+        </p>
+
+        <p className="flex items-center">
+          <Clock size="16" className="mr-2" />
+          Active duration: {duration_active}
+        </p>
+
+        <p className="flex items-center">
+          <CalendarRange size="16" className="mr-2" />
+          Average between talks: {avg_time_between_talks}
+        </p>
+
+        <p className="flex items-center">
+          <History size="16" className="mr-2" />
+          {meetups_since_last_talk} meetup
+          {meetups_since_last_talk > 1 ? "s" : ""} since last talk
         </p>
       </div>
 
