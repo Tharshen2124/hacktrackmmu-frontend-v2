@@ -7,7 +7,12 @@ interface SidebarProps {
   isAdmin: boolean;
 }
 
-export function Sidebar({ isOpen, onClose, isAdmin }: SidebarProps) {
+export function Sidebar({
+  isOpen,
+  onClose,
+  isAdmin,
+  handleLogout,
+}: SidebarProps) {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -78,7 +83,10 @@ export function Sidebar({ isOpen, onClose, isAdmin }: SidebarProps) {
                 Admin Mode
               </p>
             )}
-            <button className="w-full bg-gray-800 text-white dark:bg-white dark:text-black font-semibold py-2 px-4 rounded-md hover:bg-gray-700 dark:hover:bg-gray-100 transition duration-200">
+            <button
+              onClick={handleLogout}
+              className="w-full bg-gray-800 text-white dark:bg-white dark:text-black font-semibold py-2 px-4 rounded-md hover:bg-gray-700 dark:hover:bg-gray-100 transition duration-200"
+            >
               Logout
             </button>
           </div>
