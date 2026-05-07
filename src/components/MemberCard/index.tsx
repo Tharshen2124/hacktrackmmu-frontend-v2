@@ -1,7 +1,6 @@
 import {
   CheckCircle,
   CircleAlert,
-  FolderCheck,
   FolderCode,
   Hammer,
   Lightbulb,
@@ -249,10 +248,6 @@ export default function MemberCard({
         <p className="flex items-center">
           <FolderCode size="16" className="mr-2" />
           {projects.length} Projects
-        </p>
-        <p className="flex items-center">
-          <FolderCheck size="16" className="mr-2" />
-          {numberOfCompletedProjects} Projects Completed
         </p>
         <p className="flex items-center">
           <Speech size="16" className="mr-2" />
