@@ -45,9 +45,8 @@ export default function MemberCard({
   const { token, isAdmin } = useAuthStore();
   const { showToast } = useToast();
 
-  const numberOfCompletedProjects = projects.filter(
-    (project) => project.completed,
-  ).length;
+  let ideaTalksCount = 0;
+  let progressTalksCount = 0;
   const numberOfUpdates = projects.reduce(
     (acc, project) => acc + project.updates.length,
     0,
@@ -66,6 +65,17 @@ export default function MemberCard({
   const [editingUpdateId, setEditingUpdateId] = useState<
     string | number | null
   >(null);
+
+  projects.forEach((project) => {
+    project.updates?.forEach((update) => {
+      const cat = String(update.category);
+      if (cat === "idea_talk" || cat === "0") {
+        ideaTalksCount++;
+      } else {
+        progressTalksCount++;
+      }
+    });
+  });
 
   const handleCardClick = () => setIsModalOpen(true);
 
@@ -251,7 +261,7 @@ export default function MemberCard({
         </p>
         <p className="flex items-center">
           <Speech size="16" className="mr-2" />
-          {numberOfUpdates} Talks
+          ProgressTalks: {progressTalksCount}, IdeaTalks: {ideaTalksCount}
         </p>
 
         <p className="flex items-center">
@@ -267,7 +277,10 @@ export default function MemberCard({
         <p className="flex items-center">
           <History size="16" className="mr-2" />
           {meetups_since_last_talk} meetup
-          {meetups_since_last_talk > 1 ? "s" : ""} since last talk
+          {meetups_since_last_talk > 1 || meetups_since_last_talk == 0
+            ? "s"
+            : ""}{" "}
+          since last talk
         </p>
       </div>
 
