@@ -6,6 +6,7 @@ import useAuthStore from "@/store/useAuthStore";
 import { apiUrl } from "@/utils/env";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { createApiLogger } from "@/utils/logger";
 import { MultiSelectDropdown } from "@/components/atomComponents/Dropdown/MultiSelectDropdown";
 import { useCreateUpdateData } from "../NewUpdateActionButton/NewUpdateActionModal";
 
@@ -47,11 +48,14 @@ export function NewProjectActionModal({
         );
         setMembers(response.data.members);
         setIsLoading(false);
-      } catch (error: any) {
-        setIsLoading(false);
-        setIsError(true);
-        console.error("Error occured during fetch", error);
-      }
+    } catch (error: any) {
+      setIsLoading(false);
+      setIsError(true);
+      const projectLogger = createApiLogger("NewProjectActionModal", "getData");
+      projectLogger.failure("Failed to fetch project data", error, Date.now(), {
+        errorCode: error.response?.status,
+      });
+    }
     }
 
     getData();
