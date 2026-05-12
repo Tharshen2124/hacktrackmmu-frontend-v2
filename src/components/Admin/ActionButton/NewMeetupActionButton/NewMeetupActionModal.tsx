@@ -7,6 +7,7 @@ import useAuthStore from "@/store/useAuthStore";
 import { apiUrl } from "@/utils/env";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { createApiLogger } from "@/utils/logger";
 
 interface NewMeetupActionModalProps {
   isModalOpen: boolean;
@@ -80,7 +81,10 @@ export function NewMeetupActionModal({
     } catch (error: any) {
       setIsLoading(false);
       setIsError(true);
-      console.error("Error occured during fetch", error);
+      const fetchLogger = createApiLogger("NewMeetupActionModal", "getData");
+      fetchLogger.failure("Failed to fetch meetup data", error, Date.now(), {
+        errorCode: error.response?.status,
+      });
     }
   }
 
@@ -130,7 +134,11 @@ export function NewMeetupActionModal({
       showToast("Successfully added meetup!", "success");
     } catch (error: any) {
       setIsSubmitting(false); // Fix this: previously was true!
-      console.log("Error caught in POST:", error);
+      const submitLogger = createApiLogger("NewMeetupActionModal", "handleSubmit");
+      submitLogger.failure("Failed to create meetup", error, Date.now(), {
+        errorCode: error.response?.status,
+        errorMessage: error.response?.data?.message,
+      });
       showToast("Error occurred, meetup was not saved.", "error");
     }
   }
