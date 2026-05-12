@@ -9,6 +9,7 @@ import { apiUrl } from "@/utils/env";
 import axios from "axios";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState, useCallback } from "react";
+import { createApiLogger } from "@/utils/logger";
 
 export default function Meetups() {
   const { token } = useAuthStore();
@@ -22,6 +23,8 @@ export default function Meetups() {
   // Extract getData and wrap in useCallback so we can use it as a mutation trigger
   const getData = useCallback(
     async (showLoadingState = true) => {
+      const startTime = Date.now();
+      const meetupsLogger = createApiLogger("MeetupsPage", "getData");
       if (showLoadingState) setIsLoading(true);
       try {
         const response = await axios.get(
@@ -37,10 +40,18 @@ export default function Meetups() {
         setHackathons(response.data.data.hackathons);
         setTotalPagination(response.data.meta.regular_meetups.total_pages);
         if (showLoadingState) setIsLoading(false);
+        meetupsLogger.success("Meetups data fetched", startTime, {
+          paginationNumber,
+          meetupsCount: response.data.data.regular_meetups?.length || 0,
+          hackathonsCount: response.data.data.hackathons?.length || 0,
+        });
       } catch (error: any) {
         if (showLoadingState) setIsLoading(false);
         setIsError(true);
-        console.log("Error occured and caught", error);
+        meetupsLogger.failure("Failed to fetch meetups data", error, startTime, {
+          paginationNumber,
+          errorCode: error.response?.status,
+        });
       }
     },
     [paginationNumber, token],

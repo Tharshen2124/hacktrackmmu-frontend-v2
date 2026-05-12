@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from "react"; // Add useMemo
 import { ChevronDown } from "lucide-react";
+import { warn } from "@/utils/logger";
 
 interface Option {
   id: string;
@@ -56,8 +57,11 @@ export const SearchableDropdown = ({
           month: "long",
           day: "numeric",
         });
-      } catch (e) {
-        console.warn("Invalid date format for option:", option.date, e);
+      } catch {
+        warn("Invalid date format for option", {
+          component: "SelectDropdown",
+          dateValue: option.date,
+        });
         return option.date; // Fallback to raw date string if invalid
       }
     }
