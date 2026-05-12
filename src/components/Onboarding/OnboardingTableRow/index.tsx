@@ -10,6 +10,7 @@ import { useToast } from "@/components/Toast/ToastProvider";
 import { NullTextIndicator } from "@/components/atomComponents/NullTextIndicator";
 import DeleteModal from "../DeleteModal";
 import { handleConfirmDeleteMember } from "../handleConfirmDeleteMember";
+import { error as logError } from "@/utils/logger";
 
 interface OnboardingTableRowProps {
   member: Member;
@@ -79,14 +80,16 @@ export default function OnboardingTableRow({
       mutateOnboarding();
       showToast("Member status updated successfully", "success");
     } catch (error) {
-      console.error("Error updating status", error);
+      logError("Failed to update member status", error, {
+        component: "OnboardingTableRow",
+        memberId: member?.id,
+        action: "handleStatusChange",
+      });
       showToast("Failed to update status", "error");
     } finally {
       setIsUpdating(false);
     }
   };
-
-  console.log("Rendering row for member:", member);
 
   return (
     <>

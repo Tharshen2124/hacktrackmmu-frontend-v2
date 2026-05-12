@@ -1,5 +1,6 @@
 import axios from "axios";
 import { apiUrl } from "@/utils/env";
+import { error as logError } from "@/utils/logger";
 
 interface HandleConfirmDeleteMemberParams {
   memberId: number;
@@ -31,7 +32,10 @@ export const handleConfirmDeleteMember = async ({
     showToast("Member deleted successfully", "success");
     handleCloseDeleteModal();
   } catch (error) {
-    console.error("Error deleting member", error);
+    logError("Failed to delete member", error, {
+      component: "handleConfirmDeleteMember",
+      memberId,
+    });
     showToast("Failed to delete member", "error");
   } finally {
     setIsDeleting(false);

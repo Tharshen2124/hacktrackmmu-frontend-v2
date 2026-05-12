@@ -20,6 +20,7 @@ import {
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { handleConfirmDeleteMember } from "../handleConfirmDeleteMember";
+import { error as logError } from "@/utils/logger";
 import DeleteModal from "../DeleteModal";
 
 interface OnboardingMemberModalProps {
@@ -109,7 +110,11 @@ export function OnboardingMemberModal({
       mutateOnboarding();
       showToast("Member status updated successfully", "success");
     } catch (error) {
-      console.error("Error occurred during fetch", error);
+      logError("Failed to update member status", error, {
+        component: "OnboardingMemberModal",
+        memberId: member?.id,
+        action: "handleStatusChange",
+      });
       showToast("Failed to update status", "error");
     }
   };
