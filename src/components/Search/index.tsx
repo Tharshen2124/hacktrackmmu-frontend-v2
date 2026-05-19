@@ -3,6 +3,7 @@ import axios from "axios";
 import { apiUrl } from "@/utils/env";
 import { Member } from "@/types/types";
 import { SearchIcon, X } from "lucide-react";
+import { createApiLogger } from "@/utils/logger";
 
 interface SearchComponentProps {
   token: string;
@@ -17,8 +18,10 @@ const SearchComponent = ({
 }: SearchComponentProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const apiLogger = createApiLogger("SearchComponent", "searchMembers");
 
   const searchMembers = async (searchQuery: string, page = 1) => {
+    const startTime = Date.now();
     try {
       setIsSearching(true);
       const response = await axios.get(`${apiUrl}/api/v1/members/search`, {
@@ -32,10 +35,17 @@ const SearchComponent = ({
         },
       });
 
-      console.log("Search results:", response.data);
+      apiLogger.success("Search completed", startTime, {
+        resultCount: response.data?.data?.length || response.data?.length || 0,
+        query: searchQuery,
+        page: page,
+      });
       return response.data;
     } catch (error) {
-      console.error("Search error:", error);
+      apiLogger.failure("Search failed", error, startTime, {
+        query: searchQuery,
+        page: page,
+      });
       throw error;
     } finally {
       setIsSearching(false);

@@ -57,7 +57,7 @@ export const SearchableDropdown = ({
           day: "numeric",
         });
       } catch (e) {
-        console.warn("Invalid date format for option:", option.date, e);
+        // Invalid date format - silently fallback to raw date string
         return option.date; // Fallback to raw date string if invalid
       }
     }
