@@ -12,6 +12,7 @@ import dayjs from "dayjs";
 import { ChevronLeft, ChevronRight, ArrowUp, ArrowDown } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
+import { error as logError } from "@/utils/logger";
 
 const ONBOARDING_STATUSES = [
   MemberStatus.Registered,
@@ -75,8 +76,6 @@ export default function Onboarding() {
     setPaginationNumber(1);
   }, [statusFilter]);
 
-  console.log("Onboarding data:", onboardingData);
-
   const members = useMemo(() => {
     let rawMembers = isSearching ? searchResults : onboardingData?.data || [];
 
@@ -115,7 +114,10 @@ export default function Onboarding() {
   };
 
   const handleSearchError = (error: unknown) => {
-    console.error("Search failed:", error);
+    logError("Search failed", error, {
+      component: "OnboardingPage",
+      action: "handleSearchError",
+    });
   };
 
   const getCurrentSingleStatus = () => {

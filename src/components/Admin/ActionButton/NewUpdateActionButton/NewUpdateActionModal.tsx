@@ -9,6 +9,7 @@ import { fetcherWithToken } from "@/utils/fetcher";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
+import { createApiLogger } from "@/utils/logger";
 
 interface NewUpdateActionModalProps {
   isModalOpen: boolean;
@@ -121,7 +122,11 @@ export function NewUpdateActionModal({
       showToast("Successfully added updates!", "success");
     } catch (error: any) {
       setIsSubmitting(false); // Fixed: was setting to true
-      console.log("Error caught in POST:", error);
+      const updateLogger = createApiLogger("NewUpdateActionModal", "handleSubmit");
+      updateLogger.failure("Failed to create update", error, Date.now(), {
+        errorCode: error.response?.status,
+        errorMessage: error.response?.data?.message,
+      });
       showToast("Error occured, update was not saved.", "error");
     }
   }

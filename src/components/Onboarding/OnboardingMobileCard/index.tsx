@@ -9,6 +9,7 @@ import { useToast } from "@/components/Toast/ToastProvider";
 import Link from "next/link";
 import DeleteModal from "../DeleteModal";
 import { handleConfirmDeleteMember } from "../handleConfirmDeleteMember";
+import { error as logError } from "@/utils/logger";
 
 interface OnboardingMobileCardProps {
   member: Member;
@@ -61,7 +62,11 @@ export default function OnboardingMobileCard({
       mutateOnboarding();
       showToast("Member status updated successfully", "success");
     } catch (error) {
-      console.error("Error updating status", error);
+      logError("Failed to update member status", error, {
+        component: "OnboardingMobileCard",
+        memberId: member?.id,
+        action: "handleStatusChange",
+      });
       showToast("Failed to update status", "error");
     } finally {
       setIsUpdating(false);

@@ -11,6 +11,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { fetcherWithToken } from "@/utils/fetcher";
+import { error as logError } from "@/utils/logger";
 
 const DEFAULT_STATUSES = [MemberStatus.Active, MemberStatus.SociallyActive];
 
@@ -93,7 +94,10 @@ export default function Members() {
   };
 
   const handleSearchError = (error: unknown) => {
-    console.error("Search failed:", error);
+    logError("Search failed", error, {
+      component: "MembersPage",
+      action: "handleSearchError",
+    });
     setIsSearchError(true);
   };
 
