@@ -69,31 +69,34 @@ export default function OnboardingMobileCard({
   };
 
   return (
-    <div className="border border-gray-700 rounded-lg p-4 mb-5">
-      <div className="upper-part flex justify-between">
-        <div className="left-side">
-          <h2 className="text-lg font-bold mb-2">{member.name}</h2>
-          <p className="text-sm mb-1 truncate">
-            <span className="font-bold">Contact Number: </span>
+    <div className="border border-gray-700 bg-[#1e1e1e]/30 rounded-lg p-4 mb-4">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col overflow-hidden">
+          <h2 className="text-lg font-bold mb-1 text-gray-100 truncate">
+            {member.name}
+          </h2>
+          <p className="text-sm mb-1 text-gray-300 truncate">
+            <span className="font-semibold text-gray-500">Contact: </span>
             {member.contact_number || "N/A"}
           </p>
-          <p className="text-sm mb-1 truncate">
-            <span className="font-bold">Created At: </span>
+          <p className="text-sm text-gray-300 truncate">
+            <span className="font-semibold text-gray-500">Created: </span>
             {dayjs(member.created_at).format("MMM D, YYYY")}
           </p>
         </div>
-        <div className="right-side">
+
+        <div className="w-full">
           <select
             value={member.status}
             onChange={(e) => handleStatusChange(e.target.value as MemberStatus)}
             disabled={isUpdating}
-            className={`truncate px-2 py-1 text-xs font-medium border-gray-200 border rounded-full bg-transparent cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
+            className="w-full px-3 py-2.5 text-sm font-medium border border-gray-600 rounded-md bg-transparent text-gray-200 cursor-pointer focus:outline-none focus:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {ONBOARDING_STATUSES.map((status) => (
               <option
                 key={status}
                 value={status}
-                className="bg-[#1e1e1e] text-white"
+                className="bg-[#1e1e1e] text-white py-2"
               >
                 {MemberStatusLabels[status].toUpperCase()}
               </option>
@@ -101,31 +104,37 @@ export default function OnboardingMobileCard({
           </select>
         </div>
       </div>
-      <div className="bottom-part mt-3">
-        <div className="button-container flex justify-evenly gap-x-2">
+
+      {/* ── Bottom Action Buttons ── */}
+      <div className="mt-5 border-t border-gray-800 pt-4">
+        <div className="flex justify-between gap-2">
           <button
-            className="w-full text-black text-sm font-semibold bg-[#d9d9d9] py-2 rounded-md transition duration-200 hover:bg-gray-200 active:bg-gray-400"
+            className="flex-1 text-black text-sm font-semibold bg-[#d9d9d9] py-2.5 rounded-md transition duration-200 hover:bg-gray-200 active:bg-gray-400"
             onClick={handleViewClick}
           >
             View
           </button>
+
           <Link
             href={`/member/${member.id}/edit?source=onboarding`}
             passHref
-            className="w-full"
+            className="flex-1"
           >
-            <button className="w-full text-white text-sm font-semibold bg-blue-800 py-2 rounded-md transition duration-200 hover:bg-blue-700 active:bg-gray-400">
+            <button className="w-full text-white text-sm font-semibold bg-blue-800 py-2.5 rounded-md transition duration-200 hover:bg-blue-700 active:bg-blue-900">
               Edit
             </button>
           </Link>
+
           <button
             onClick={handleDeleteMember}
-            className="w-full text-white text-sm font-semibold bg-red-800 py-2 rounded-md transition duration-200 hover:bg-red-700 active:bg-gray-400"
+            className="flex-1 text-white text-sm font-semibold bg-red-800 py-2.5 rounded-md transition duration-200 hover:bg-red-700 active:bg-red-900"
           >
             Delete
           </button>
         </div>
       </div>
+
+      {/* Modals */}
       <OnboardingMemberModal
         isModalOpen={isModalOpen}
         handleCloseModal={handleCloseModal}
