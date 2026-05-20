@@ -78,12 +78,14 @@ export function Sidebar({
               Meetups
             </Link>
 
-            <Link
-              href="/onboarding"
-              className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              Onboarding
-            </Link>
+            {isAdmin ? (
+              <Link
+                href="/onboarding"
+                className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                Onboarding
+              </Link>
+            ) : null}
           </nav>
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
             {isClient && isAdmin && (
