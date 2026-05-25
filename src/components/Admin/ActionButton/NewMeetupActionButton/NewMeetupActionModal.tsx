@@ -100,7 +100,6 @@ export function NewMeetupActionModal({
       category: category,
     };
 
-    // The Fix:
     if (category === "hackathon") {
       payload.hackathon_number = meetupNumberInput;
     } else {
@@ -129,7 +128,7 @@ export function NewMeetupActionModal({
       handleCloseModal();
       showToast("Successfully added meetup!", "success");
     } catch (error: any) {
-      setIsSubmitting(false); // Fix this: previously was true!
+      setIsSubmitting(false);
       console.log("Error caught in POST:", error);
       showToast("Error occurred, meetup was not saved.", "error");
     }
@@ -206,8 +205,8 @@ export function NewMeetupActionModal({
             name="host"
             placeholder="Search for a host..."
             groups={[
-              { label: "Have Hosted", options: haveHosted || [] },
               { label: "Yet To Host", options: yetToHost || [] },
+              { label: "Have Hosted", options: haveHosted || [] },
             ]}
             value={selectedHostID}
             onChange={setSelectedHostID}
