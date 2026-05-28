@@ -43,7 +43,7 @@ const convertToWhatsapp = (phoneNumber: string) => {
 const STATUS_ORDER = [
   MemberStatus.Registered,
   MemberStatus.Contacted,
-  MemberStatus.IdeaTalked,
+  MemberStatus.FirstTalkGiven,
   MemberStatus.NeverActive,
   MemberStatus.Active,
   MemberStatus.SociallyActive,
@@ -77,7 +77,7 @@ export function OnboardingMemberModal({
   }, []);
 
   const currentStatusIndex = getStatusIndex(member.status as MemberStatus);
-  const maxOnboardingIndex = getStatusIndex(MemberStatus.IdeaTalked);
+  const maxOnboardingIndex = getStatusIndex(MemberStatus.FirstTalkGiven);
   const minOnboardingIndex = getStatusIndex(MemberStatus.Registered);
 
   const canPromote =
@@ -167,142 +167,144 @@ export function OnboardingMemberModal({
             </button>
           </div>
         </div>
-      
 
-      <div className="status-container flex flex-row justify-between items-center">
-        <h3 className="text-lg font-semibold">
-          Status:{" "}
-          {MemberStatusLabels[member.status as MemberStatus] || member.status}
-        </h3>
-        {isClient && (
-          <div className="arrow-containers flex flex-row gap-x-2 items-center">
-            {isAtFinalOnboardingStatus && (
-              <Link
-                href={`/member/${member.id}/edit?source=onboarding`}
-                passHref
-              >
-                <button
-                  className="bg-green-600 p-1 rounded-md"
-                  title="Assign Status in Edit Page"
+        <div className="status-container flex flex-row justify-between items-center">
+          <h3 className="text-lg font-semibold">
+            Status:{" "}
+            {MemberStatusLabels[member.status as MemberStatus] || member.status}
+          </h3>
+          {isClient && (
+            <div className="arrow-containers flex flex-row gap-x-2 items-center">
+              {isAtFinalOnboardingStatus && (
+                <Link
+                  href={`/member/${member.id}/edit?source=onboarding`}
+                  passHref
                 >
-                  <Check size="16" />
+                  <button
+                    className="bg-green-600 p-1 rounded-md"
+                    title="Assign Status in Edit Page"
+                  >
+                    <Check size="16" />
+                  </button>
+                </Link>
+              )}
+              {canPromote ? (
+                <button
+                  title={`Promote to ${getNextStatusLabel()}`}
+                  className="bg-blue-600 p-1 rounded-md"
+                  onClick={() => updateStatus("up")}
+                >
+                  <ArrowUp size="16" className="text-white" />
                 </button>
-              </Link>
-            )}
-            {canPromote ? (
-              <button
-                title={`Promote to ${getNextStatusLabel()}`}
-                className="bg-blue-600 p-1 rounded-md"
-                onClick={() => updateStatus("up")}
-              >
-                <ArrowUp size="16" className="text-white" />
-              </button>
-            ) : (
-              <div className="bg-gray-600 p-1 rounded-md">
-                <ArrowUp size="16" className="text-white" />
-              </div>
-            )}
-            {canDemote ? (
-              <button
-                title={`Demote to ${getPreviousStatusLabel()}`}
-                className="bg-yellow-500 p-1 rounded-md"
-                onClick={() => updateStatus("down")}
-              >
-                <ArrowDown size="16" className="text-white" />
-              </button>
-            ) : (
-              <div className="bg-gray-600 p-1 rounded-md">
-                <ArrowDown size="16" className="text-white" />
-              </div>
-            )}
+              ) : (
+                <div className="bg-gray-600 p-1 rounded-md">
+                  <ArrowUp size="16" className="text-white" />
+                </div>
+              )}
+              {canDemote ? (
+                <button
+                  title={`Demote to ${getPreviousStatusLabel()}`}
+                  className="bg-yellow-500 p-1 rounded-md"
+                  onClick={() => updateStatus("down")}
+                >
+                  <ArrowDown size="16" className="text-white" />
+                </button>
+              ) : (
+                <div className="bg-gray-600 p-1 rounded-md">
+                  <ArrowDown size="16" className="text-white" />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {isAtFinalOnboardingStatus && (
+          <div className="bg-green-500 text-black font-bold text-sm p-2 rounded-md mt-2">
+            <p>Select Tick Icon to Assign Status in Edit Page.</p>
           </div>
         )}
-      </div>
 
-      {isAtFinalOnboardingStatus && (
-        <div className="bg-green-500 text-black font-bold text-sm p-2 rounded-md mt-2">
-          <p>Select Tick Icon to Assign Status in Edit Page.</p>
-        </div>
-      )}
-
-      <h3 className="text-lg font-semibold mt-4 mb-1">Contact Information</h3>
-      <div className="flex flex-col gap-y-2">
-        <div className="flex items-center justify-between border border-gray-700 py-3 px-4 rounded-md gap-3">
-          <p className="min-w-0 truncate">
-            <span className="font-bold">Email:</span> {member.email || "N/A"}
-          </p>
-          <div className="flex flex-row gap-x-4">
-            <Copy
-              onClick={() => copyToClipBoard(member.email, "Email")}
-              className="hover:text-gray-400 hover:cursor-pointer active:text-green-500"
-              size="16"
-            />
-            <Link href={`mailto:${member.email}`} passHref>
-              <Mail
-                className="hover:text-gray-400 active:text-blue-500"
+        <h3 className="text-lg font-semibold mt-4 mb-1">Contact Information</h3>
+        <div className="flex flex-col gap-y-2">
+          <div className="flex items-center justify-between border border-gray-700 py-3 px-4 rounded-md gap-3">
+            <p className="min-w-0 truncate">
+              <span className="font-bold">Email:</span> {member.email || "N/A"}
+            </p>
+            <div className="flex flex-row gap-x-4">
+              <Copy
+                onClick={() => copyToClipBoard(member.email, "Email")}
+                className="hover:text-gray-400 hover:cursor-pointer active:text-green-500"
                 size="16"
               />
-            </Link>
+              <Link href={`mailto:${member.email}`} passHref>
+                <Mail
+                  className="hover:text-gray-400 active:text-blue-500"
+                  size="16"
+                />
+              </Link>
+            </div>
+          </div>
+          <div className="flex items-center justify-between border border-gray-700 py-3 px-4 rounded-md gap-3">
+            <p className="min-w-0 truncate">
+              <span className="font-bold">Contact Number:</span>{" "}
+              {member.contact_number || <NullTextIndicator />}
+            </p>
+            <div className="flex flex-row gap-x-4">
+              <Copy
+                onClick={() =>
+                  copyToClipBoard(member.contact_number, "Contact Number")
+                }
+                className="hover:text-gray-400 hover:cursor-pointer active:text-green-500"
+                size="16"
+              />
+              <Phone
+                onClick={() => handleWhatsapp(member.contact_number)}
+                size={16}
+              />
+            </div>
+          </div>
+          <div className="flex items-center justify-between border border-gray-700 py-3 px-4 rounded-md gap-3">
+            <p className="min-w-0 truncate">
+              <span className="font-bold">Discord Tag:</span>{" "}
+              {member.discord_tag || <NullTextIndicator />}
+            </p>
+            <div className="flex flex-row gap-x-4">
+              <Copy
+                onClick={() =>
+                  copyToClipBoard(member.discord_tag, "Discord Tag")
+                }
+                className="hover:text-gray-400 hover:cursor-pointer active:text-green-500"
+                size="16"
+              />
+              <Tag size={16} />
+            </div>
           </div>
         </div>
-        <div className="flex items-center justify-between border border-gray-700 py-3 px-4 rounded-md gap-3">
-          <p className="min-w-0 truncate">
-            <span className="font-bold">Contact Number:</span>{" "}
-            {member.contact_number || <NullTextIndicator />}
-          </p>
-          <div className="flex flex-row gap-x-4">
-            <Copy
-              onClick={() =>
-                copyToClipBoard(member.contact_number, "Contact Number")
-              }
-              className="hover:text-gray-400 hover:cursor-pointer active:text-green-500"
-              size="16"
-            />
-            <Phone onClick={() => handleWhatsapp(member.contact_number)} size={16} />
-          </div>
-        </div>
-        <div className="flex items-center justify-between border border-gray-700 py-3 px-4 rounded-md gap-3">
-          <p className="min-w-0 truncate">
-            <span className="font-bold">Discord Tag:</span>{" "}
-            {member.discord_tag || <NullTextIndicator />}
-          </p>
-          <div className="flex flex-row gap-x-4">
-            <Copy
-              onClick={() =>
-                copyToClipBoard(member.discord_tag, "Discord Tag")
-              }
-              className="hover:text-gray-400 hover:cursor-pointer active:text-green-500"
-              size="16"
-            />
-            <Tag size={16} />
-          </div>
-        </div>
-      </div>
 
-      <h3 className="text-lg font-semibold mb-1 mt-4">Comment</h3>
-      <div className="flex flex-col gap-x-2 border border-gray-700 py-3 px-4 rounded-md max-h-36 lg:max-h-48 overflow-y-auto">
-        <p>{member.comment || <NullTextIndicator />}</p>
-      </div>
+        <h3 className="text-lg font-semibold mb-1 mt-4">Comment</h3>
+        <div className="flex flex-col gap-x-2 border border-gray-700 py-3 px-4 rounded-md max-h-36 lg:max-h-48 overflow-y-auto">
+          <p>{member.comment || <NullTextIndicator />}</p>
+        </div>
 
-      <h3 className="text-lg font-semibold mb-1 mt-4">Other Information</h3>
-      <div className="flex flex-col gap-x-2 border border-gray-700 py-3 px-4 rounded-md max-h-36 lg:max-h-48 overflow-y-auto">
-        <p>
-          <span className="font-semibold">Register Date:</span>{" "}
-          {dayjs(member.created_at).format("DD/MM/YYYY")}
-        </p>
-        <p>
-          <span className="font-semibold">Register Time:</span>{" "}
-          {dayjs(member.created_at).format("HH:mm")}
-        </p>
-        <p>
-          <span className="font-semibold">Legacy Status:</span>{" "}
-          {typeof member.active === "boolean"
-            ? member.active
-              ? "Active"
-              : "Inactive"
-            : "N/A"}
-        </p>
-      </div>
+        <h3 className="text-lg font-semibold mb-1 mt-4">Other Information</h3>
+        <div className="flex flex-col gap-x-2 border border-gray-700 py-3 px-4 rounded-md max-h-36 lg:max-h-48 overflow-y-auto">
+          <p>
+            <span className="font-semibold">Register Date:</span>{" "}
+            {dayjs(member.created_at).format("DD/MM/YYYY")}
+          </p>
+          <p>
+            <span className="font-semibold">Register Time:</span>{" "}
+            {dayjs(member.created_at).format("HH:mm")}
+          </p>
+          <p>
+            <span className="font-semibold">Legacy Status:</span>{" "}
+            {typeof member.active === "boolean"
+              ? member.active
+                ? "Active"
+                : "Inactive"
+              : "N/A"}
+          </p>
+        </div>
 
         <button
           onClick={handleCloseModal}
