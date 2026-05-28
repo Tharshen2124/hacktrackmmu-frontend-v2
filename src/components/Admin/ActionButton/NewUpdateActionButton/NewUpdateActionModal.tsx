@@ -8,7 +8,7 @@ import { apiUrl } from "@/utils/env";
 import { fetcherWithToken } from "@/utils/fetcher";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 
 interface NewUpdateActionModalProps {
   isModalOpen: boolean;
@@ -116,8 +116,20 @@ export function NewUpdateActionModal({
           },
         },
       );
+
       setIsSubmitting(false);
       handleCloseModal();
+
+      // BROADCAST THE REFRESH: Tell all dashboard SWR hooks to re-fetch
+      mutate(
+        (key) =>
+          Array.isArray(key) &&
+          typeof key[0] === "string" &&
+          key[0].includes("/api/v1/dashboard"),
+        undefined,
+        { revalidate: true },
+      );
+
       showToast("Successfully added updates!", "success");
     } catch (error: any) {
       setIsSubmitting(false); // Fixed: was setting to true
