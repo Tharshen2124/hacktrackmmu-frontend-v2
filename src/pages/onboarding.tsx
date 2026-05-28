@@ -16,7 +16,7 @@ import useSWR from "swr";
 const ONBOARDING_STATUSES = [
   MemberStatus.Registered,
   MemberStatus.Contacted,
-  MemberStatus.IdeaTalked,
+  MemberStatus.FirstTalkGiven,
   MemberStatus.NeverActive,
   MemberStatus.Active,
   MemberStatus.SociallyActive,
