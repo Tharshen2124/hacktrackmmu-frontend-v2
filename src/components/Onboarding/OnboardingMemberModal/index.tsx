@@ -3,8 +3,13 @@ import { ModalLayout } from "@/components/ModalLayout";
 import { useToast } from "@/components/Toast/ToastProvider";
 import useAuthStore from "@/store/useAuthStore";
 import { Member, MemberStatus, MemberStatusLabels } from "@/types/types";
+import { apiUrl } from "@/utils/env";
+import axios from "axios";
 import dayjs from "dayjs";
 import {
+  ArrowDown,
+  ArrowUp,
+  Check,
   Copy,
   Edit,
   Mail,
@@ -13,7 +18,7 @@ import {
   Trash,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { handleConfirmDeleteMember } from "../handleConfirmDeleteMember";
 import DeleteModal from "../DeleteModal";
 
@@ -35,6 +40,26 @@ const convertToWhatsapp = (phoneNumber: string) => {
   }
 };
 
+const STATUS_ORDER = [
+  MemberStatus.Registered,
+  MemberStatus.Contacted,
+  MemberStatus.FirstTalkGiven,
+  MemberStatus.NeverActive,
+  MemberStatus.Active,
+  MemberStatus.SociallyActive,
+  MemberStatus.WasActive,
+  MemberStatus.WasSociallyActive,
+  MemberStatus.Terminated,
+];
+
+const getStatusIndex = (status: MemberStatus): number => {
+  return STATUS_ORDER.indexOf(status);
+};
+
+const getStatusByIndex = (index: number): MemberStatus | undefined => {
+  return STATUS_ORDER[index];
+};
+
 export function OnboardingMemberModal({
   isModalOpen,
   handleCloseModal,
@@ -43,8 +68,61 @@ export function OnboardingMemberModal({
 }: OnboardingMemberModalProps) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const { showToast } = useToast();
   const { token } = useAuthStore();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const currentStatusIndex = getStatusIndex(member.status as MemberStatus);
+  const maxOnboardingIndex = getStatusIndex(MemberStatus.FirstTalkGiven);
+  const minOnboardingIndex = getStatusIndex(MemberStatus.Registered);
+
+  const canPromote =
+    currentStatusIndex < maxOnboardingIndex &&
+    currentStatusIndex >= minOnboardingIndex;
+  const canDemote =
+    currentStatusIndex > minOnboardingIndex &&
+    currentStatusIndex <= maxOnboardingIndex;
+  const isAtFinalOnboardingStatus = currentStatusIndex === maxOnboardingIndex;
+
+  const getNextStatusLabel = () => {
+    const nextStatus = getStatusByIndex(currentStatusIndex + 1);
+    return nextStatus ? MemberStatusLabels[nextStatus] : "";
+  };
+
+  const getPreviousStatusLabel = () => {
+    const prevStatus = getStatusByIndex(currentStatusIndex - 1);
+    return prevStatus ? MemberStatusLabels[prevStatus] : "";
+  };
+
+  const updateStatus = async (change: "up" | "down") => {
+    const newIndex =
+      change === "up" ? currentStatusIndex + 1 : currentStatusIndex - 1;
+    const newStatus = getStatusByIndex(newIndex);
+
+    if (!newStatus) return;
+
+    try {
+      await axios.put(
+        `${apiUrl}/api/v1/members/${member.id}`,
+        { member: { status: newStatus } },
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      mutateOnboarding();
+      showToast("Member status updated successfully", "success");
+    } catch (error) {
+      console.error("Error occurred during fetch", error);
+      showToast("Failed to update status", "error");
+    }
+  };
 
   const copyToClipBoard = async (text: string, toastText: string = "Item") => {
     if (!text) {
@@ -89,85 +167,137 @@ export function OnboardingMemberModal({
             </button>
           </div>
         </div>
-      
 
-      <div className="status-container flex flex-row justify-between items-center mb-2">
-        <h3 className="text-lg font-semibold">
-          Status:{" "}
-          {MemberStatusLabels[member.status as MemberStatus] || member.status}
-        </h3>
-      </div>
+        <div className="status-container flex flex-row justify-between items-center mb-2">
+          <h3 className="text-lg font-semibold">
+            Status:{" "}
+            {MemberStatusLabels[member.status as MemberStatus] || member.status}
+          </h3>
+          {isClient && (
+            <div className="arrow-containers flex flex-row gap-x-2 items-center">
+              {isAtFinalOnboardingStatus && (
+                <Link
+                  href={`/member/${member.id}/edit?source=onboarding`}
+                  passHref
+                >
+                  <button
+                    className="bg-green-600 p-1 rounded-md"
+                    title="Assign Status in Edit Page"
+                  >
+                    <Check size="16" className="text-white" />
+                  </button>
+                </Link>
+              )}
+              {canPromote ? (
+                <button
+                  title={`Promote to ${getNextStatusLabel()}`}
+                  className="bg-blue-600 p-1 rounded-md transition hover:bg-blue-700"
+                  onClick={() => updateStatus("up")}
+                >
+                  <ArrowUp size="16" className="text-white" />
+                </button>
+              ) : (
+                <div className="bg-gray-600 p-1 rounded-md">
+                  <ArrowUp size="16" className="text-white" />
+                </div>
+              )}
+              {canDemote ? (
+                <button
+                  title={`Demote to ${getPreviousStatusLabel()}`}
+                  className="bg-yellow-500 p-1 rounded-md transition hover:bg-yellow-600"
+                  onClick={() => updateStatus("down")}
+                >
+                  <ArrowDown size="16" className="text-white" />
+                </button>
+              ) : (
+                <div className="bg-gray-600 p-1 rounded-md">
+                  <ArrowDown size="16" className="text-white" />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
-      <h3 className="text-lg font-semibold mt-4 mb-1">Contact Information</h3>
-      <div className="flex flex-col gap-y-2">
-        <div className="flex items-center justify-between border border-gray-700 py-3 px-4 rounded-md gap-3">
-          <p className="min-w-0 truncate">
-            <span className="font-bold">Email:</span> {member.email || "N/A"}
-          </p>
-          <div className="flex flex-row gap-x-4">
-            <Copy
-              onClick={() => copyToClipBoard(member.email, "Email")}
-              className="hover:text-gray-400 hover:cursor-pointer active:text-green-500"
-              size="16"
-            />
-            <Link href={`mailto:${member.email}`} passHref>
-              <Mail
-                className="hover:text-gray-400 active:text-blue-500"
+        {isAtFinalOnboardingStatus && (
+          <div className="bg-green-500 text-black font-bold text-sm p-2 rounded-md mt-2">
+            <p>Select Tick Icon to Assign Status in Edit Page.</p>
+          </div>
+        )}
+
+        <h3 className="text-lg font-semibold mt-4 mb-1">Contact Information</h3>
+        <div className="flex flex-col gap-y-2">
+          <div className="flex items-center justify-between border border-gray-700 py-3 px-4 rounded-md gap-3">
+            <p className="min-w-0 truncate">
+              <span className="font-bold">Email:</span> {member.email || "N/A"}
+            </p>
+            <div className="flex flex-row gap-x-4">
+              <Copy
+                onClick={() => copyToClipBoard(member.email, "Email")}
+                className="hover:text-gray-400 hover:cursor-pointer active:text-green-500"
                 size="16"
               />
-            </Link>
+              <Link href={`mailto:${member.email}`} passHref>
+                <Mail
+                  className="hover:text-gray-400 active:text-blue-500"
+                  size="16"
+                />
+              </Link>
+            </div>
+          </div>
+          <div className="flex items-center justify-between border border-gray-700 py-3 px-4 rounded-md gap-3">
+            <p className="min-w-0 truncate">
+              <span className="font-bold">Contact Number:</span>{" "}
+              {member.contact_number || <NullTextIndicator />}
+            </p>
+            <div className="flex flex-row gap-x-4">
+              <Copy
+                onClick={() =>
+                  copyToClipBoard(member.contact_number, "Contact Number")
+                }
+                className="hover:text-gray-400 hover:cursor-pointer active:text-green-500"
+                size="16"
+              />
+              <Phone
+                onClick={() => handleWhatsapp(member.contact_number)}
+                className="hover:text-gray-400 hover:cursor-pointer active:text-green-500"
+                size={16}
+              />
+            </div>
+          </div>
+          <div className="flex items-center justify-between border border-gray-700 py-3 px-4 rounded-md gap-3">
+            <p className="min-w-0 truncate">
+              <span className="font-bold">Discord Tag:</span>{" "}
+              {member.discord_tag || <NullTextIndicator />}
+            </p>
+            <div className="flex flex-row gap-x-4">
+              <Copy
+                onClick={() =>
+                  copyToClipBoard(member.discord_tag, "Discord Tag")
+                }
+                className="hover:text-gray-400 hover:cursor-pointer active:text-green-500"
+                size="16"
+              />
+              <Tag size={16} />
+            </div>
           </div>
         </div>
-        <div className="flex items-center justify-between border border-gray-700 py-3 px-4 rounded-md gap-3">
-          <p className="min-w-0 truncate">
-            <span className="font-bold">Contact Number:</span>{" "}
-            {member.contact_number || <NullTextIndicator />}
-          </p>
-          <div className="flex flex-row gap-x-4">
-            <Copy
-              onClick={() =>
-                copyToClipBoard(member.contact_number, "Contact Number")
-              }
-              className="hover:text-gray-400 hover:cursor-pointer active:text-green-500"
-              size="16"
-            />
-            <Phone onClick={() => handleWhatsapp(member.contact_number)} size={16} />
-          </div>
-        </div>
-        <div className="flex items-center justify-between border border-gray-700 py-3 px-4 rounded-md gap-3">
-          <p className="min-w-0 truncate">
-            <span className="font-bold">Discord Tag:</span>{" "}
-            {member.discord_tag || <NullTextIndicator />}
-          </p>
-          <div className="flex flex-row gap-x-4">
-            <Copy
-              onClick={() =>
-                copyToClipBoard(member.discord_tag, "Discord Tag")
-              }
-              className="hover:text-gray-400 hover:cursor-pointer active:text-green-500"
-              size="16"
-            />
-            <Tag size={16} />
-          </div>
-        </div>
-      </div>
 
-      <h3 className="text-lg font-semibold mb-1 mt-4">Comment</h3>
-      <div className="flex flex-col gap-x-2 border border-gray-700 py-3 px-4 rounded-md max-h-36 lg:max-h-48 overflow-y-auto">
-        <p>{member.comment || <NullTextIndicator />}</p>
-      </div>
+        <h3 className="text-lg font-semibold mb-1 mt-4">Comment</h3>
+        <div className="flex flex-col gap-x-2 border border-gray-700 py-3 px-4 rounded-md max-h-36 lg:max-h-48 overflow-y-auto">
+          <p>{member.comment || <NullTextIndicator />}</p>
+        </div>
 
-      <h3 className="text-lg font-semibold mb-1 mt-4">Other Information</h3>
-      <div className="flex flex-col gap-x-2 border border-gray-700 py-3 px-4 rounded-md max-h-36 lg:max-h-48 overflow-y-auto">
-        <p>
-          <span className="font-semibold">Register Date:</span>{" "}
-          {dayjs(member.created_at).format("DD/MM/YYYY")}
-        </p>
-        <p>
-          <span className="font-semibold">Register Time:</span>{" "}
-          {dayjs(member.created_at).format("HH:mm")}
-        </p>
-      </div>
+        <h3 className="text-lg font-semibold mb-1 mt-4">Other Information</h3>
+        <div className="flex flex-col gap-x-2 border border-gray-700 py-3 px-4 rounded-md max-h-36 lg:max-h-48 overflow-y-auto">
+          <p>
+            <span className="font-semibold">Register Date:</span>{" "}
+            {dayjs(member.created_at).format("DD/MM/YYYY")}
+          </p>
+          <p>
+            <span className="font-semibold">Register Time:</span>{" "}
+            {dayjs(member.created_at).format("HH:mm")}
+          </p>
+        </div>
 
         <button
           onClick={handleCloseModal}

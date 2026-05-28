@@ -2,7 +2,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import useAuthStore from "@/store/useAuthStore";
 import { apiUrl } from "@/utils/env";
 import { fetcherWithToken } from "@/utils/fetcher";
-import { Member, MemberStatus } from "@/types/types";
+import { Member, MemberStatus, getStatusLabel } from "@/types/types";
 import { ChevronLeft, LoaderCircle } from "lucide-react";
 import { useRouter } from "next/router";
 import useSWR from "swr";
@@ -185,7 +185,7 @@ export default function EditMemberPage() {
                 <option value="">Select a status</option>
                 {Object.values(MemberStatus).map((status) => (
                   <option key={status} value={status}>
-                    {status}
+                    {getStatusLabel(status)}
                   </option>
                 ))}
               </select>

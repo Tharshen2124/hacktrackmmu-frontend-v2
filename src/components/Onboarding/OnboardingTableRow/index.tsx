@@ -93,9 +93,15 @@ export default function OnboardingTableRow({
       <td className="pl-8 pr-2 py-4 min-w-[150px] overflow-auto">
         {member.name}
       </td>
-      <td className="py-4 px-4">{member.contact_number || <NullTextIndicator />}</td>
       <td className="py-4 px-4">
-        {member.register_date ? dayjs(member.register_date).format("MMM D, YYYY") : <NullTextIndicator />}
+        {member.contact_number || <NullTextIndicator />}
+      </td>
+      <td className="py-4 px-4">
+        {member.register_date ? (
+          dayjs(member.register_date).format("MMM D, YYYY")
+        ) : (
+          <NullTextIndicator />
+        )}
       </td>
 
       <td className="py-4 px-4">
@@ -131,7 +137,7 @@ export default function OnboardingTableRow({
               Edit
             </button>
           </Link>
-          <button 
+          <button
             onClick={handleDeleteMember}
             className="w-[80px] text-white text-sm font-semibold bg-red-800 py-2 px-3 rounded-full transition duration-200 hover:bg-red-700 active:bg-gray-400"
           >
