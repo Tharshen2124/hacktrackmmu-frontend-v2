@@ -66,9 +66,9 @@ export function OnboardingMemberModal({
   member,
   mutateOnboarding,
 }: OnboardingMemberModalProps) {
-  const [isClient, setIsClient] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const { showToast } = useToast();
   const { token } = useAuthStore();
 
@@ -87,6 +87,16 @@ export function OnboardingMemberModal({
     currentStatusIndex > minOnboardingIndex &&
     currentStatusIndex <= maxOnboardingIndex;
   const isAtFinalOnboardingStatus = currentStatusIndex === maxOnboardingIndex;
+
+  const getNextStatusLabel = () => {
+    const nextStatus = getStatusByIndex(currentStatusIndex + 1);
+    return nextStatus ? MemberStatusLabels[nextStatus] : "";
+  };
+
+  const getPreviousStatusLabel = () => {
+    const prevStatus = getStatusByIndex(currentStatusIndex - 1);
+    return prevStatus ? MemberStatusLabels[prevStatus] : "";
+  };
 
   const updateStatus = async (change: "up" | "down") => {
     const newIndex =
@@ -133,16 +143,6 @@ export function OnboardingMemberModal({
     window.open(whatsappLink, "_blank");
   };
 
-  const getNextStatusLabel = (): string => {
-    const nextStatus = getStatusByIndex(currentStatusIndex + 1);
-    return nextStatus ? MemberStatusLabels[nextStatus] : "";
-  };
-
-  const getPreviousStatusLabel = (): string => {
-    const prevStatus = getStatusByIndex(currentStatusIndex - 1);
-    return prevStatus ? MemberStatusLabels[prevStatus] : "";
-  };
-
   const handleDeleteMember = () => setIsDeleteModalOpen(true);
   const handleCloseDeleteModal = () => setIsDeleteModalOpen(false);
 
@@ -168,7 +168,7 @@ export function OnboardingMemberModal({
           </div>
         </div>
 
-        <div className="status-container flex flex-row justify-between items-center">
+        <div className="status-container flex flex-row justify-between items-center mb-2">
           <h3 className="text-lg font-semibold">
             Status:{" "}
             {MemberStatusLabels[member.status as MemberStatus] || member.status}
@@ -184,14 +184,14 @@ export function OnboardingMemberModal({
                     className="bg-green-600 p-1 rounded-md"
                     title="Assign Status in Edit Page"
                   >
-                    <Check size="16" />
+                    <Check size="16" className="text-white" />
                   </button>
                 </Link>
               )}
               {canPromote ? (
                 <button
                   title={`Promote to ${getNextStatusLabel()}`}
-                  className="bg-blue-600 p-1 rounded-md"
+                  className="bg-blue-600 p-1 rounded-md transition hover:bg-blue-700"
                   onClick={() => updateStatus("up")}
                 >
                   <ArrowUp size="16" className="text-white" />
@@ -204,7 +204,7 @@ export function OnboardingMemberModal({
               {canDemote ? (
                 <button
                   title={`Demote to ${getPreviousStatusLabel()}`}
-                  className="bg-yellow-500 p-1 rounded-md"
+                  className="bg-yellow-500 p-1 rounded-md transition hover:bg-yellow-600"
                   onClick={() => updateStatus("down")}
                 >
                   <ArrowDown size="16" className="text-white" />
@@ -259,6 +259,7 @@ export function OnboardingMemberModal({
               />
               <Phone
                 onClick={() => handleWhatsapp(member.contact_number)}
+                className="hover:text-gray-400 hover:cursor-pointer active:text-green-500"
                 size={16}
               />
             </div>
@@ -295,14 +296,6 @@ export function OnboardingMemberModal({
           <p>
             <span className="font-semibold">Register Time:</span>{" "}
             {dayjs(member.created_at).format("HH:mm")}
-          </p>
-          <p>
-            <span className="font-semibold">Legacy Status:</span>{" "}
-            {typeof member.active === "boolean"
-              ? member.active
-                ? "Active"
-                : "Inactive"
-              : "N/A"}
           </p>
         </div>
 
