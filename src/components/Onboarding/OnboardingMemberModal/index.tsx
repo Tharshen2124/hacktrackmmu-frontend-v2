@@ -294,14 +294,6 @@ export function OnboardingMemberModal({
           <span className="font-semibold">Register Time:</span>{" "}
           {dayjs(member.created_at).format("HH:mm")}
         </p>
-        <p>
-          <span className="font-semibold">Legacy Status:</span>{" "}
-          {typeof member.active === "boolean"
-            ? member.active
-              ? "Active"
-              : "Inactive"
-            : "N/A"}
-        </p>
       </div>
 
         <button
