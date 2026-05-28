@@ -19,7 +19,7 @@ interface OnboardingTableRowProps {
 const statusColour: Partial<Record<MemberStatus, string>> = {
   [MemberStatus.Registered]: "white",
   [MemberStatus.Contacted]: "blue-400",
-  [MemberStatus.IdeaTalked]: "green-400",
+  [MemberStatus.FirstTalkGiven]: "green-400",
   [MemberStatus.NeverActive]: "gray-400",
   [MemberStatus.Active]: "yellow-400",
   [MemberStatus.SociallyActive]: "orange-400",
@@ -32,7 +32,7 @@ const statusColour: Partial<Record<MemberStatus, string>> = {
 const ONBOARDING_STATUSES = [
   MemberStatus.Registered,
   MemberStatus.Contacted,
-  MemberStatus.IdeaTalked,
+  MemberStatus.FirstTalkGiven,
   MemberStatus.NeverActive,
   MemberStatus.Active,
   MemberStatus.SociallyActive,
