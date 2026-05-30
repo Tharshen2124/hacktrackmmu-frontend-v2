@@ -26,6 +26,7 @@ const statusColour: Partial<Record<MemberStatus, string>> = {
   [MemberStatus.WasActive]: "purple-400",
   [MemberStatus.WasSociallyActive]: "indigo-400",
   [MemberStatus.Terminated]: "red-400",
+  [MemberStatus.Duplicate]: "zinc-300",
 };
 
 // Easy to modify: just add/remove statuses here
@@ -39,6 +40,7 @@ const ONBOARDING_STATUSES = [
   MemberStatus.WasActive,
   MemberStatus.WasSociallyActive,
   MemberStatus.Terminated,
+  MemberStatus.Duplicate,
 ];
 
 export default function OnboardingTableRow({
