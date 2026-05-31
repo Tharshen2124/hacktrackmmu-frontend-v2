@@ -50,6 +50,7 @@ const STATUS_ORDER = [
   MemberStatus.WasActive,
   MemberStatus.WasSociallyActive,
   MemberStatus.Terminated,
+  MemberStatus.Duplicate,
 ];
 
 const getStatusIndex = (status: MemberStatus): number => {

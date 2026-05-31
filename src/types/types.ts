@@ -8,6 +8,7 @@ export enum MemberStatus {
   WasActive = "was_active",
   WasSociallyActive = "was_socially_active",
   Terminated = "terminated",
+  Duplicate = "duplicate",
 }
 
 // Display labels for the UI
@@ -21,6 +22,7 @@ export const MemberStatusLabels: Record<MemberStatus, string> = {
   [MemberStatus.WasActive]: "Was Active",
   [MemberStatus.WasSociallyActive]: "Was Socially Active",
   [MemberStatus.Terminated]: "Terminated",
+  [MemberStatus.Duplicate]: "Duplicate",
 };
 
 // Helper to get label from backend value

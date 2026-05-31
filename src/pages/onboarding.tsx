@@ -23,6 +23,7 @@ const ONBOARDING_STATUSES = [
   MemberStatus.WasActive,
   MemberStatus.WasSociallyActive,
   MemberStatus.Terminated,
+  MemberStatus.Duplicate,
 ];
 
 export default function Onboarding() {
