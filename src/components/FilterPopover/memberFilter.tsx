@@ -10,7 +10,8 @@ const DEFAULT_SORT = "newest";
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest" },
   { value: "talks_desc", label: "Most Talks" },
-  { value: "recent_talks", label: "Recent Talks"}
+  { value: "recent_talks", label: "Recent Talks"},
+  { value: "alphabetical", label: "Alphabetical" },
 ];
 
 interface MemberFilterProps {
