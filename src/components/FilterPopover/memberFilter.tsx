@@ -14,6 +14,11 @@ const SORT_OPTIONS = [
   { value: "alphabetical", label: "Alphabetical" },
 ];
 
+interface SortOption {
+  value: string;
+  label: string;
+}
+
 interface MemberFilterProps {
   onStatusChange: (status: string[]) => void;
   onSortChange: (sortBy: string) => void;
@@ -21,6 +26,8 @@ interface MemberFilterProps {
   currentSortBy: string;
   availableStatuses?: MemberStatus[];
   defaultStatuses?: MemberStatus[];
+  availableSortOptions?: SortOption[];
+  defaultSort?: string;
   isOnboarding?: boolean;
 }
 
@@ -29,8 +36,10 @@ export default function MemberFilter({
   onSortChange,
   currentStatus,
   currentSortBy,
-  availableStatuses = Object.values(MemberStatus), // Default: all statuses
-  defaultStatuses = [MemberStatus.Active, MemberStatus.SociallyActive], // Default: active members
+  availableStatuses = Object.values(MemberStatus),
+  defaultStatuses = [MemberStatus.Active, MemberStatus.SociallyActive],
+  availableSortOptions = SORT_OPTIONS,
+  defaultSort = DEFAULT_SORT,
   isOnboarding = false,
 }: MemberFilterProps) {
   const filterPopoverRef = useRef<{ closePopover: () => void }>(null);
@@ -63,9 +72,9 @@ export default function MemberFilter({
 
   const handleClear = () => {
     setSelectedStatus(ALL_OPTION);
-    setSelectedSort(DEFAULT_SORT);
+    setSelectedSort(defaultSort);
     onStatusChange(defaultStatuses);
-    onSortChange(DEFAULT_SORT);
+    onSortChange(defaultSort);
     filterPopoverRef.current?.closePopover();
   };
 
@@ -85,7 +94,7 @@ export default function MemberFilter({
         {!isOnboarding && (
           <Selector
             label="Sort By"
-            options={SORT_OPTIONS}
+            options={availableSortOptions}
             value={selectedSort}
             onChange={setSelectedSort}
           />

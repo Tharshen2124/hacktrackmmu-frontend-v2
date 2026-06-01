@@ -5,54 +5,60 @@ import OnboardingTableRow from "@/components/Onboarding/OnboardingTableRow";
 import SearchComponent from "@/components/Search";
 import { useMediaQuery } from "@/hooks";
 import useAuthStore from "@/store/useAuthStore";
-import { MemberStatus, Member } from "@/types/types";
+import { MemberStatus, Member, getStatusLabel } from "@/types/types";
+
+const MemberStatusComponent = ({ status }: { status: string }) => (
+  <div className="border-neutral-400 border dark:border-gray-200 px-4 py-1 rounded-2xl text-center items-center flex">
+    <p>{status}</p>
+  </div>
+);
 import { apiUrl } from "@/utils/env";
 import { fetcherWithToken } from "@/utils/fetcher";
-import dayjs from "dayjs";
-import { ChevronLeft, ChevronRight, ArrowUp, ArrowDown } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 
 const ONBOARDING_STATUSES = [
   MemberStatus.Registered,
   MemberStatus.Contacted,
   MemberStatus.FirstTalkGiven,
-  MemberStatus.NeverActive,
-  MemberStatus.Active,
-  MemberStatus.SociallyActive,
-  MemberStatus.WasActive,
-  MemberStatus.WasSociallyActive,
-  MemberStatus.Terminated,
-  MemberStatus.Duplicate,
 ];
 
-const ONBOARDING_SORT_BY = "recent_talks";
+const ONBOARDING_SORT_OPTIONS = [
+  { value: "recent_talks", label: "Recent Talks" },
+  { value: "newest", label: "Latest Registered" },
+  { value: "oldest", label: "Earliest Registered" },
+  { value: "alphabetical", label: "Alphabetical" },
+];
+
+const DEFAULT_SORT = "recent_talks";
 
 export default function Onboarding() {
   const { token } = useAuthStore();
   const [isClient, setIsClient] = useState(false);
   const [searchResults, setSearchResults] = useState<Member[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [dateSortOrder, setDateSortOrder] = useState<"desc" | "asc">("desc");
-  const [isRegisterDateSortEnabled, setIsRegisterDateSortEnabled] = useState(false);
   const isMaxWidth768px = useMediaQuery("(max-width: 768px)");
   const [paginationNumber, setPaginationNumber] = useState(1);
-  const [statusFilter, setStatusFilter] =
-    useState<string[]>(ONBOARDING_STATUSES);
+  const [statusFilter, setStatusFilter] = useState<string[]>(ONBOARDING_STATUSES);
+  const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  const createQueryParams = (page: number) => {
+  const getSWRKey = () => {
+    if (!token || !isClient || isSearching) return null;
+
     const queryParams = new URLSearchParams({
-      page: page.toString(),
-      sort_by: ONBOARDING_SORT_BY,
+      page: paginationNumber.toString(),
+      sort_by: sortBy,
     });
     statusFilter.forEach((status) => {
       queryParams.append("status[]", status);
     });
-    return queryParams;
+
+    return [`${apiUrl}/api/v1/members/filtered?${queryParams.toString()}`, token];
   };
 
   const {
@@ -60,57 +66,24 @@ export default function Onboarding() {
     error: onboardingError,
     isLoading: onboardingLoading,
     mutate: mutateOnboarding,
-  } = useSWR(
-    token && isClient
-      ? [
-          `${apiUrl}/api/v1/members/filtered?${createQueryParams(paginationNumber).toString()}`,
-          token,
-        ]
-      : null,
-    ([url, token]) => fetcherWithToken(url, token),
-  );
+  } = useSWR(getSWRKey(), ([url, token]) => fetcherWithToken(url, token));
 
   const totalPagination = onboardingData?.meta?.total_pages || 1;
 
-  const toggleDateSort = () => {
-    setDateSortOrder((prev) => (prev === "desc" ? "asc" : "desc"));
-  };
+  const members = isSearching
+    ? searchResults.filter((m: Member) => statusFilter.includes(m.status))
+    : onboardingData?.data || [];
 
   useEffect(() => {
     setPaginationNumber(1);
-  }, [statusFilter]);
-
-  const members = useMemo(() => {
-    let rawMembers = isSearching ? searchResults : onboardingData?.data || [];
-
-    if (isSearching) {
-      rawMembers = rawMembers.filter((member: Member) =>
-        statusFilter.includes(member.status),
-      );
-    }
-
-    const sortableMembers = [...rawMembers];
-
-    if (!isRegisterDateSortEnabled) return sortableMembers;
-
-    return sortableMembers.sort((a: Member, b: Member) => {
-      const dateA = dayjs(a.register_date);
-      const dateB = dayjs(b.register_date);
-
-      if (dateSortOrder === "desc") {
-        if (dateB.isAfter(dateA)) return 1;
-        if (dateB.isBefore(dateA)) return -1;
-        return 0;
-      } else {
-        if (dateA.isAfter(dateB)) return 1;
-        if (dateA.isBefore(dateB)) return -1;
-        return 0;
-      }
-    });
-  }, [onboardingData, searchResults, statusFilter, isSearching, dateSortOrder, isRegisterDateSortEnabled]);
+  }, [statusFilter, sortBy]);
 
   const handleStatusChange = (newStatuses: string[]) => {
     setStatusFilter(newStatuses);
+  };
+
+  const handleSortChange = (newSortBy: string) => {
+    setSortBy(newSortBy);
   };
 
   const handleSearchResults = (results: Member[], searching: boolean) => {
@@ -121,6 +94,8 @@ export default function Onboarding() {
   const handleSearchError = (error: unknown) => {
     console.error("Search failed:", error);
   };
+
+  const currentStatusLabels = statusFilter.map((status) => getStatusLabel(status));
 
   const getCurrentSingleStatus = () => {
     if (statusFilter.length === ONBOARDING_STATUSES.length) return "all";
@@ -138,7 +113,27 @@ export default function Onboarding() {
 
   return (
     <DashboardLayout pageTitle="HackTrack - Onboarding">
-      <h1 className="text-4xl font-bold mt-6">Onboarding</h1>
+      <div className="flex justify-between items-center mt-6 mb-3">
+        <div className="flex flex-row gap-4">
+          <h1 className="text-4xl font-bold">Onboarding</h1>
+          <div className="currentStatusMap gap-2 flex-row items-center md:flex hidden">
+            {currentStatusLabels.map((status, index) => (
+              <MemberStatusComponent key={index} status={status} />
+            ))}
+          </div>
+        </div>
+        <MemberFilter
+          onStatusChange={handleStatusChange}
+          onSortChange={handleSortChange}
+          currentStatus={getCurrentSingleStatus()}
+          currentSortBy={sortBy}
+          availableStatuses={ONBOARDING_STATUSES}
+          defaultStatuses={ONBOARDING_STATUSES}
+          availableSortOptions={ONBOARDING_SORT_OPTIONS}
+          defaultSort={DEFAULT_SORT}
+        />
+      </div>
+
       {onboardingError && <p>Error loading data</p>}
 
       <div className="filter-section flex flex-row items-center justify-between my-3">
@@ -161,47 +156,10 @@ export default function Onboarding() {
                   Contact Number
                 </th>
                 <th className="py-4 px-4 bg-neutral-700 dark:bg-[#1e1e1e]">
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={toggleDateSort}
-                      disabled={!isRegisterDateSortEnabled}
-                      className="flex items-center gap-2 hover:text-gray-300 transition-colors font-bold disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Register Date
-                      {isRegisterDateSortEnabled && (
-                        dateSortOrder === "desc" ? (
-                          <ArrowDown size={16} />
-                        ) : (
-                          <ArrowUp size={16} />
-                        )
-                      )}
-                    </button>
-                    <button
-                      onClick={() => setIsRegisterDateSortEnabled((prev) => !prev)}
-                      title={isRegisterDateSortEnabled ? "Disable register date sort" : "Enable register date sort"}
-                      className={`text-xs px-2 py-0.5 rounded border transition-colors ${
-                        isRegisterDateSortEnabled
-                          ? "border-blue-500 text-blue-400 bg-blue-500/10 hover:bg-blue-500/20"
-                          : "border-gray-600 text-gray-500 hover:border-gray-400 hover:text-gray-400"
-                      }`}
-                    >
-                      {isRegisterDateSortEnabled ? "On" : "Off"}
-                    </button>
-                  </div>
+                  Register Date
                 </th>
                 <th className="py-4 px-4 bg-neutral-700 dark:bg-[#1e1e1e]">
-                  <div className="flex items-center gap-x-3">
-                    Status
-                    <MemberFilter
-                      onStatusChange={handleStatusChange}
-                      onSortChange={() => {}}
-                      currentStatus={getCurrentSingleStatus()}
-                      currentSortBy=""
-                      availableStatuses={ONBOARDING_STATUSES}
-                      defaultStatuses={ONBOARDING_STATUSES}
-                      isOnboarding={true}
-                    />
-                  </div>
+                  Status
                 </th>
                 <th className="pl-2 pr-8 py-4 bg-neutral-700 dark:bg-[#1e1e1e] w-[297px]">
                   Options
@@ -249,27 +207,29 @@ export default function Onboarding() {
         )}
       </div>
 
-      <div className="fixed flex items-center border-2 border-gray-200 dark:border-gray-700 rounded-full w-fit bottom-4 right-4 z-50 overflow-hidden">
-        <button
-          onClick={() => setPaginationNumber((prev) => Math.max(1, prev - 1))}
-          className="text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 py-2 px-2 transition duration-200 hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={onboardingLoading || paginationNumber === 1}
-        >
-          <ChevronLeft />
-        </button>
-        <div className="text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 w-[75px] py-2 px-2 text-center border-x border-gray-200 dark:border-gray-700">
-          {paginationNumber} - {totalPagination}
+      {!isSearching && (
+        <div className="fixed flex items-center border-2 border-gray-200 dark:border-gray-700 rounded-full w-fit bottom-4 right-4 z-50 overflow-hidden">
+          <button
+            onClick={() => setPaginationNumber((prev) => Math.max(1, prev - 1))}
+            className="text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 py-2 px-2 transition duration-200 hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={onboardingLoading || paginationNumber === 1}
+          >
+            <ChevronLeft />
+          </button>
+          <div className="text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 w-[75px] py-2 px-2 text-center border-x border-gray-200 dark:border-gray-700">
+            {paginationNumber} - {totalPagination}
+          </div>
+          <button
+            onClick={() =>
+              setPaginationNumber((prev) => Math.min(totalPagination, prev + 1))
+            }
+            className="text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 py-2 px-2 transition duration-200 hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={onboardingLoading || paginationNumber >= totalPagination}
+          >
+            <ChevronRight />
+          </button>
         </div>
-        <button
-          onClick={() =>
-            setPaginationNumber((prev) => Math.min(totalPagination, prev + 1))
-          }
-          className="text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 py-2 px-2 transition duration-200 hover:bg-gray-200 dark:hover:bg-neutral-800 active:bg-gray-300 dark:active:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={onboardingLoading || paginationNumber >= totalPagination}
-        >
-          <ChevronRight />
-        </button>
-      </div>
+      )}
     </DashboardLayout>
   );
 }
