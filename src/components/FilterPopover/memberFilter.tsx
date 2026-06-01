@@ -9,6 +9,7 @@ const ALL_LABEL = "All";
 const SORT_OPTIONS = [
   { value: "", label: "Default" },
   { value: "talks_desc", label: "Most Talks" },
+  { value: "recent_talks", label: "Recent Talks"}
 ];
 
 interface MemberFilterProps {
