@@ -5,9 +5,10 @@ import { MemberStatus, MemberStatusLabels } from "@/types/types";
 
 const ALL_OPTION = "all";
 const ALL_LABEL = "All";
+const DEFAULT_SORT = "newest";
 
 const SORT_OPTIONS = [
-  { value: "", label: "Default" },
+  { value: "newest", label: "Newest" },
   { value: "talks_desc", label: "Most Talks" },
   { value: "recent_talks", label: "Recent Talks"}
 ];
@@ -61,9 +62,9 @@ export default function MemberFilter({
 
   const handleClear = () => {
     setSelectedStatus(ALL_OPTION);
-    setSelectedSort("");
+    setSelectedSort(DEFAULT_SORT);
     onStatusChange(defaultStatuses);
-    onSortChange("");
+    onSortChange(DEFAULT_SORT);
     filterPopoverRef.current?.closePopover();
   };
 

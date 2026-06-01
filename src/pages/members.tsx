@@ -26,7 +26,7 @@ export default function Members() {
   const { token } = useAuthStore();
   const [paginationNumber, setPaginationNumber] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string[]>(DEFAULT_STATUSES);
-  const [sortBy, setSortBy] = useState<string>("");
+  const [sortBy, setSortBy] = useState<string>("recent_talks");
 
   const [searchResults, setSearchResults] = useState<Member[]>([]);
   const [isSearching, setIsSearching] = useState(false);
