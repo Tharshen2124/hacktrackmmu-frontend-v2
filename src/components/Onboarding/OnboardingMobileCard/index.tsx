@@ -110,7 +110,7 @@ export default function OnboardingMobileCard({
       <div className="mt-5 border-t border-gray-800 pt-4">
         <div className="flex justify-between gap-2">
           <button
-            className="flex-1 text-black text-sm font-semibold bg-[#d9d9d9] py-2.5 rounded-md transition duration-200 hover:bg-gray-200 active:bg-gray-400"
+            className="flex-1 text-black text-sm font-semibold bg-[#d9d9d9] py-2 rounded-md transition duration-200 hover:bg-gray-200 active:bg-gray-400"
             onClick={handleViewClick}
           >
             View
@@ -121,14 +121,14 @@ export default function OnboardingMobileCard({
             passHref
             className="flex-1"
           >
-            <button className="w-full text-white text-sm font-semibold bg-blue-800 py-2.5 rounded-md transition duration-200 hover:bg-blue-700 active:bg-blue-900">
+            <button className="w-full text-white text-sm font-semibold bg-blue-800 py-2 rounded-md transition duration-200 hover:bg-blue-700 active:bg-blue-900">
               Edit
             </button>
           </Link>
 
           <button
             onClick={handleDeleteMember}
-            className="flex-1 text-white text-sm font-semibold bg-red-800 py-2.5 rounded-md transition duration-200 hover:bg-red-700 active:bg-red-900"
+            className="flex-1 text-white text-sm font-semibold bg-red-800 py-2 rounded-md transition duration-200 hover:bg-red-700 active:bg-red-900"
           >
             Delete
           </button>

@@ -159,6 +159,9 @@ export default function Onboarding() {
                   Register Date
                 </th>
                 <th className="py-4 px-4 bg-neutral-700 dark:bg-[#1e1e1e]">
+                  Comment
+                </th>
+                <th className="py-4 px-4 bg-neutral-700 dark:bg-[#1e1e1e]">
                   Status
                 </th>
                 <th className="pl-2 pr-8 py-4 bg-neutral-700 dark:bg-[#1e1e1e] w-[297px]">
@@ -181,7 +184,7 @@ export default function Onboarding() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="text-center py-8 text-gray-500">
+                  <td colSpan={6} className="text-center py-8 text-gray-500">
                     {onboardingLoading ? "Loading..." : "No members found"}
                   </td>
                 </tr>
