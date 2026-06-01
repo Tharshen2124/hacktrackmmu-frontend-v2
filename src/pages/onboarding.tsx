@@ -26,12 +26,15 @@ const ONBOARDING_STATUSES = [
   MemberStatus.Duplicate,
 ];
 
+const ONBOARDING_SORT_BY = "recent_talks";
+
 export default function Onboarding() {
   const { token } = useAuthStore();
   const [isClient, setIsClient] = useState(false);
   const [searchResults, setSearchResults] = useState<Member[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [dateSortOrder, setDateSortOrder] = useState<"desc" | "asc">("desc");
+  const [isRegisterDateSortEnabled, setIsRegisterDateSortEnabled] = useState(false);
   const isMaxWidth768px = useMediaQuery("(max-width: 768px)");
   const [paginationNumber, setPaginationNumber] = useState(1);
   const [statusFilter, setStatusFilter] =
@@ -44,6 +47,7 @@ export default function Onboarding() {
   const createQueryParams = (page: number) => {
     const queryParams = new URLSearchParams({
       page: page.toString(),
+      sort_by: ONBOARDING_SORT_BY,
     });
     statusFilter.forEach((status) => {
       queryParams.append("status[]", status);
@@ -76,8 +80,6 @@ export default function Onboarding() {
     setPaginationNumber(1);
   }, [statusFilter]);
 
-  console.log("Onboarding data:", onboardingData);
-
   const members = useMemo(() => {
     let rawMembers = isSearching ? searchResults : onboardingData?.data || [];
 
@@ -88,6 +90,8 @@ export default function Onboarding() {
     }
 
     const sortableMembers = [...rawMembers];
+
+    if (!isRegisterDateSortEnabled) return sortableMembers;
 
     return sortableMembers.sort((a: Member, b: Member) => {
       const dateA = dayjs(a.register_date);
@@ -102,9 +106,8 @@ export default function Onboarding() {
         if (dateA.isBefore(dateB)) return -1;
         return 0;
       }
-      return 0;
     });
-  }, [onboardingData, searchResults, statusFilter, isSearching, dateSortOrder]);
+  }, [onboardingData, searchResults, statusFilter, isSearching, dateSortOrder, isRegisterDateSortEnabled]);
 
   const handleStatusChange = (newStatuses: string[]) => {
     setStatusFilter(newStatuses);
@@ -158,17 +161,33 @@ export default function Onboarding() {
                   Contact Number
                 </th>
                 <th className="py-4 px-4 bg-neutral-700 dark:bg-[#1e1e1e]">
-                  <button
-                    onClick={toggleDateSort}
-                    className="flex items-center gap-2 hover:text-gray-300 transition-colors font-bold"
-                  >
-                    Register Date
-                    {dateSortOrder === "desc" ? (
-                      <ArrowDown size={16} />
-                    ) : (
-                      <ArrowUp size={16} />
-                    )}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={toggleDateSort}
+                      disabled={!isRegisterDateSortEnabled}
+                      className="flex items-center gap-2 hover:text-gray-300 transition-colors font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Register Date
+                      {isRegisterDateSortEnabled && (
+                        dateSortOrder === "desc" ? (
+                          <ArrowDown size={16} />
+                        ) : (
+                          <ArrowUp size={16} />
+                        )
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setIsRegisterDateSortEnabled((prev) => !prev)}
+                      title={isRegisterDateSortEnabled ? "Disable register date sort" : "Enable register date sort"}
+                      className={`text-xs px-2 py-0.5 rounded border transition-colors ${
+                        isRegisterDateSortEnabled
+                          ? "border-blue-500 text-blue-400 bg-blue-500/10 hover:bg-blue-500/20"
+                          : "border-gray-600 text-gray-500 hover:border-gray-400 hover:text-gray-400"
+                      }`}
+                    >
+                      {isRegisterDateSortEnabled ? "On" : "Off"}
+                    </button>
+                  </div>
                 </th>
                 <th className="py-4 px-4 bg-neutral-700 dark:bg-[#1e1e1e]">
                   <div className="flex items-center gap-x-3">
