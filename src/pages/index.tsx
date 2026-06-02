@@ -112,6 +112,12 @@ export default function BackgroundPaths({
           </motion.div>
         </motion.div>
       </div>
+      {/* Footer */}
+      <div className="absolute bottom-4 w-full text-center z-10">
+        <p className="text-white/40 text-sm tracking-wide">
+          © 2026 Hackerspace MMU
+        </p>
+      </div>
     </div>
   );
 }
