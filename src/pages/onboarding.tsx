@@ -18,20 +18,16 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 
-const ONBOARDING_STATUSES = [
-  MemberStatus.Registered,
-  MemberStatus.Contacted,
-  MemberStatus.FirstTalkGiven,
-];
+const ALL_STATUSES = Object.values(MemberStatus);
 
 const ONBOARDING_SORT_OPTIONS = [
-  { value: "recent_talks", label: "Recent Talks" },
   { value: "newest", label: "Latest Registered" },
   { value: "oldest", label: "Earliest Registered" },
+  { value: "recent_talks", label: "Recent Talks" },
   { value: "alphabetical", label: "Alphabetical" },
 ];
 
-const DEFAULT_SORT = "recent_talks";
+const DEFAULT_SORT = "newest";
 
 export default function Onboarding() {
   const { token } = useAuthStore();
@@ -40,7 +36,7 @@ export default function Onboarding() {
   const [isSearching, setIsSearching] = useState(false);
   const isMaxWidth768px = useMediaQuery("(max-width: 768px)");
   const [paginationNumber, setPaginationNumber] = useState(1);
-  const [statusFilter, setStatusFilter] = useState<string[]>(ONBOARDING_STATUSES);
+  const [statusFilter, setStatusFilter] = useState<string[]>(ALL_STATUSES);
   const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT);
 
   useEffect(() => {
@@ -98,7 +94,7 @@ export default function Onboarding() {
   const currentStatusLabels = statusFilter.map((status) => getStatusLabel(status));
 
   const getCurrentSingleStatus = () => {
-    if (statusFilter.length === ONBOARDING_STATUSES.length) return "all";
+    if (statusFilter.length === ALL_STATUSES.length) return "all";
     return statusFilter[0] || "all";
   };
 
@@ -117,9 +113,13 @@ export default function Onboarding() {
         <div className="flex flex-row gap-4">
           <h1 className="text-4xl font-bold">Onboarding</h1>
           <div className="currentStatusMap gap-2 flex-row items-center md:flex hidden">
-            {currentStatusLabels.map((status, index) => (
-              <MemberStatusComponent key={index} status={status} />
-            ))}
+            {statusFilter.length === ALL_STATUSES.length ? (
+              <MemberStatusComponent status="All" />
+            ) : (
+              currentStatusLabels.map((status, index) => (
+                <MemberStatusComponent key={index} status={status} />
+              ))
+            )}
           </div>
         </div>
         <MemberFilter
@@ -127,8 +127,8 @@ export default function Onboarding() {
           onSortChange={handleSortChange}
           currentStatus={getCurrentSingleStatus()}
           currentSortBy={sortBy}
-          availableStatuses={ONBOARDING_STATUSES}
-          defaultStatuses={ONBOARDING_STATUSES}
+          availableStatuses={ALL_STATUSES}
+          defaultStatuses={ALL_STATUSES}
           availableSortOptions={ONBOARDING_SORT_OPTIONS}
           defaultSort={DEFAULT_SORT}
         />
