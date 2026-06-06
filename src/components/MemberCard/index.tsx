@@ -402,7 +402,7 @@ export default function MemberCard({
                             )}
                           </div>
 
-                          <p className="text-sm mt-1 break-all whitespace-pre-line">
+                          <p className="text-sm mt-1 break-words whitespace-pre-line">
                             {update.description}
                           </p>
                           <p className="text-[#777] mt-1 text-sm font-semibold">
