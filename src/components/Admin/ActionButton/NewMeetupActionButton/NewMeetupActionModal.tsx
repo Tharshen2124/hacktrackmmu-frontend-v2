@@ -7,6 +7,7 @@ import useAuthStore from "@/store/useAuthStore";
 import { apiUrl } from "@/utils/env";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { mutate } from "swr";
 
 interface NewMeetupActionModalProps {
   isModalOpen: boolean;
@@ -124,6 +125,15 @@ export function NewMeetupActionModal({
       } else if (category === "regular_meetup") {
         await mutateMeetups();
       }
+      mutate(
+        (key) =>
+          Array.isArray(key) &&
+          typeof key[0] === "string" &&
+          key[0].includes("/api/v1/dashboard/create_update"),
+        undefined,
+        { revalidate: true },
+      );
+
       setIsSubmitting(false);
       handleCloseModal();
       showToast("Successfully added meetup!", "success");
