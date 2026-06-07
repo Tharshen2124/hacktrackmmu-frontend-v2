@@ -2,9 +2,6 @@ import NavigationBar from "../NavigationBar";
 import Head from "next/head";
 import useAuthStore from "@/store/useAuthStore";
 import { useState, useEffect } from "react";
-import useSWR from "swr";
-import { fetcherWithToken } from "@/utils/fetcher";
-import { apiUrl } from "@/utils/env";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -15,7 +12,7 @@ export default function DashboardLayout({
   children,
   pageTitle = "HackTrack",
 }: DashboardLayoutProps) {
-  const { hydrateAuth, token } = useAuthStore();
+  const { hydrateAuth } = useAuthStore();
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
@@ -23,41 +20,8 @@ export default function DashboardLayout({
     setIsHydrated(true);
   }, [hydrateAuth]);
 
-  useSWR(
-    isHydrated && token && token !== "0"
-      ? [`${apiUrl}/api/v1/members?unpaginated=true`, token]
-      : null,
-    ([url, token]) => fetcherWithToken(url, token),
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 60000,
-    },
-  );
-
-  useSWR(
-    isHydrated && token && token !== "0"
-      ? [`${apiUrl}/api/v1/meetups?category=regular_meetup&limit=1000`, token]
-      : null,
-    ([url, token]) => fetcherWithToken(url, token),
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 60000,
-    },
-  );
-
-  useSWR(
-    isHydrated && token && token !== "0"
-      ? [`${apiUrl}/api/v1/meetups?category=hackathon&limit=1000`, token]
-      : null,
-    ([url, token]) => fetcherWithToken(url, token),
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 60000,
-    },
-  );
-
   if (!isHydrated) {
-    return null;
+    return null; // Prevents hydration mismatch while loading auth state
   }
 
   return (

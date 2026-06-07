@@ -9,6 +9,8 @@ import { useDarkMode } from "@/hooks/useDarkMode";
 import axios from "axios";
 import { apiUrl } from "@/utils/env";
 import { useToast } from "@/components/Toast/ToastProvider";
+import { fetcherWithToken } from "@/utils/fetcher";
+import { preload } from "swr";
 
 export default function NavigationBar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -85,14 +87,40 @@ export default function NavigationBar() {
             <Link href="/dashboard" className="hover:text-blue-400">
               Dashboard
             </Link>
-            <Link href="/members" className="ml-4 hover:text-blue-400">
+            <Link
+              href="/members"
+              onMouseEnter={() =>
+                // 1. Pass the array key [url, token]
+                // 2. Unpack the array and pass both to the fetcher
+                preload([`${apiUrl}/api/v1/members`, token], ([url, t]) =>
+                  fetcherWithToken(url, t),
+                )
+              }
+              className="ml-4 hover:text-blue-400"
+            >
               Members
             </Link>
-            <Link href="/meetups" className="ml-4 hover:text-blue-400">
+            <Link
+              href="/meetups"
+              onMouseEnter={() =>
+                preload([`${apiUrl}/api/v1/members`, token], ([url, t]) =>
+                  fetcherWithToken(url, t),
+                )
+              }
+              className="ml-4 hover:text-blue-400"
+            >
               Meetups
             </Link>
             {isClient && isAdmin && (
-              <Link href="/onboarding" className="ml-4 hover:text-blue-400">
+              <Link
+                href="/onboarding"
+                onMouseEnter={() =>
+                  preload([`${apiUrl}/api/v1/members`, token], ([url, t]) =>
+                    fetcherWithToken(url, t),
+                  )
+                }
+                className="ml-4 hover:text-blue-400"
+              >
                 Onboarding
               </Link>
             )}
