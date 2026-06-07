@@ -65,7 +65,7 @@ export function Sidebar({
           </div>
           <nav className="flex-1 px-4 py-6">
             <Link
-              href="/"
+              href="/dashboard"
               className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               Dashboard
