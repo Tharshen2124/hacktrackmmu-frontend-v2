@@ -7,7 +7,7 @@ import useAuthStore from "@/store/useAuthStore";
 import { apiUrl } from "@/utils/env";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import useSWR, { mutate } from "swr";
+import { mutate } from "swr";
 
 interface NewMeetupActionModalProps {
   isModalOpen: boolean;
