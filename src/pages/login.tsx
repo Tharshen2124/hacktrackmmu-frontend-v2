@@ -9,6 +9,8 @@ import { useToast } from "@/components/Toast/ToastProvider";
 import { useRouter } from "next/router";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import { SubmitButton } from "@/components/atomComponents/SubmitButton";
+import { preload } from "swr";
+import { fetcherWithToken } from "@/utils/fetcher";
 
 const images = [
   "/presentation.jpg",
@@ -79,8 +81,16 @@ export default function LoginPage() {
         );
         setIsSubmitting(false);
         setToken(response.data.token, rememberMe);
+
         setAdmin(response.data.isAdmin);
         setValidUntil(response.data.valid_until);
+
+        preload([`${apiUrl}/api/v1/members`, response.data.token], ([url, t]) =>
+          fetcherWithToken(url, t),
+        );
+        preload([`${apiUrl}/api/v1/meetups`, response.data.token], ([url, t]) =>
+          fetcherWithToken(url, t),
+        );
         router.push("/dashboard");
       }
       // eslint-disable-next-line  @typescript-eslint/no-explicit-any

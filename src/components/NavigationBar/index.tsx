@@ -84,14 +84,27 @@ export default function NavigationBar() {
             </h1>
           </div>
           <div className="hidden lg:flex items-center">
-            <Link href="/dashboard" className="hover:text-blue-400">
+            <Link
+              href="/dashboard"
+              onMouseEnter={() => {
+                // 1. Pass the array key [url, token]
+                // 2. Unpack the array and pass both to the fetcher
+                preload([`${apiUrl}/api/v1/members`, token], ([url, t]) =>
+                  fetcherWithToken(url, t),
+                );
+
+                // 3. Preload the second endpoint
+                preload([`${apiUrl}/api/v1/meetups`, token], ([url, t]) =>
+                  fetcherWithToken(url, t),
+                );
+              }}
+              className="hover:text-blue-400"
+            >
               Dashboard
             </Link>
             <Link
               href="/members"
               onMouseEnter={() =>
-                // 1. Pass the array key [url, token]
-                // 2. Unpack the array and pass both to the fetcher
                 preload([`${apiUrl}/api/v1/members`, token], ([url, t]) =>
                   fetcherWithToken(url, t),
                 )
@@ -148,6 +161,7 @@ export default function NavigationBar() {
         isOpen={isSidebarOpen}
         onClose={toggleSidebar}
         isAdmin={isAdmin}
+        token={token}
         handleLogout={handleLogout}
       />
     </>

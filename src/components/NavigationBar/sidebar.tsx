@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { preload } from "swr";
+import { fetcherWithToken } from "@/utils/fetcher";
+import { apiUrl } from "@/utils/env";
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   isAdmin: boolean;
+  token: string;
   handleLogout: () => Promise<void>;
 }
 
@@ -12,6 +16,7 @@ export function Sidebar({
   isOpen,
   onClose,
   isAdmin,
+  token,
   handleLogout,
 }: SidebarProps) {
   const [isClient, setIsClient] = useState(false);
@@ -60,19 +65,41 @@ export function Sidebar({
           </div>
           <nav className="flex-1 px-4 py-6">
             <Link
-              href="/"
+              href="/dashboard"
               className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+              onMouseEnter={() => {
+                // 1. Pass the array key [url, token]
+                // 2. Unpack the array and pass both to the fetcher
+                preload([`${apiUrl}/api/v1/members`, token], ([url, t]) =>
+                  fetcherWithToken(url, t),
+                );
+
+                // 3. Preload the second endpoint
+                preload([`${apiUrl}/api/v1/meetups`, token], ([url, t]) =>
+                  fetcherWithToken(url, t),
+                );
+              }}
             >
               Dashboard
             </Link>
             <Link
               href="/members"
+              onMouseEnter={() =>
+                preload([`${apiUrl}/api/v1/members`, token], ([url, t]) =>
+                  fetcherWithToken(url, t),
+                )
+              }
               className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               Members
             </Link>
             <Link
               href="/meetups"
+              onMouseEnter={() =>
+                preload([`${apiUrl}/api/v1/members`, token], ([url, t]) =>
+                  fetcherWithToken(url, t),
+                )
+              }
               className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               Meetups
@@ -81,6 +108,11 @@ export function Sidebar({
             {isAdmin ? (
               <Link
                 href="/onboarding"
+                onMouseEnter={() =>
+                  preload([`${apiUrl}/api/v1/members`, token], ([url, t]) =>
+                    fetcherWithToken(url, t),
+                  )
+                }
                 className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 Onboarding
