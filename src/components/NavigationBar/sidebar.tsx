@@ -67,6 +67,18 @@ export function Sidebar({
             <Link
               href="/dashboard"
               className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+              onMouseEnter={() => {
+                // 1. Pass the array key [url, token]
+                // 2. Unpack the array and pass both to the fetcher
+                preload([`${apiUrl}/api/v1/members`, token], ([url, t]) =>
+                  fetcherWithToken(url, t),
+                );
+
+                // 3. Preload the second endpoint
+                preload([`${apiUrl}/api/v1/meetups`, token], ([url, t]) =>
+                  fetcherWithToken(url, t),
+                );
+              }}
             >
               Dashboard
             </Link>

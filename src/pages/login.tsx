@@ -88,6 +88,9 @@ export default function LoginPage() {
         preload([`${apiUrl}/api/v1/members`, response.data.token], ([url, t]) =>
           fetcherWithToken(url, t),
         );
+        preload([`${apiUrl}/api/v1/meetups`, response.data.token], ([url, t]) =>
+          fetcherWithToken(url, t),
+        );
         router.push("/dashboard");
       }
       // eslint-disable-next-line  @typescript-eslint/no-explicit-any
