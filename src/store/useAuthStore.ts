@@ -80,7 +80,7 @@ const useAuthStore = create<useAuthStoreProps>((set, get) => {
       set({ isCheckingToken: true });
       const token = get().token;
       try {
-        const res = await axios.get(`${apiUrl}/api/v1/dashboard/members`, {
+        const res = await axios.get(`${apiUrl}/api/v1/sessions/verify`, {
           headers: {
             Authorization: `Bearer ${token}`,
             Accept: "application/json",
