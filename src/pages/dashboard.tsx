@@ -6,6 +6,7 @@ import MemberCard from "@/components/MemberCard";
 import SkeletonActionButton from "@/components/SkeletonActionButton";
 import SkeletonHackathonCard from "@/components/skeletonComponents/SkeletonHackathonCard";
 import SkeletonMemberCard from "@/components/skeletonComponents/SkeletonMemberCard";
+import SkeletonMeetupCard from "@/components/skeletonComponents/SkeletonMeetupCard";
 import useAuthStore from "@/store/useAuthStore";
 import { apiUrl } from "@/utils/env";
 import { fetcherWithToken } from "@/utils/fetcher";
@@ -56,23 +57,22 @@ export default function Home() {
 
   if (!isClient) return null;
 
-  const isLoading = membersLoading || meetupsLoading || hackathonsLoading;
-  const isError = membersError || meetupsError || hackathonsError;
-
-  if (isLoading) {
+  if (meetupsLoading) {
     return (
       <DashboardLayout pageTitle="HackTrack - Home">
         <h1 className="text-4xl font-bold mt-6">Dashboard</h1>
-        <div className="mt-10">
-          <div className="flex justify-between items-center">
-            <h2 className="text-3xl font-semibold">Control Panel</h2>
+        {isAdmin && (
+          <div className="mt-10">
+            <div className="flex justify-between items-center">
+              <h2 className="text-3xl font-semibold">Control Panel</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+              <SkeletonActionButton />
+              <SkeletonActionButton />
+              <SkeletonActionButton />
+            </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
-            <SkeletonActionButton />
-            <SkeletonActionButton />
-            <SkeletonActionButton />
-          </div>
-        </div>
+        )}
         <div className="mt-10">
           <div className="flex justify-between items-center">
             <h2 className="text-3xl font-semibold">Meetups</h2>
@@ -86,43 +86,7 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
             {[...Array(4)].map((_, index) => (
-              <SkeletonMemberCard key={index} />
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-10">
-          <div className="flex justify-between items-center">
-            <h2 className="text-3xl font-semibold">Hackathons</h2>
-            <Link
-              href="/meetups"
-              className="flex items-center gap-x-2 dark:bg-white dark:hover:bg-[#e0e0e0] dark:text-black transition duration-200 bg-gray-800 hover:bg-gray-950 py-2 px-6 rounded-full font-semibold text-white"
-            >
-              <CircleArrowRight size="18" />
-              View All
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-            {[...Array(4)].map((_, index) => (
-              <SkeletonHackathonCard key={index} />
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-10">
-          <div className="flex justify-between items-center">
-            <h2 className="text-3xl font-semibold">Members</h2>
-            <Link
-              href="/members"
-              className="flex items-center gap-x-2 dark:bg-white dark:hover:bg-[#e0e0e0] dark:text-black transition duration-200 bg-gray-800 hover:bg-gray-950 py-2 px-6 rounded-full font-semibold text-white"
-            >
-              <CircleArrowRight size="18" />
-              View All
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-            {[...Array(4)].map((_, index) => (
-              <SkeletonMemberCard key={index} />
+              <SkeletonMeetupCard key={index} />
             ))}
           </div>
         </div>
@@ -130,10 +94,10 @@ export default function Home() {
     );
   }
 
-  if (isError) {
+  if (meetupsError) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <h1 className="text-4xl font-bold">Error occurred</h1>
+        <h1 className="text-4xl font-bold text-red-500">Error loading dashboard meetups.</h1>
       </div>
     );
   }
@@ -190,21 +154,31 @@ export default function Home() {
             View All
           </Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-          {Array.isArray(hackathons) &&
-            hackathons.map((hackathon: any) => (
-              <HackathonCard
-                key={hackathon.id}
-                id={hackathon.id}
-                number={hackathon.hackathon_number}
-                date={hackathon.date}
-                numberOfUpdates={hackathon.updates.length}
-                hostName={hackathon.host?.name || "unknown host"}
-                updates={hackathon.updates}
-                mutateHackathons={mutateHackathons}
-              />
+        {hackathonsLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
+            {[...Array(4)].map((_, index) => (
+              <SkeletonHackathonCard key={index} />
             ))}
-        </div>
+          </div>
+        ) : hackathonsError ? (
+          <div className="mt-4 text-red-500">Failed to load hackathons.</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
+            {Array.isArray(hackathons) &&
+              hackathons.map((hackathon: any) => (
+                <HackathonCard
+                  key={hackathon.id}
+                  id={hackathon.id}
+                  number={hackathon.hackathon_number}
+                  date={hackathon.date}
+                  numberOfUpdates={hackathon.updates.length}
+                  hostName={hackathon.host?.name || "unknown host"}
+                  updates={hackathon.updates}
+                  mutateHackathons={mutateHackathons}
+                />
+              ))}
+          </div>
+        )}
       </div>
 
       {/* Members */}
@@ -219,16 +193,26 @@ export default function Home() {
             View All
           </Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-          {Array.isArray(members) &&
-            members.map((member: any) => (
-              <MemberCard
-                key={member.id}
-                {...member}
-                mutateMembers={mutateMembers}
-              />
+        {membersLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
+            {[...Array(4)].map((_, index) => (
+              <SkeletonMemberCard key={index} />
             ))}
-        </div>
+          </div>
+        ) : membersError ? (
+          <div className="mt-4 text-red-500">Failed to load active members.</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
+            {Array.isArray(members) &&
+              members.map((member: any) => (
+                <MemberCard
+                  key={member.id}
+                  {...member}
+                  mutateMembers={mutateMembers}
+                />
+              ))}
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );
