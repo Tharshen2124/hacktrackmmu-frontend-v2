@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FilterPopover from ".";
 import Selector from "./FilterComponent/selector";
 import { MemberStatus, MemberStatusLabels } from "@/types/types";
@@ -56,6 +56,14 @@ export default function MemberFilter({
     currentStatus === "all" ? ALL_OPTION : currentStatus,
   );
   const [selectedSort, setSelectedSort] = useState<string>(currentSortBy);
+
+  useEffect(() => {
+    setSelectedStatus(currentStatus === "all" ? ALL_OPTION : currentStatus);
+  }, [currentStatus]);
+
+  useEffect(() => {
+    setSelectedSort(currentSortBy);
+  }, [currentSortBy]);
 
   const handleStatusSelect = (value: string) => {
     setSelectedStatus(value);

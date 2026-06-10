@@ -19,6 +19,11 @@ import { useEffect, useState } from "react";
 import useSWR from "swr";
 
 const ALL_STATUSES = Object.values(MemberStatus);
+const ONBOARDING_STATUSES = [
+  MemberStatus.Registered,
+  MemberStatus.Contacted,
+  MemberStatus.FirstTalkGiven,
+];
 
 const ONBOARDING_SORT_OPTIONS = [
   { value: "newest", label: "Latest Registered" },
@@ -36,7 +41,7 @@ export default function Onboarding() {
   const [isSearching, setIsSearching] = useState(false);
   const isMaxWidth768px = useMediaQuery("(max-width: 768px)");
   const [paginationNumber, setPaginationNumber] = useState(1);
-  const [statusFilter, setStatusFilter] = useState<string[]>(ALL_STATUSES);
+  const [statusFilter, setStatusFilter] = useState<string[]>(ONBOARDING_STATUSES);
   const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT);
 
   useEffect(() => {
@@ -94,8 +99,8 @@ export default function Onboarding() {
   const currentStatusLabels = statusFilter.map((status) => getStatusLabel(status));
 
   const getCurrentSingleStatus = () => {
-    if (statusFilter.length === ALL_STATUSES.length) return "all";
-    return statusFilter[0] || "all";
+    if (statusFilter.length === 1) return statusFilter[0];
+    return "all";
   };
 
   if (!isClient) {
@@ -128,7 +133,7 @@ export default function Onboarding() {
           currentStatus={getCurrentSingleStatus()}
           currentSortBy={sortBy}
           availableStatuses={ALL_STATUSES}
-          defaultStatuses={ALL_STATUSES}
+          defaultStatuses={ONBOARDING_STATUSES}
           availableSortOptions={ONBOARDING_SORT_OPTIONS}
           defaultSort={DEFAULT_SORT}
         />
