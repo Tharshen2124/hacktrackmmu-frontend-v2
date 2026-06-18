@@ -15,6 +15,15 @@ export const ModalLayout: React.FC<ModalProps> = ({
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (
+        target &&
+        target.closest &&
+        (target.closest('[role="listbox"]') || target.closest('[role="option"]'))
+      ) {
+        return;
+      }
+
       if (
         modalRef.current &&
         !modalRef.current.contains(event.target as Node)
