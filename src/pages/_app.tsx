@@ -77,6 +77,10 @@ function AuthRedirectHandler() {
 }
 
 export default function App({ Component, pageProps }: AppProps) {
+  useEffect(() => {
+    document.body.classList.add(hankenGrotesk.className);
+  }, []);
+
   return (
     <ToastProvider>
       <main className={hankenGrotesk.className}>

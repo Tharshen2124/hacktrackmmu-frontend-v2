@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect, useMemo } from "react"; // Add useMemo
+import { useState, useRef, useEffect, useMemo, useCallback } from "react"; // Add useMemo
+import { createPortal } from "react-dom";
 import { ChevronDown } from "lucide-react";
 
 interface Option {
@@ -42,9 +43,45 @@ export const SearchableDropdown = ({
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const portalRef = useRef<HTMLUListElement>(null);
+  const [mounted, setMounted] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: 0, maxHeight: 240 });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const updateCoords = () => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const margin = 16;
+      const spaceBelow = window.innerHeight - rect.bottom - margin;
+      // Allow it to grow up to 500px, but cap it so it stops 16px before the bottom viewport edge
+      const calculatedMaxHeight = Math.min(Math.max(spaceBelow, 240), 500);
+      setCoords({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+        maxHeight: calculatedMaxHeight,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      updateCoords();
+      window.addEventListener("resize", updateCoords);
+      window.addEventListener("scroll", updateCoords, true);
+      return () => {
+        window.removeEventListener("resize", updateCoords);
+        window.removeEventListener("scroll", updateCoords, true);
+      };
+    }
+  }, [isOpen]);
 
   // Helper function to get the display value from an option
-  const getOptionDisplayName = (option: Option) => {
+  const getOptionDisplayName = useCallback((option: Option) => {
     // If date is chosen as displayKey, format it as needed
     if (displayKey === "date" && option.date) {
       try {
@@ -63,7 +100,7 @@ export const SearchableDropdown = ({
     }
     // Default to name or fallback if name is not available
     return option.name || option.date || option.id; // Fallback to id if neither name nor date
-  };
+  }, [displayKey]);
 
   // Flatten options for easy lookup, handling both groups and flat options
   const allOptions = useMemo(() => {
@@ -107,7 +144,7 @@ export const SearchableDropdown = ({
           showAll || getOptionDisplayName(option).toLowerCase().includes(term),
       );
     }
-  }, [options, groups, searchTerm, selectedOption]);
+  }, [options, groups, searchTerm, selectedOption, getOptionDisplayName]);
 
   useEffect(() => {
     const firstSelectableIndex = filteredItems.findIndex(
@@ -144,9 +181,11 @@ export const SearchableDropdown = ({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        !dropdownRef.current.contains(target) &&
+        (!portalRef.current || !portalRef.current.contains(target))
       ) {
         setIsOpen(false);
 
@@ -161,7 +200,7 @@ export const SearchableDropdown = ({
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [selectedOption, searchTerm, value]);
+  }, [selectedOption, searchTerm, value, getOptionDisplayName]);
 
   // Set initial search term when selected value changes
   useEffect(() => {
@@ -170,7 +209,7 @@ export const SearchableDropdown = ({
     } else if (!selectedOption && !isOpen && !value) {
       setSearchTerm("");
     }
-  }, [selectedOption, isOpen, value]);
+  }, [selectedOption, isOpen, value, getOptionDisplayName]);
 
   // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -234,7 +273,7 @@ export const SearchableDropdown = ({
       <label htmlFor={id} className="font-semibold">
         {label}
       </label>
-      <div className="relative mt-1">
+      <div className="relative mt-1" ref={containerRef}>
         <input
           ref={inputRef}
           id={id}
@@ -272,12 +311,19 @@ export const SearchableDropdown = ({
         </button>
       </div>
 
-      {isOpen && (
+      {isOpen && mounted && createPortal(
         <ul
+          ref={portalRef}
           id={`${id}-options`}
           role="listbox"
           aria-labelledby={`${id}-label`}
-          className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-input bg-background py-1 shadow-lg dark:bg-[#333] dark:border-[#555]"
+          className="absolute z-[100] mt-1 overflow-auto rounded-md border border-input bg-background py-1 shadow-lg dark:bg-[#333] dark:border-[#555]"
+          style={{
+            top: `${coords.top}px`,
+            left: `${coords.left}px`,
+            width: `${coords.width}px`,
+            maxHeight: `${coords.maxHeight}px`,
+          }}
         >
           {filteredItems.length === 0 ? (
             <li className="px-4 py-2 text-muted-foreground">
@@ -313,7 +359,8 @@ export const SearchableDropdown = ({
               );
             })
           )}
-        </ul>
+        </ul>,
+        document.body
       )}
 
       {/* Hidden native select for form submission */}
