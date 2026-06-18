@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { ChevronDown, X } from "lucide-react";
 
 interface MultiSelectDropdownProps {
@@ -27,6 +28,42 @@ export const MultiSelectDropdown = ({
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const portalRef = useRef<HTMLUListElement>(null);
+  const [mounted, setMounted] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: 0, maxHeight: 240 });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const updateCoords = () => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const margin = 16;
+      const spaceBelow = window.innerHeight - rect.bottom - margin;
+      // Allow it to grow up to 500px, but cap it so it stops 16px before the bottom viewport edge
+      const calculatedMaxHeight = Math.min(Math.max(spaceBelow, 240), 500);
+      setCoords({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+        maxHeight: calculatedMaxHeight,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      updateCoords();
+      window.addEventListener("resize", updateCoords);
+      window.addEventListener("scroll", updateCoords, true);
+      return () => {
+        window.removeEventListener("resize", updateCoords);
+        window.removeEventListener("scroll", updateCoords, true);
+      };
+    }
+  }, [isOpen]);
 
   // Get selected options objects
   const selectedOptions = options.filter((option) =>
@@ -72,9 +109,11 @@ export const MultiSelectDropdown = ({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        !dropdownRef.current.contains(target) &&
+        (!portalRef.current || !portalRef.current.contains(target))
       ) {
         setIsOpen(false);
         setSearchTerm(""); // Clear search term when closing
@@ -149,7 +188,7 @@ export const MultiSelectDropdown = ({
         </div>
       )}
 
-      <div className="relative mt-2">
+      <div className="relative mt-2" ref={containerRef}>
         <input
           ref={inputRef}
           id={id}
@@ -187,13 +226,20 @@ export const MultiSelectDropdown = ({
         </button>
       </div>
 
-      {isOpen && (
+      {isOpen && mounted && createPortal(
         <ul
+          ref={portalRef}
           id={`${id}-options`}
           role="listbox"
           aria-multiselectable="true"
           aria-labelledby={`${id}-label`}
-          className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-input bg-background py-1 shadow-lg dark:bg-[#333] dark:border-[#555]"
+          className="absolute z-[100] mt-1 overflow-auto rounded-md border border-input bg-background py-1 shadow-lg dark:bg-[#333] dark:border-[#555]"
+          style={{
+            top: `${coords.top}px`,
+            left: `${coords.left}px`,
+            width: `${coords.width}px`,
+            maxHeight: `${coords.maxHeight}px`,
+          }}
         >
           {filteredOptions.length === 0 ? (
             <li className="px-4 py-2 text-muted-foreground">
@@ -224,7 +270,8 @@ export const MultiSelectDropdown = ({
               );
             })
           )}
-        </ul>
+        </ul>,
+        document.body
       )}
 
       {/* Hidden inputs for form submission */}
